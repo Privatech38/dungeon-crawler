@@ -1,28 +1,42 @@
+import { HitBoxBase, HitBox, SphereHitBox } from './HitBox';
+
 class Entity {
-    x: number;
-    y: number;
+    position: { x: number, y: number, z: number };
+    hitBox: HitBoxBase;  // This can be either a HitBox or a SphereHitBox
     health: number;
 
-    constructor(x: number, y: number, health: number) {
-        this.x = x;
-        this.y = y;
+    constructor(x: number, y: number, z: number, health: number, hitBox: HitBoxBase) {
+        this.position = { x, y, z };
+        this.hitBox = hitBox;
         this.health = health;
     }
 
-    public move(dx: number, dy: number): void{
-        this.x += dx;
-        this.y += dy;
-        //todo: movement
+    // Update the position of the entity
+    public updatePosition(x: number, y: number, z: number): void {
+        this.position = { x, y, z };
     }
 
-    public takeDamage(amount: number): void{
+    // Check if the entity collides with a point (projectile hit)
+    public checkCollisionWithPoint(point: { x: number, y: number, z: number }): boolean {
+        return this.hitBox.intersects(point);
+    }
+
+    // Check if this entity collides with another entity
+    public checkCollisionWithEntity(other: Entity): boolean {
+        return this.hitBox.intersectsHitBox(other.hitBox);
+    }
+
+    public takeDamage(amount: number): void {
         this.health -= amount;
-        if (this.health <= 0){
-            this.die()
+        if (this.health <= 0) {
+            this.die();
         }
     }
 
     public die(): void {
         //todo: on death
+        console.log("Entity has died");
     }
 }
+
+export default Entity;
