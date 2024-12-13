@@ -1,25 +1,31 @@
-export abstract class HitBoxBase {
+import Vector from "../Vector";
+
+/**
+ * A class representing a 3D Axis-Aligned Bounding Box (AABB) for collision detection.
+ */
+class HitBox {
     position: { x: number, y: number, z: number };
-
-    protected constructor(position: { x: number, y: number, z: number } = { x: 0, y: 0, z: 0 }) {
-        this.position = position;
-    }
-
-    // Abstract method for intersection with a point (for polymorphism)
-    abstract intersects(point: { x: number, y: number, z: number }): boolean;
-
-    // Abstract method for intersection with another hitbox (for polymorphism)
-    abstract intersectsHitBox(other: HitBoxBase): boolean;
-}
-
-export class HitBox extends HitBoxBase {
     size: { width: number, height: number, depth: number };
 
+    /**
+     * Creates an instance of the HitBox class.
+     *
+     * @param position - The position of the center of the bounding box.
+     * @param width - The width of the bounding box.
+     * @param height - The height of the bounding box.
+     * @param depth - The depth of the bounding box.
+     */
     constructor(position: { x: number, y: number, z: number } = { x: 0, y: 0, z: 0 }, width: number, height: number, depth: number) {
-        super(position);
+        this.position = position;
         this.size = { width, height, depth };
     }
 
+    /**
+     * Checks if a point is inside the bounding box.
+     *
+     * @param point - The point to check for intersection with the bounding box.
+     * @returns `true` if the point is inside the bounding box, `false` otherwise.
+     */
     public intersects(point: { x: number, y: number, z: number }): boolean {
         return (
             point.x >= this.position.x - this.size.width / 2 &&
@@ -31,71 +37,75 @@ export class HitBox extends HitBoxBase {
         );
     }
 
-    public intersectsHitBox(other: HitBoxBase): boolean {
-        if (other instanceof HitBox) {
-            return (
-                this.position.x - this.size.width / 2 < other.position.x + other.size.width / 2 &&
-                this.position.x + this.size.width / 2 > other.position.x - other.size.width / 2 &&
-                this.position.y - this.size.height / 2 < other.position.y + other.size.height / 2 &&
-                this.position.y + this.size.height / 2 > other.position.y - other.size.height / 2 &&
-                this.position.z - this.size.depth / 2 < other.position.z + other.size.depth / 2 &&
-                this.position.z + this.size.depth / 2 > other.position.z - other.size.depth / 2
-            );
-        } else if (other instanceof SphereHitBox) {
-            const distX = Math.abs(this.position.x - other.position.x);
-            const distY = Math.abs(this.position.y - other.position.y);
-            const distZ = Math.abs(this.position.z - other.position.z);
+    /**
+     * Checks if a line intersects the bounding box.
+     *
+     * @param lineStart - The start point of the line.
+     * @param target - The direction (or target point) towards which the line is extended.
+     * @param range - The maximum length of the line.
+     * @returns `true` if the line intersects the bounding box, `false` otherwise.
+     */
+    public intersects_line(
+        lineStart: { x: number, y: number, z: number },
+        target: { x: number, y: number, z: number },
+        range: number
+    ): boolean {
+        // Create a vector to calculate the endpoint of the line
+        const vector = new Vector(lineStart, target, range);
+        const lineEnd = vector.endPoint;
 
-            const closestX = Math.max(0, distX - this.size.width / 2);
-            const closestY = Math.max(0, distY - this.size.height / 2);
-            const closestZ = Math.max(0, distZ - this.size.depth / 2);
+        // Define the min and max bounds of the AABB
+        const min = {
+            x: this.position.x - this.size.width / 2,
+            y: this.position.y - this.size.height / 2,
+            z: this.position.z - this.size.depth / 2,
+        };
+        const max = {
+            x: this.position.x + this.size.width / 2,
+            y: this.position.y + this.size.height / 2,
+            z: this.position.z + this.size.depth / 2,
+        };
 
-            const distance = Math.sqrt(closestX * closestX + closestY * closestY + closestZ * closestZ);
-            return distance <= other.radius;
-        }
+        // Check for intersection using the AABB-line intersection algorithm
+        let tMin = (min.x - lineStart.x) / (lineEnd.x - lineStart.x);
+        let tMax = (max.x - lineStart.x) / (lineEnd.x - lineStart.x);
 
-        return false;
+        if (tMin > tMax) [tMin, tMax] = [tMax, tMin];
+
+        let tyMin = (min.y - lineStart.y) / (lineEnd.y - lineStart.y);
+        let tyMax = (max.y - lineStart.y) / (lineEnd.y - lineStart.y);
+
+        if (tyMin > tyMax) [tyMin, tMax] = [tMax, tyMin];
+
+        if ((tMin > tyMax) || (tyMin > tMax)) return false;
+
+        if (tyMin > tMin) tMin = tyMin;
+        if (tyMax < tMax) tMax = tyMax;
+
+        let tzMin = (min.z - lineStart.z) / (lineEnd.z - lineStart.z);
+        let tzMax = (max.z - lineStart.z) / (lineEnd.z - lineStart.z);
+
+        if (tzMin > tzMax) [tzMin, tzMax] = [tzMax, tzMin];
+
+        return !((tMin > tzMax) || (tzMin > tMax));
     }
-}
 
-export class SphereHitBox extends HitBoxBase {
-    radius: number;
-
-    constructor(position: { x: number, y: number, z: number } = { x: 0, y: 0, z: 0 }, radius: number) {
-        super(position);
-        this.radius = radius;
-    }
-
-    public intersects(point: { x: number, y: number, z: number }): boolean {
-        const distance = Math.sqrt(
-            Math.pow(this.position.x - point.x, 2) +
-            Math.pow(this.position.y - point.y, 2) +
-            Math.pow(this.position.z - point.z, 2)
+    /**
+     * Checks if the current bounding box intersects with another bounding box.
+     *
+     * @param other - The other bounding box to check for intersection with.
+     * @returns `true` if the two bounding boxes intersect, `false` otherwise.
+     */
+    public intersects_hitbox(other: HitBox): boolean {
+        return (
+            this.position.x - this.size.width / 2 < other.position.x + other.size.width / 2 &&
+            this.position.x + this.size.width / 2 > other.position.x - other.size.width / 2 &&
+            this.position.y - this.size.height / 2 < other.position.y + other.size.height / 2 &&
+            this.position.y + this.size.height / 2 > other.position.y - other.size.height / 2 &&
+            this.position.z - this.size.depth / 2 < other.position.z + other.size.depth / 2 &&
+            this.position.z + this.size.depth / 2 > other.position.z - other.size.depth / 2
         );
-        return distance <= this.radius;
-    }
-
-    public intersectsHitBox(other: HitBoxBase): boolean {
-        if (other instanceof SphereHitBox) {
-            const distance = Math.sqrt(
-                Math.pow(this.position.x - other.position.x, 2) +
-                Math.pow(this.position.y - other.position.y, 2) +
-                Math.pow(this.position.z - other.position.z, 2)
-            );
-            return distance <= (this.radius + other.radius);
-        } else if (other instanceof HitBox) {
-            const distX = Math.abs(this.position.x - other.position.x);
-            const distY = Math.abs(this.position.y - other.position.y);
-            const distZ = Math.abs(this.position.z - other.position.z);
-
-            const closestX = Math.max(0, distX - other.size.width / 2);
-            const closestY = Math.max(0, distY - other.size.height / 2);
-            const closestZ = Math.max(0, distZ - other.size.depth / 2);
-
-            const distance = Math.sqrt(closestX * closestX + closestY * closestY + closestZ * closestZ);
-            return distance <= this.radius;
-        }
-
-        return false;
     }
 }
+
+export default HitBox;
