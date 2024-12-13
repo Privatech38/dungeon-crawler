@@ -2,7 +2,7 @@ import {Vector} from "../../Vector"
 import {Entity} from "../../entities/Entity";
 import {CollisionManager} from "../../entities/Collision";
 import {GameManager} from "../../GameManager";
-import {BoxHitbox, Hitbox, SemiCircleHitbox} from "../../entities/Hitbox";
+import {BoxHitbox, Hitbox, SemiCircleHitbox, SphereHitbox} from "../../entities/Hitbox";
 
 
 class Attack {
@@ -16,6 +16,7 @@ class Attack {
     protected readonly isSplashAttack: boolean;
     protected entities: Entity[];
     protected splashHitbox: SemiCircleHitbox;
+    public isActive;
 
     constructor(
         damage: number,
@@ -36,6 +37,7 @@ class Attack {
         this.splashDamage = splashDamage;
         this.splashAngle = splashAngle;
         this.isSplashAttack = splashRadius > 0 && splashAngle > 0; // Check if splash attack is enabled
+        this.isActive = true;
     }
 
     protected applyDamage(entity: Entity): void {
@@ -90,6 +92,9 @@ class Melee extends Attack{
     }
 
     public update_position(): void {
+        if (!this.isActive){
+            return;
+        }
         this.frameCount++;
         if (this.frameCount > this.FPS * this.duration) return;
 
@@ -121,16 +126,22 @@ class Melee extends Attack{
         entities.forEach(entity => {
             if (CollisionManager.checkPointCollision(entity.hitbox, this.target)) {
                 this.applyDamage(entity);
+                this.isActive = false;
             }
         })
     }
 
     private SplashCollisionWithEntity(entities: Entity[]): void {
+        let gotHit: boolean = false;
         entities.forEach(entity => {
             if (CollisionManager.checkCollision(entity.hitbox, this.splashHitbox)){
                 this.applySplashDamage(entity)
+                gotHit = true;
             }
         })
+        if (gotHit) {
+            this.isActive = false;
+        }
     }
 }
 
@@ -175,14 +186,6 @@ class Projectile extends Attack {
         this.target = new Vector();
     }
 
-    private createSplashAttackHitbox(): SemiCircleHitbox {
-        return new SemiCircleHitbox(
-            this.start,
-            this.splashRadius,
-            this.direction,
-        )
-    }
-
     public update_position(): void {
         // Update position using velocity and gravity (gravity affects Z)
         this.target.x += this.initialVelocity.x * this.timeStep;
@@ -192,6 +195,37 @@ class Projectile extends Attack {
 
     public current_position(): { x: number, y: number, z: number } {
         return this.target;
+    }
+
+    private collisionWithEntity(entities: Entity[]): void {
+        entities.forEach(entity => {
+            if (CollisionManager.checkPointCollision(entity.hitbox, this.target)) {
+                this.applyDamage(entity);
+                this.isActive = false;
+            }
+        })
+    }
+
+    private SplashCollisionWithEntity(entities: Entity[]): void {
+        entities.forEach(entity => {
+            //todo: also check if it hits a wall or ground
+            if (CollisionManager.checkPointCollision(entity.hitbox, this.target)) {
+                this.applyDamage(entity);
+                entities.forEach(entity => {
+                    if (CollisionManager.checkCollision(entity.hitbox, this.splashHitbox)){
+                        this.applySplashDamage(entity)
+                    }
+                })
+                this.isActive = false;
+            }
+        })
+    }
+
+    private createSplashAttackHitbox(): SphereHitbox {
+        return new SphereHitbox(
+            this.start,
+            this.splashRadius,
+        )
     }
 }
 
