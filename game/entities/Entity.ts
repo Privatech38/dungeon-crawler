@@ -1,11 +1,11 @@
-import { HitBoxBase, HitBox, SphereHitBox } from './HitBox';
+import HitBox from './HitBox';
 
 class Entity {
     position: { x: number, y: number, z: number };
-    hitBox: HitBoxBase;  // This can be either a HitBox or a SphereHitBox
+    hitBox: HitBox;  // HitBox instance for collision detection
     health: number;
 
-    constructor(x: number, y: number, z: number, health: number, hitBox: HitBoxBase) {
+    constructor(x: number, y: number, z: number, health: number, hitBox: HitBox) {
         this.position = { x, y, z };
         this.hitBox = hitBox;
         this.health = health;
@@ -14,18 +14,25 @@ class Entity {
     // Update the position of the entity
     public updatePosition(x: number, y: number, z: number): void {
         this.position = { x, y, z };
+        this.hitBox.position = this.position; // Update the position of the hitbox as well
     }
 
-    // Check if the entity collides with a point (projectile hit)
+    // Check if the entity collides with a point (e.g., projectile hit)
     public checkCollisionWithPoint(point: { x: number, y: number, z: number }): boolean {
         return this.hitBox.intersects(point);
     }
 
-    // Check if this entity collides with another entity
+    // Check if this entity collides with another entity's hitbox
     public checkCollisionWithEntity(other: Entity): boolean {
-        return this.hitBox.intersectsHitBox(other.hitBox);
+        return this.hitBox.intersects_hitbox(other.hitBox);
     }
 
+    // Check if the entity is affected by a splash area
+    public checkCollisionWithSplash(splashPosition: { x: number, y: number, z: number }, splashRadius: number): boolean {
+        return this.hitBox.intersects_splash(splashPosition, splashRadius);
+    }
+
+    // Apply damage to the entity
     public takeDamage(amount: number): void {
         this.health -= amount;
         if (this.health <= 0) {
@@ -33,9 +40,10 @@ class Entity {
         }
     }
 
+    // Handle the entity's death
     public die(): void {
-        //todo: on death
         console.log("Entity has died");
+        // Additional death logic here (e.g., remove entity from the game, play death animation, etc.)
     }
 }
 

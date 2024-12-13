@@ -1,7 +1,8 @@
 import Attack from "./Attack";
+import Splash from "./Splash";
 import Vector from "../Vector";
+import GameManager from "../GameManager";
 
-// Class for Melee attack (inherits from Attack)
 class Melee extends Attack {
     private readonly attackRange: number;
     private readonly duration: number;
@@ -9,14 +10,6 @@ class Melee extends Attack {
     private frameCount: number;
     private readonly timeStep: number;
 
-    /**
-     * @param startPosition - The initial position of the melee attack (x, y, z).
-     * @param targetPosition - The target position for the melee attack (x, y, z).
-     * @param damage - The damage dealt by the melee attack.
-     * @param attackRange - The range of the melee attack.
-     * @param duration - The duration (in seconds) of the melee attack.
-     * @param FPS - The frames per second for the update cycle.
-     */
     constructor(
         startPosition: { x: number, y: number, z: number },
         targetPosition: { x: number, y: number, z: number },
@@ -33,28 +26,41 @@ class Melee extends Attack {
         this.endPosition = new Vector(this.startPosition, this.targetPosition, 0);
     }
 
-    /**
-     * Updates the position of the melee attack over time.
-     */
     public update_position(): void {
         this.frameCount++;
-
-        // Check if attack is finished
-        if (this.frameCount > this.FPS * this.duration) {
-            return;
-        }
-
-        // Calculate new position based on time segment and range
+        if (this.frameCount > this.FPS * this.duration) return;
         this.endPosition.length = this.timeStep * this.frameCount * this.attackRange;
         this.endPosition.recalculate();
     }
 
-    /**
-     * Returns the current position of the melee attack.
-     * @returns lineEnd - The start and end points of the melee attack range.
-     */
-    public get_position():{ x: number; y: number; z: number }  {
+    public get_position(): { x: number, y: number, z: number } {
         return this.endPosition.endPoint;
+    }
+
+    /**
+     * Notify GameManager about splash damage.
+     * @param splash The splash effect to check for.
+     * @param gameManager The GameManager instance to handle splash damage application.
+     */
+    public apply_splash(splash: Splash, gameManager: GameManager): void {
+        gameManager.apply_splash_damage(splash, this.damage);
     }
 }
 
+
+/*
+let m = new Melee(
+    {x: 0, y: 0, z: 0},
+    {x: 0, y: 1, z: 0},
+    1,
+    5,
+    0.5,
+    60
+)
+
+for (let i = 0; i < 30; i++) {
+    m.update_position();
+    console.log(m.get_position());
+}
+
+ */

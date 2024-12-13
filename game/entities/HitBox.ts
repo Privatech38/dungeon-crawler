@@ -106,6 +106,24 @@ class HitBox {
             this.position.z + this.size.depth / 2 > other.position.z - other.size.depth / 2
         );
     }
+
+    /**
+     * Checks if the hitbox intersects with a splash (spherical area).
+     * @param splashPosition - The position of the splash center.
+     * @param radius - The radius of the splash.
+     * @returns `true` if the hitbox intersects with the splash, `false` otherwise.
+     */
+    public intersects_splash(splashPosition: { x: number, y: number, z: number }, radius: number): boolean {
+        // Calculate the distance from the hitbox center to the splash center
+        const distance = Math.sqrt(
+            Math.pow(this.position.x - splashPosition.x, 2) +
+            Math.pow(this.position.y - splashPosition.y, 2) +
+            Math.pow(this.position.z - splashPosition.z, 2)
+        );
+
+        // Check if the hitbox is within the splash radius
+        return distance <= radius;
+    }
 }
 
 export default HitBox;
