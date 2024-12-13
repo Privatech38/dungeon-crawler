@@ -1,58 +1,58 @@
-import Vector from '../Vector'
+import Attack from './Attack'
+import Vector from "../Vector";
 
-class Projectile {
-    private readonly startPosition: { x: number, y: number, z: number }; // Starting position (position of bow)
-    private readonly targetPosition: { x: number, y: number, z: number }; // Position of target (mouse pointer / AI pointer position)
-    private readonly velocity: number; // Initial velocity of the arrow
-    private readonly damage: number;
-    private readonly FPS: number;
-
+// Class for Projectile attack (inherits from Attack)
+class Projectile extends Attack {
+    private readonly velocity: number; // Initial velocity of the projectile
+    private readonly gravity: number = 9.81; // Gravity constant
     private currentPosition: { x: number, y: number, z: number };
-    private initialVelocity: { x: number, y: number, z: number }; // Initial velocity vector components
-
-    private readonly gravity: number;
+    private velocityVector: { x: number, y: number, z: number }; // Split velocity into components
+    private time: number = 0; // Time since launch
 
     constructor(
         startPosition: { x: number, y: number, z: number },
         targetPosition: { x: number, y: number, z: number },
-        velocity: number,
         damage: number,
-        FPS: number,
+        velocity: number,
+        FPS: number
     ) {
-        // Initialize positions as dictionaries (objects)
-        this.startPosition = startPosition;
-        this.targetPosition = targetPosition;
+        super(startPosition, targetPosition, damage, FPS);
         this.velocity = velocity;
-        this.damage = damage;
-        this.FPS = FPS;
+        this.currentPosition = { x: startPosition.x, y: startPosition.y, z: startPosition.z };
 
-        this.initialVelocity = this.initial_velocity_vector();
-        this.currentPosition = { x: this.startPosition.x, y: this.startPosition.y, z: this.startPosition.z };
-
-        this.gravity = 9.81;
+        // Calculate the initial direction and velocity vector
+        this.velocityVector = new Vector(startPosition, targetPosition, velocity).endPoint;
     }
 
+    /**
+     * Update the projectile's position based on velocity and gravity.
+     * This is done by calculating the movement for each frame.
+     */
     public update_position(): void {
-        // Update position using velocity and gravity (gravity affects Z)
+        this.time += 1 / this.FPS; // Increment time
 
-        let time = 1/this.FPS;
-        this.currentPosition.x += this.initialVelocity.x * time;
-        this.currentPosition.y += this.initialVelocity.y * time;
-        this.currentPosition.z += this.initialVelocity.z * time - (this.gravity * Math.pow(time, 2)) / 2; // Gravity applied to Z (vertical movement)
+        // Calculate the new position based on velocity and time
+        this.currentPosition.x = this.startPosition.x + this.velocityVector.x * this.time;
+        this.currentPosition.y = this.startPosition.y + this.velocityVector.y * this.time;
+
+        // Gravity only affects the vertical (z) direction
+        this.currentPosition.z = this.startPosition.z + this.velocityVector.z * this.time - (this.gravity * Math.pow(this.time, 2)) / 2;
     }
 
-    private initial_velocity_vector(): { x: number, y: number, z: number } {
-        let vector: Vector = new Vector(this.startPosition, this.targetPosition, this.velocity)
-        return vector.endPoint;
-    }
-
-    public current_position(): { x: number, y: number, z: number } {
+    /**
+     * Get the current position of the projectile
+     * @returns The current position of the projectile
+     */
+    public get_position(): { x: number, y: number, z: number } {
         return this.currentPosition;
     }
 
-    public get_damage(): number {
-        return this.damage;
+    /**
+     * This is an implementation of the abstract method from Attack.
+     * It retrieves the position of the projectile.
+     */
+    public current_position(): { x: number, y: number, z: number } {
+        return this.get_position();
     }
 }
 
-export default Projectile;

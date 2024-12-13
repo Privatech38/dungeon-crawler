@@ -77,6 +77,33 @@ class Vector {
         this.magnitude = this.get_magnitude();
         this.endPoint = this.compute_end_point();
     }
+
+    /**
+     * Getter for the x component of the direction vector.
+     *
+     * @returns The x component of the direction vector.
+     */
+    get x(): number {
+        return this.direction.x;
+    }
+
+    /**
+     * Getter for the y component of the direction vector.
+     *
+     * @returns The y component of the direction vector.
+     */
+    get y(): number {
+        return this.direction.y;
+    }
+
+    /**
+     * Getter for the z component of the direction vector.
+     *
+     * @returns The z component of the direction vector.
+     */
+    get z(): number {
+        return this.direction.z;
+    }
 }
 
 export default Vector;
