@@ -148,13 +148,14 @@ class Melee extends Attack{
 class Projectile extends Attack {
     private readonly timeStep: number;
     private readonly attackRange: number;
-    private target: Vector;
+    private readonly target: Vector;
     private readonly velocity: number;
     private readonly initialVelocity: Vector;
     private readonly gravity: number;
 
     private readonly direction: Vector;
     private readonly magnitude: number;
+    private frameCount: number;
 
     constructor(
         damage: number,
@@ -165,7 +166,8 @@ class Projectile extends Attack {
         entities: Entity[],
         splashRadius: number = 0,
         splashDamage: number = 0,
-        splashAngle: number = 0,
+        splashAngle: number = 360,
+        gravity: number = 9.81,
     ) {
         super(
             damage,
@@ -177,20 +179,29 @@ class Projectile extends Attack {
             splashDamage,
             splashAngle,
         );
-        this.gravity = 9.81;
+        this.gravity = gravity;
         this.timeStep = 1 / this.FPS;
         this.velocity = velocity;
         this.direction = Vector.getDirectionVector(this.start, this.mousePosition);
         this.magnitude = Vector.getMagnitude(this.direction)
         this.initialVelocity = this.start.computeEndPoint(this.direction, this.magnitude, this.velocity);
-        this.target = new Vector();
+        this.target = new Vector(this.start.x, this.start.y, this.start.z);
+        this.frameCount = 0;
     }
 
     public update_position(): void {
+        this.frameCount++;
         // Update position using velocity and gravity (gravity affects Z)
         this.target.x += this.initialVelocity.x * this.timeStep;
         this.target.y += this.initialVelocity.y * this.timeStep;
-        this.target.z += this.initialVelocity.z * this.timeStep - (this.gravity * Math.pow(this.timeStep, 2)) / 2; // Gravity applied to Z (vertical movement)
+        this.target.z += this.initialVelocity.z * this.timeStep - 0.5 * this.gravity * Math.pow(this.timeStep * this.frameCount, 2);
+        // check if its splash or point attack
+        if (this.isSplashAttack){
+            this.SplashCollisionWithEntity(this.entities)
+        }
+        else {
+            this.collisionWithEntity(this.entities)
+        }
     }
 
     public current_position(): { x: number, y: number, z: number } {

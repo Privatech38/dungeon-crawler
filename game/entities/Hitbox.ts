@@ -32,7 +32,14 @@ class BoxHitbox extends Hitbox {
     depth: number;
 
     constructor(position: Vector, width: number, height: number, depth: number, isActive: boolean = true) {
-        super(position, isActive);
+        super(
+            new Vector(
+                position.x - width / 2,
+                position.y - height / 2,
+                position.z - depth / 2
+            ),
+            isActive
+        );
         this.width = width;
         this.height = height;
         this.depth = depth;
