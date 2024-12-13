@@ -1,21 +1,28 @@
 import {Vector} from "../../Vector"
 import {Entity} from "../../entities/Entity";
+import {CollisionManager} from "../../entities/Collision";
+import {GameManager} from "../../GameManager";
+import {SemiCircleHitbox} from "../../entities/Hitbox";
+
 
 class Attack {
     private readonly damage: number;
     protected readonly start: Vector;
     protected readonly mousePosition: Vector;
     protected readonly FPS: number;
-    private readonly splashRadius: number;
-    private readonly splashDamage: number;
-    private readonly splashAngle: number; // Angle in degrees (0 to 360)
-    private readonly isSplashAttack: boolean;
+    protected readonly splashRadius: number;
+    protected readonly splashDamage: number;
+    protected readonly splashAngle: number; // Angle in degrees (0 to 360)
+    protected readonly isSplashAttack: boolean;
+    protected entities: Entity[];
+    protected splashHitbox: SemiCircleHitbox;
 
     constructor(
         damage: number,
         start: Vector,
         mousePosition: Vector,
         FPS: number,
+        entities: Entity[],
         splashRadius: number = 0,
         splashDamage: number = 0,
         splashAngle: number = 0,
@@ -24,20 +31,19 @@ class Attack {
         this.start = start;
         this.mousePosition = mousePosition;
         this.FPS = FPS;
+        this.entities = entities;
         this.splashRadius = splashRadius;
         this.splashDamage = splashDamage;
         this.splashAngle = splashAngle;
         this.isSplashAttack = splashRadius > 0 && splashAngle > 0; // Check if splash attack is enabled
     }
 
-    private applyDamage(entity: Entity): void {
+    protected applyDamage(entity: Entity): void {
         entity.takeDamage(this.damage);
     }
 
-    private applySplashDamage(entities: Entity[]){
-        entities.forEach(entity => {
-            entity.takeDamage(this.splashDamage);
-        })
+    protected applySplashDamage(entity: Entity){
+        entity.takeDamage(this.splashDamage);
     }
 }
 
@@ -56,6 +62,7 @@ class Melee extends Attack{
         start: Vector,
         mousePosition: Vector,
         FPS: number,
+        entities: Entity[],
         duration: number,
         attackRange: number,
         splashRadius: number = 0,
@@ -67,6 +74,7 @@ class Melee extends Attack{
             start,
             mousePosition,
             FPS,
+            entities,
             splashRadius,
             splashDamage,
             splashAngle,
@@ -78,6 +86,15 @@ class Melee extends Attack{
         this.direction = Vector.getDirectionVector(this.start, this.mousePosition);
         this.magnitude = Vector.getMagnitude(this.direction)
         this.target = new Vector();
+        if (this.isSplashAttack) {this.createSplashAttackHitbox()}
+    }
+
+    private createSplashAttackHitbox(): SemiCircleHitbox {
+        return new SemiCircleHitbox(
+            this.start,
+            this.splashRadius,
+            this.direction,
+        )
     }
 
     public update_position(): void {
@@ -85,11 +102,31 @@ class Melee extends Attack{
         if (this.frameCount > this.FPS * this.duration) return;
         let length = this.timeStep * this.frameCount * this.attackRange;
         this.target = this.target.computeEndPoint(this.direction, this.magnitude, length);
+        if (this.isSplashAttack){ this.SplashCollisionWithEntity(this.entities) }
+        else { this.collisionWithEntity(this.entities) }
     }
 
     public get_position(): { x: number, y: number, z: number } {
         return this.target;
     }
+
+    private collisionWithEntity(entities: Entity[]): void {
+        entities.forEach(entity => {
+            if (CollisionManager.checkPointCollision(entity.hitbox, this.target)) {
+                this.applyDamage(entity);
+            }
+        })
+    }
+
+    private SplashCollisionWithEntity(entities: Entity[]): void {
+        entities.forEach(entity => {
+            if (CollisionManager.checkCollision(entity.hitbox, this.splashHitbox)){
+                this.applySplashDamage(entity)
+            }
+        })
+    }
+
+
 }
 
 export { Attack, Melee }

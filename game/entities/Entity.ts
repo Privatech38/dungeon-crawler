@@ -14,6 +14,7 @@ class Entity {
 
     updatePosition(vector: Vector): void {
         this.position = vector;
+        this.hitbox.position = vector;
     }
 
     takeDamage(damage: number): void {
