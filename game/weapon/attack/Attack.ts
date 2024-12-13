@@ -2,11 +2,11 @@ import {Vector} from "../../Vector"
 import {Entity} from "../../entities/Entity";
 import {CollisionManager} from "../../entities/Collision";
 import {GameManager} from "../../GameManager";
-import {SemiCircleHitbox} from "../../entities/Hitbox";
+import {BoxHitbox, Hitbox, SemiCircleHitbox} from "../../entities/Hitbox";
 
 
 class Attack {
-    private readonly damage: number;
+    protected readonly damage: number;
     protected readonly start: Vector;
     protected readonly mousePosition: Vector;
     protected readonly FPS: number;
@@ -89,25 +89,32 @@ class Melee extends Attack{
         if (this.isSplashAttack) {this.createSplashAttackHitbox()}
     }
 
+    public update_position(): void {
+        this.frameCount++;
+        if (this.frameCount > this.FPS * this.duration) return;
+
+        let length = this.timeStep * this.frameCount * this.attackRange;
+        this.target = this.target.computeEndPoint(this.direction, this.magnitude, length);
+
+        // check if its splash or point attack
+        if (this.isSplashAttack){
+            this.SplashCollisionWithEntity(this.entities)
+        }
+        else {
+            this.collisionWithEntity(this.entities)
+        }
+    }
+
+    public get_position(): { x: number, y: number, z: number } {
+        return this.target;
+    }
+
     private createSplashAttackHitbox(): SemiCircleHitbox {
         return new SemiCircleHitbox(
             this.start,
             this.splashRadius,
             this.direction,
         )
-    }
-
-    public update_position(): void {
-        this.frameCount++;
-        if (this.frameCount > this.FPS * this.duration) return;
-        let length = this.timeStep * this.frameCount * this.attackRange;
-        this.target = this.target.computeEndPoint(this.direction, this.magnitude, length);
-        if (this.isSplashAttack){ this.SplashCollisionWithEntity(this.entities) }
-        else { this.collisionWithEntity(this.entities) }
-    }
-
-    public get_position(): { x: number, y: number, z: number } {
-        return this.target;
     }
 
     private collisionWithEntity(entities: Entity[]): void {
@@ -125,8 +132,67 @@ class Melee extends Attack{
             }
         })
     }
-
-
 }
 
-export { Attack, Melee }
+class Projectile extends Attack {
+    private readonly timeStep: number;
+    private readonly attackRange: number;
+    private target: Vector;
+    private readonly velocity: number;
+    private readonly initialVelocity: Vector;
+    private readonly gravity: number;
+
+    private readonly direction: Vector;
+    private readonly magnitude: number;
+
+    constructor(
+        damage: number,
+        start: Vector,
+        mousePosition: Vector,
+        FPS: number,
+        velocity: number,
+        entities: Entity[],
+        splashRadius: number = 0,
+        splashDamage: number = 0,
+        splashAngle: number = 0,
+    ) {
+        super(
+            damage,
+            start,
+            mousePosition,
+            FPS,
+            entities,
+            splashRadius,
+            splashDamage,
+            splashAngle,
+        );
+        this.gravity = 9.81;
+        this.timeStep = 1 / this.FPS;
+        this.velocity = velocity;
+        this.direction = Vector.getDirectionVector(this.start, this.mousePosition);
+        this.magnitude = Vector.getMagnitude(this.direction)
+        this.initialVelocity = this.start.computeEndPoint(this.direction, this.magnitude, this.velocity);
+        this.target = new Vector();
+    }
+
+    private createSplashAttackHitbox(): SemiCircleHitbox {
+        return new SemiCircleHitbox(
+            this.start,
+            this.splashRadius,
+            this.direction,
+        )
+    }
+
+    public update_position(): void {
+        // Update position using velocity and gravity (gravity affects Z)
+        this.target.x += this.initialVelocity.x * this.timeStep;
+        this.target.y += this.initialVelocity.y * this.timeStep;
+        this.target.z += this.initialVelocity.z * this.timeStep - (this.gravity * Math.pow(this.timeStep, 2)) / 2; // Gravity applied to Z (vertical movement)
+    }
+
+    public current_position(): { x: number, y: number, z: number } {
+        return this.target;
+    }
+}
+
+export { Attack, Melee, Projectile };
