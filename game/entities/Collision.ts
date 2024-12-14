@@ -1,13 +1,13 @@
 import { Hitbox } from "./Hitbox";
-import { Vector } from "../Vector";
+import { Vector3 } from "../Vector";
 
 class CollisionResult {
     collides: boolean;
     hitboxA: Hitbox;
     hitboxB: Hitbox;
-    collisionPoint: Vector | null;
+    collisionPoint: Vector3 | null;
 
-    constructor(collides: boolean, hitboxA: Hitbox, hitboxB: Hitbox, collisionPoint: Vector | null = null) {
+    constructor(collides: boolean, hitboxA: Hitbox, hitboxB: Hitbox, collisionPoint: Vector3 | null = null) {
         this.collides = collides;
         this.hitboxA = hitboxA;
         this.hitboxB = hitboxB;
@@ -19,26 +19,11 @@ class CollisionManager {
     static checkCollision(hitboxA: Hitbox, hitboxB: Hitbox): CollisionResult {
         if (!hitboxA.isActive || !hitboxB.isActive) return new CollisionResult(false, hitboxA, hitboxB);
 
-        if (hitboxA.checkCollision(hitboxB)) {
-            const collisionPoint = hitboxA.position.add(hitboxB.position).multiply(0.5);
+        if (hitboxA.collides(hitboxB)) {
+            const collisionPoint = hitboxA.center.add(hitboxB.center).scale(0.5);
             return new CollisionResult(true, hitboxA, hitboxB, collisionPoint);
         }
         return new CollisionResult(false, hitboxA, hitboxB);
-    }
-
-    static checkPointCollision(hitbox: Hitbox, point: Vector): boolean {
-        return hitbox.isActive && hitbox.checkPointCollision(point);
-    }
-
-    static checkMultipleCollisions(hitboxes: Hitbox[], target: Hitbox): CollisionResult[] {
-        const results: CollisionResult[] = [];
-        hitboxes.forEach(hitbox => {
-            if (hitbox.checkCollision(target)) {
-                const collisionPoint = hitbox.position.add(target.position).multiply(0.5);
-                results.push(new CollisionResult(true, hitbox, target, collisionPoint));
-            }
-        });
-        return results;
     }
 }
 

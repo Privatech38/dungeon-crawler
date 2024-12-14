@@ -1,89 +1,45 @@
-class Vector {
-    x: number;
-    y: number;
-    z: number;
+class Vector3 {
+    constructor(public x: number, public y: number, public z: number) {}
 
-    constructor(x: number = 0, y: number = 0, z: number = 0) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    // Check if vectors are the same
+    equals(v: Vector3): boolean {
+        return this.x === v.x && this.y === v.y && this.z === v.z;
     }
 
-    add(other: Vector): Vector {
-        return new Vector(this.x + other.x, this.y + other.y, this.z + other.z);
+    // Add two vectors
+    add(v: Vector3): Vector3 {
+        return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
     }
 
-    subtract(other: Vector): Vector {
-        return new Vector(this.x - other.x, this.y - other.y, this.z - other.z);
+    // Subtract two vectors
+    subtract(v: Vector3): Vector3 {
+        return new Vector3(this.x - v.x, this.y - v.y, this.z - v.z);
     }
 
-    multiply(scalar: number): Vector {
-        return new Vector(this.x * scalar, this.y * scalar, this.z * scalar);
+    // Scale the vector
+    scale(s: number): Vector3 {
+        return new Vector3(this.x * s, this.y * s, this.z * s);
     }
 
-    distanceTo(other: Vector): number {
-        return Math.sqrt(
-            Math.pow(this.x - other.x, 2) +
-            Math.pow(this.y - other.y, 2) +
-            Math.pow(this.z - other.z, 2)
+    // Compute dot product
+    dot(v: Vector3): number {
+        return this.x * v.x + this.y * v.y + this.z * v.z;
+    }
+
+    // Compute cross product
+    cross(v: Vector3): Vector3 {
+        return new Vector3(
+            this.y * v.z - this.z * v.y,
+            this.z * v.x - this.x * v.z,
+            this.x * v.y - this.y * v.x
         );
     }
 
-    dot(other: Vector): number {
-        return this.x * other.x + this.y * other.y + this.z * other.z;
-    }
-
-    cross(other: Vector): Vector {
-        return new Vector(
-            this.y * other.z - this.z * other.y,
-            this.z * other.x - this.x * other.z,
-            this.x * other.y - this.y * other.x
-        );
-    }
-
-    normalize(): Vector {
+    // Normalize the vector
+    normalize(): Vector3 {
         const length = Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
-        return length === 0 ? new Vector(0, 0, 0) : this.multiply(1 / length);
-    }
-
-    isZero(): boolean {
-        return this.x === 0 && this.y === 0 && this.z === 0;
-    }
-
-    projectOnto(other: Vector): number {
-        const dotProduct = this.dot(other);
-        const otherLengthSquared = other.dot(other);
-        return dotProduct / otherLengthSquared;
-    }
-
-    getDirectionVector(end: Vector): Vector {
-        return end.subtract(new Vector(this.x, this.y, this.z)).normalize();
-    }
-
-    magnitude(): number {
-        return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
-    }
-
-    computeEndPoint(direction: Vector, magnitude: number, scale: number): Vector {
-        return direction.multiply(scale / magnitude);
-    }
-
-    static getAngleBetweenVectors(v1: Vector, v2: Vector): number {
-        const dotProduct = v1.dot(v2);
-        const magnitudeV1 = v1.magnitude();
-        const magnitudeV2 = v2.magnitude();
-
-        if (magnitudeV1 === 0 || magnitudeV2 === 0) {
-            return 0; // Avoid division by zero
-        }
-
-        const cosTheta = dotProduct / (magnitudeV1 * magnitudeV2);
-        return Math.acos(Math.min(Math.max(cosTheta, -1), 1));
-    }
-
-    equals(other: Vector): boolean {
-        return this.x === other.x && this.y === other.y && this.z === other.z;
+        return new Vector3(this.x / length, this.y / length, this.z / length);
     }
 }
 
-export { Vector }
+export { Vector3 };
