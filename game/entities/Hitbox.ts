@@ -1,195 +1,114 @@
 import {Vector} from "../Vector";
 
-abstract class Hitbox {
-    position: Vector;
-    isActive: boolean;
-
-    constructor(position: Vector, isActive: boolean = true) {
-        this.position = position;
-        this.isActive = isActive;
-    }
-
-    abstract checkCollision(other: Hitbox): boolean;
+export abstract class Hitbox {
+    abstract checkHitboxCollision(otherHitbox: Hitbox): boolean;
     abstract checkPointCollision(point: Vector): boolean;
-
-    deactivate() {
-        this.isActive = false;
-    }
-
-    activate() {
-        this.isActive = true;
-    }
-
-    move(newPosition: Vector) {
-        this.position = newPosition;
-    }
 }
 
-// Box Hitbox (3D Rectangular Prism)
-class BoxHitbox extends Hitbox {
-    width: number;
-    height: number;
-    depth: number;
-
-    constructor(position: Vector, width: number, height: number, depth: number, isActive: boolean = true) {
-        super(
-            new Vector(
-                position.x - width / 2,
-                position.y - height / 2,
-                position.z - depth / 2
-            ),
-            isActive
-        );
-        this.width = width;
-        this.height = height;
-        this.depth = depth;
+export class BoxHitbox extends Hitbox {
+    constructor(public position: Vector, public width: number, public height: number) {
+        super();
     }
 
-    checkCollision(other: Hitbox): boolean {
-        if (other instanceof BoxHitbox) {
-            return this.isCollidingWithBox(other);
-        } else if (other instanceof SphereHitbox) {
-            return this.isCollidingWithSphere(other);
-        } else if (other instanceof SemiCircleHitbox) {
-            return this.isCollidingWithSemiCircle(other);
+    // Box vs Box collision check (non-overlapping and overlapping)
+    checkHitboxCollision(otherHitbox: Hitbox): boolean {
+        if (otherHitbox instanceof BoxHitbox) {
+            const box1 = this;
+            const box2 = otherHitbox;
+
+            // Check if boxes are overlapping
+            return !(box1.position.x + box1.width < box2.position.x ||
+                box1.position.x > box2.position.x + box2.width ||
+                box1.position.y + box1.height < box2.position.y ||
+                box1.position.y > box2.position.y + box2.height);
+        } else if (otherHitbox instanceof SphereHitbox) {
+            // Box vs Sphere collision
+            return this.checkSphereCollision(otherHitbox);
+        } else if (otherHitbox instanceof SemiCircleHitbox) {
+            // Box vs SemiCircle collision
+            return this.checkSemiCircleCollision(otherHitbox);
         }
         return false;
     }
 
+    // Check if a point is inside the box
     checkPointCollision(point: Vector): boolean {
-        return (
-            point.x >= this.position.x && point.x <= this.position.x + this.width &&
-            point.y >= this.position.y && point.y <= this.position.y + this.height &&
-            point.z >= this.position.z && point.z <= this.position.z + this.depth
-        );
+        return point.x >= this.position.x && point.x <= this.position.x + this.width &&
+            point.y >= this.position.y && point.y <= this.position.y + this.height;
     }
 
-    private isCollidingWithBox(other: BoxHitbox): boolean {
-        const a = this.position;
-        const b = other.position;
-        const overlapX = a.x < b.x + other.width && a.x + this.width > b.x;
-        const overlapY = a.y < b.y + other.height && a.y + this.height > b.y;
-        const overlapZ = a.z < b.z + other.depth && a.z + this.depth > b.z;
-        return overlapX && overlapY && overlapZ;
+    // Box vs Sphere collision logic
+    private checkSphereCollision(sphere: SphereHitbox): boolean {
+        const closestPoint = sphere.position.closestPointOnBox(this);
+        return closestPoint.distanceTo(sphere.position) <= sphere.radius;
     }
 
-    private isCollidingWithSphere(sphere: SphereHitbox): boolean {
-        const closestX = Math.max(this.position.x, Math.min(sphere.position.x, this.position.x + this.width));
-        const closestY = Math.max(this.position.y, Math.min(sphere.position.y, this.position.y + this.height));
-        const closestZ = Math.max(this.position.z, Math.min(sphere.position.z, this.position.z + this.depth));
-        const distance = Math.sqrt(Math.pow(closestX - sphere.position.x, 2) +
-            Math.pow(closestY - sphere.position.y, 2) +
-            Math.pow(closestZ - sphere.position.z, 2));
-        return distance <= sphere.radius;
-    }
-
-    private isCollidingWithSemiCircle(semicircle: SemiCircleHitbox): boolean {
-        const direction = semicircle.direction.normalize();
-        const distance = this.position.distanceTo(semicircle.center);
-        const projection = this.position.subtract(semicircle.center).projectOnto(direction);
-        const radius = semicircle.radius;
-
-        return distance <= radius && projection >= 0 && projection <= radius;
+    // Box vs SemiCircle collision (simplified for this example)
+    private checkSemiCircleCollision(semiCircle: SemiCircleHitbox): boolean {
+        const closestPoint = semiCircle.position.closestPointOnBox(this);
+        return closestPoint.distanceTo(semiCircle.position) <= semiCircle.radius;
     }
 }
 
-// Sphere Hitbox (3D Sphere)
-class SphereHitbox extends Hitbox {
-    radius: number;
-
-    constructor(position: Vector, radius: number, isActive: boolean = true) {
-        super(position, isActive);
-        this.radius = radius;
+export class SemiCircleHitbox extends Hitbox {
+    constructor(public position: Vector, public direction: Vector, public radius: number, public angle: number) {
+        super();
     }
 
-    checkCollision(other: Hitbox): boolean {
-        if (other instanceof SphereHitbox) {
-            return this.isCollidingWithSphere(other);
-        } else if (other instanceof BoxHitbox) {
-            return this.isCollidingWithBox(other);
-        } else if (other instanceof SemiCircleHitbox) {
-            return this.isCollidingWithSemiCircle(other);
+    checkHitboxCollision(otherHitbox: Hitbox): boolean {
+        if (otherHitbox instanceof BoxHitbox) {
+            return otherHitbox.checkHitboxCollision(this);
+        } else if (otherHitbox instanceof SemiCircleHitbox) {
+            return this.checkSemiCircleCollision(otherHitbox);
+        } else if (otherHitbox instanceof SphereHitbox) {
+            return this.checkSphereCollision(otherHitbox);
         }
         return false;
     }
 
     checkPointCollision(point: Vector): boolean {
         const distance = this.position.distanceTo(point);
-        return distance <= this.radius;
+        return distance <= this.radius && point.y <= this.position.y;
     }
 
-    private isCollidingWithSphere(other: SphereHitbox): boolean {
+    private checkSemiCircleCollision(other: SemiCircleHitbox): boolean {
         const distance = this.position.distanceTo(other.position);
         return distance <= this.radius + other.radius;
     }
 
-    private isCollidingWithBox(box: BoxHitbox): boolean {
-        const closestX = Math.max(box.position.x, Math.min(this.position.x, box.position.x + box.width));
-        const closestY = Math.max(box.position.y, Math.min(this.position.y, box.position.y + box.height));
-        const closestZ = Math.max(box.position.z, Math.min(this.position.z, box.position.z + box.depth));
-        const distance = Math.sqrt(Math.pow(closestX - this.position.x, 2) +
-            Math.pow(closestY - this.position.y, 2) +
-            Math.pow(closestZ - this.position.z, 2));
-        return distance <= this.radius;
-    }
-
-    private isCollidingWithSemiCircle(semicircle: SemiCircleHitbox): boolean {
-        const distance = this.position.distanceTo(semicircle.center);
-        const projection = this.position.subtract(semicircle.center).projectOnto(semicircle.direction);
-        return distance <= semicircle.radius && projection >= 0 && projection <= semicircle.radius;
+    private checkSphereCollision(sphere: SphereHitbox): boolean {
+        const closestPoint = sphere.position.closestPointOnBox(this);
+        return closestPoint.distanceTo(sphere.position) <= sphere.radius;
     }
 }
 
-// 2D Semi-Circle Hitbox
-class SemiCircleHitbox extends Hitbox {
-    radius: number;
-    direction: Vector; // Direction vector for the open side of the semi-circle
-    center: Vector;
-
-    constructor(center: Vector, radius: number, direction: Vector, isActive: boolean = true) {
-        super(center, isActive);
-        this.radius = radius;
-        this.direction = direction;
-        this.center = center;
+export class SphereHitbox extends Hitbox {
+    constructor(public position: Vector, public radius: number) {
+        super();
     }
 
-    checkCollision(other: Hitbox): boolean {
-        if (other instanceof SphereHitbox) {
-            return this.isCollidingWithSphere(other);
-        } else if (other instanceof BoxHitbox) {
-            return this.isCollidingWithBox(other);
-        } else if (other instanceof SemiCircleHitbox) {
-            return this.isCollidingWithSemiCircle(other);
+    checkHitboxCollision(otherHitbox: Hitbox): boolean {
+        if (otherHitbox instanceof BoxHitbox) {
+            return otherHitbox.checkHitboxCollision(this);
+        } else if (otherHitbox instanceof SemiCircleHitbox) {
+            return this.checkSemiCircleCollision(otherHitbox);
+        } else if (otherHitbox instanceof SphereHitbox) {
+            return this.checkSphereCollision(otherHitbox);
         }
         return false;
     }
 
     checkPointCollision(point: Vector): boolean {
-        const distance = this.center.distanceTo(point);
-        const directionProjection = point.subtract(this.center).projectOnto(this.direction);
-        return distance <= this.radius && directionProjection >= 0 && directionProjection <= this.radius;
+        return this.position.distanceTo(point) <= this.radius;
     }
 
-    private isCollidingWithSphere(sphere: SphereHitbox): boolean {
-        const distance = this.center.distanceTo(sphere.position);
-        const projection = sphere.position.subtract(this.center).projectOnto(this.direction);
-        return distance <= this.radius && projection >= 0 && projection <= this.radius;
-    }
-
-    private isCollidingWithBox(box: BoxHitbox): boolean {
-        const closestPoint = new Vector(
-            Math.max(this.center.x, Math.min(box.position.x, this.center.x + this.radius)),
-            Math.max(this.center.y, Math.min(box.position.y, this.center.y + this.radius)),
-            this.center.z
-        );
-        const distance = this.center.distanceTo(closestPoint);
-        return distance <= this.radius;
-    }
-
-    private isCollidingWithSemiCircle(other: SemiCircleHitbox): boolean {
-        const distance = this.center.distanceTo(other.center);
+    private checkSphereCollision(other: SphereHitbox): boolean {
+        const distance = this.position.distanceTo(other.position);
         return distance <= this.radius + other.radius;
     }
-}
 
-export { Hitbox, BoxHitbox, SphereHitbox, SemiCircleHitbox };
+    private checkSemiCircleCollision(semiCircle: SemiCircleHitbox): boolean {
+        const distance = this.position.distanceTo(semiCircle.position);
+        return distance <= semiCircle.radius;
+    }
+}

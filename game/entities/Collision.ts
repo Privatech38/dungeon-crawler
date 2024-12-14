@@ -1,5 +1,5 @@
-import {Hitbox} from "./Hitbox";
-import {Vector} from "../Vector";
+import { Hitbox } from "./Hitbox";
+import { Vector } from "../Vector";
 
 class CollisionResult {
     collides: boolean;
@@ -17,11 +17,17 @@ class CollisionResult {
 
 class CollisionManager {
     static checkCollision(hitboxA: Hitbox, hitboxB: Hitbox): CollisionResult {
+        if (!hitboxA.isActive || !hitboxB.isActive) return new CollisionResult(false, hitboxA, hitboxB);
+
         if (hitboxA.checkCollision(hitboxB)) {
             const collisionPoint = hitboxA.position.add(hitboxB.position).multiply(0.5);
             return new CollisionResult(true, hitboxA, hitboxB, collisionPoint);
         }
         return new CollisionResult(false, hitboxA, hitboxB);
+    }
+
+    static checkPointCollision(hitbox: Hitbox, point: Vector): boolean {
+        return hitbox.isActive && hitbox.checkPointCollision(point);
     }
 
     static checkMultipleCollisions(hitboxes: Hitbox[], target: Hitbox): CollisionResult[] {
@@ -33,10 +39,6 @@ class CollisionManager {
             }
         });
         return results;
-    }
-
-    static checkPointCollision(hitbox: Hitbox, point: Vector): boolean {
-        return hitbox.checkPointCollision(point);
     }
 }
 
