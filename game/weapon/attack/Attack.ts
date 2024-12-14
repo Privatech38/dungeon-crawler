@@ -1,7 +1,7 @@
 import { Vector } from "../../Vector";
 import { Entity } from "../../entities/Entity";
-import { CollisionManager } from "../../entities/Collision";
-import { BoxHitbox, Hitbox, SemiCircleHitbox, SphereHitbox } from "../../entities/Hitbox";
+import { CollisionManager } from "../../entities/hitboxes/Collision";
+import { BoxHitbox, Hitbox, SemiCircleHitbox, SphereHitbox } from "../../entities/hitboxes/Hitbox";
 
 class Attack {
     protected readonly damage: number;

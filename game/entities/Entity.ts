@@ -1,5 +1,5 @@
 import {Vector} from "../Vector";
-import {Hitbox} from "./Hitbox";
+import {Hitbox} from "./hitboxes/Hitbox";
 
 class Entity {
     health: number;

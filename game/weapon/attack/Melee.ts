@@ -1,6 +1,6 @@
 import { Vector } from "../../Vector";
 import { Attack } from "./Attack";
-import { CollisionManager } from "../../entities/Collision";
+import { CollisionManager } from "../../entities/hitboxes/Collision";
 import {Entity} from "../../entities/Entity";
 
 class Melee extends Attack {

@@ -1,5 +1,4 @@
-import { Hitbox } from "./Hitbox";
-import { Vector3 } from "../Vector";
+import { Hitbox, Vector3 } from "./Hitbox";
 
 class CollisionResult {
     collides: boolean;
@@ -27,4 +26,4 @@ class CollisionManager {
     }
 }
 
-export { CollisionResult, CollisionManager };
+export { CollisionResult, CollisionManager, Vector3 };
