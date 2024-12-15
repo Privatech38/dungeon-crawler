@@ -6,12 +6,6 @@ import {Vector3} from "../../../math/Vector";
  */
 class CollisionResult {
     /**
-     * Indicates if a collision occurred.
-     * @type {boolean}
-     */
-    collides: boolean;
-
-    /**
      * The first hitbox involved in the collision.
      * @type {Hitbox}
      */
@@ -31,13 +25,11 @@ class CollisionResult {
 
     /**
      * Creates an instance of CollisionResult.
-     * @param {boolean} collides - Whether the collision occurred.
      * @param {Hitbox} hitboxA - The first hitbox involved in the collision.
      * @param {Hitbox} hitboxB - The second hitbox involved in the collision.
      * @param {Vector3 | null} [collisionPoint=null] - The point of collision, if any.
      */
-    constructor(collides: boolean, hitboxA: Hitbox, hitboxB: Hitbox, collisionPoint: Vector3 | null = null) {
-        this.collides = collides;
+    constructor(hitboxA: Hitbox, hitboxB: Hitbox, collisionPoint: Vector3 | null = null) {
         this.hitboxA = hitboxA;
         this.hitboxB = hitboxB;
         this.collisionPoint = collisionPoint;
@@ -55,13 +47,13 @@ class CollisionManager {
      * @returns {CollisionResult} - The result of the collision check.
      */
     static checkCollision(hitboxA: Hitbox, hitboxB: Hitbox): CollisionResult {
-        if (!hitboxA.isActive || !hitboxB.isActive) return new CollisionResult(false, hitboxA, hitboxB);
+        if (!hitboxA.isActive || !hitboxB.isActive) return new CollisionResult(hitboxA, hitboxB);
 
         if (hitboxA.collides(hitboxB)) {
             const collisionPoint = hitboxA.center.add(hitboxB.center).scale(0.5);
-            return new CollisionResult(true, hitboxA, hitboxB, collisionPoint);
+            return new CollisionResult(hitboxA, hitboxB, collisionPoint);
         }
-        return new CollisionResult(false, hitboxA, hitboxB);
+        return new CollisionResult(hitboxA, hitboxB);
     }
 }
 
