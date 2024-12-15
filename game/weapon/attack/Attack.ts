@@ -1,5 +1,6 @@
 import { Vector3 } from "../../../math/Vector";
 import { Hitbox } from "../../entities/hitboxes/Hitbox";
+import {Entity} from "../../entities/Entity";
 
 /**
  * Represents an abstract attack that can be performed by an entity.
@@ -14,7 +15,7 @@ abstract class Attack {
     /**
      * The position of the entity performing the attack.
      */
-    protected readonly entityPosition: Vector3;
+    protected readonly entity: Entity;
 
     /**
      * The position of the mouse cursor, used for attack direction.
@@ -39,7 +40,7 @@ abstract class Attack {
     /**
      * Constructs an instance of the Attack class.
      * @param {number} damage - The amount of damage the attack inflicts.
-     * @param {Vector3} entityPosition - The position of the entity performing the attack.
+     * @param {Vector3} entity - Entity that is performing the attack.
      * @param {Vector3} mousePosition - The position of the mouse cursor.
      * @param {Hitbox} hutBox - The hitbox representing the area affected by the attack.
      * @param {boolean} [isActive=true] - Whether the attack is currently active.
@@ -47,14 +48,14 @@ abstract class Attack {
      */
     protected constructor(
         damage: number,
-        entityPosition: Vector3,
+        entity: Entity,
         mousePosition: Vector3,
         hutBox: Hitbox,
         isActive: boolean = true,
         FPS: number = 60,
     ) {
         this.damage = damage;
-        this.entityPosition = entityPosition;
+        this.entity = entity;
         this.mousePosition = mousePosition;
         this.hurtBox = hutBox;
         this.isActive = isActive;

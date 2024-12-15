@@ -2,6 +2,7 @@ import { Attack } from "./Attack";
 import { Vector3 } from "../../../math/Vector";
 import { Hitbox } from "../../entities/hitboxes/Hitbox";
 import { Sphere } from "../../entities/hitboxes/Sphere";
+import {Entity} from "../../entities/Entity";
 
 /**
  * Represents a projectile attack.
@@ -16,13 +17,14 @@ class Projectile extends Attack {
     private currentPosition: Sphere;
     private splashRadius: number;
     private time: number;
+    entityPosition: Vector3;
 
     /**
      * Constructs a Projectile attack instance.
      *
      * @param {number} damage - The damage dealt by the attack.
      * @param {number} velocity - The initial velocity of the projectile.\n
-     * @param {Vector3} entityPosition - The position of the attacking entity.\n
+     * @param {Vector3} entity - Entity that is performing the attack.\n
      * @param {Vector3} mousePosition - The target position indicated by the mouse.\n
      * @param {Hitbox} hutBox - The hitbox associated with the projectile.\n
      * @param {number} [splashRadius=0.01] - The radius for splash damage.\n
@@ -33,7 +35,7 @@ class Projectile extends Attack {
     constructor(
         damage: number,
         velocity: number,
-        entityPosition: Vector3,
+        entity: Entity,
         mousePosition: Vector3,
         hutBox: Hitbox,
         splashRadius: number = 0.01,
@@ -41,13 +43,14 @@ class Projectile extends Attack {
         gravity: number = 9.81,
         FPS: number = 60
     ) {
-        super(damage, entityPosition, mousePosition, hutBox, isActive, FPS);
+        super(damage, entity, mousePosition, hutBox, isActive, FPS);
 
         this.gravity = gravity;
         this.timeStep = 1 / this.FPS;
         this.velocity = velocity;
         this.splashRadius = splashRadius;
         this.time = 0;
+        this.entityPosition = entity.position;
 
         this.directionToMouse = this.mousePosition.subtract(this.entityPosition);
         this.initialVelocityVector = this.initialVelocity();

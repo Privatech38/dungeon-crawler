@@ -4,6 +4,7 @@ import { Vector3 } from "../../../math/Vector";
 import { Hitbox } from "../../entities/hitboxes/Hitbox";
 import { OBB } from "../../entities/hitboxes/OBB";
 import { Sphere } from "../../entities/hitboxes/Sphere";
+import {Entity} from "../../entities/Entity";
 
 /**
  * Represents a melee attack.
@@ -14,12 +15,13 @@ class Melee extends Attack {
     private frameCount: number;
     private readonly directionToMouse: Vector3;
     private readonly distanceFromEntity: Vector3;
+    private readonly entityPosition: Vector3;
 
     /**
      * Constructs a Melee attack instance.
      *
      * @param {number} damage - The damage dealt by the attack.
-     * @param {Vector3} entityPosition - The position of the attacking entity.
+     * @param {Vector3} entity - Entity that is attacking.
      * @param {Vector3} mousePosition - The position of the mouse (target direction).
      * @param {Hitbox} hutBox - The hitbox associated with the attack.
      * @param {Pattern} pattern - The movement pattern of the attack.
@@ -29,7 +31,7 @@ class Melee extends Attack {
      */
     constructor(
         damage: number,
-        entityPosition: Vector3,
+        entity: Entity,
         mousePosition: Vector3,
         hutBox: Hitbox,
         pattern: Pattern,
@@ -39,7 +41,7 @@ class Melee extends Attack {
     ) {
         super(
             damage,
-            entityPosition,
+            entity,
             mousePosition,
             hutBox,
             isActive,
@@ -48,6 +50,7 @@ class Melee extends Attack {
         this.pattern = pattern;
         this.frameCount = 0;
         this.distanceFromEntity = distanceFromEntity;
+        this.entityPosition = entity.position;
         this.directionToMouse = this.mousePosition
             .subtract(this.entityPosition)
             .normalize()
