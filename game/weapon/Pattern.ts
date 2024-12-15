@@ -1,4 +1,4 @@
-import { Vector3 } from "../../Vector";
+import { Vector3 } from "../../math/Vector";
 
 class BezierCurve {
     protected controlPoints: Vector3[];
@@ -98,6 +98,7 @@ class Pattern {
     private readonly time: number;
     private readonly FPS: number;
     private readonly steps: number;
+    private readonly timePattern: number[];
 
     public dots: BezierPoint[] = [];
 
@@ -105,16 +106,14 @@ class Pattern {
         controlPoints: Vector3[],
         centerPoint: Vector3,
         zPattern: number[],
+        timePattern: number[],
         time: number,
         FPS: number = 60
     ) {
-        if (!centerPoint) {
-            throw new Error("centerPoint is undefined in Pattern constructor");
-        }
-
         this.controlPoints = controlPoints;
         this.centerPoint = centerPoint;
         this.zPattern = zPattern;
+        this.timePattern = timePattern;
         this.time = time;
         this.FPS = FPS;
 
@@ -125,9 +124,10 @@ class Pattern {
 
     private createPattern() {
         for (let i = 0; i < this.steps; i++) {
-            const timeStep: number = i / this.steps;
             const z: number =
                 this.zPattern.length === 2 ? this.calculateZ(i) : this.zPattern[i];
+            const timeStep: number =
+                this.timePattern.length === 0 ? i / this.steps : this.timePattern[i];
 
             const bezierPoint = new BezierPoint(this.controlPoints, timeStep, z, this.centerPoint);
             this.dots.push(bezierPoint);
@@ -150,7 +150,7 @@ const controlPoints = [
     new Vector3(0, 1, 0)
 ];
 
-let pattern = new Pattern(controlPoints, new Vector3(0, 0.5, 1), [0, 2], 1, 10);
+let pattern = new Pattern(controlPoints, new Vector3(0, 0.5, 1), [0, 2], [], 1);
 pattern.dots.forEach(dot => {
     console.log(dot.pointing);
 })
