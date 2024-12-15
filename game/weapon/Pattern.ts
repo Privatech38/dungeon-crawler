@@ -104,7 +104,7 @@ class Pattern {
 
     private readonly centerPoint: Vector3;
     private readonly steps: number;
-    public dots: BezierPoint[] = [];
+    public directionVector: Vector3[] = [];
 
     constructor(
         controlPoints: Vector3[],
@@ -128,7 +128,7 @@ class Pattern {
     private createPattern() {
         for (let i = 0; i < this.steps; i++) {
             const bezierPoint = new BezierPoint(this.controlPoints, this.timePattern.list[i], this.zPattern.list[i], this.centerPoint);
-            this.dots.push(bezierPoint);
+            this.directionVector.push(new Vector3(bezierPoint.pointing.x, bezierPoint.pointing.y, bezierPoint.pointing.z));
         }
     }
 }

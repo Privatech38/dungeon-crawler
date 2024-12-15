@@ -1,75 +1,60 @@
-import { Vector } from "../../Vector";
 import { Attack } from "./Attack";
-import { CollisionManager } from "../../entities/hitboxes/Collision";
-import {Entity} from "../../entities/Entity";
+import {Vector3} from "../../../math/Vector";
+import {Hitbox} from "../../entities/hitboxes/Hitbox";
+import {Sphere} from "../../entities/hitboxes/Sphere";
 
 class Projectile extends Attack {
-    private readonly timeStep: number;
-    private readonly attackRange: number;
-    private readonly target: Vector;
-    private readonly velocity: number;
-    private readonly initialVelocity: Vector;
     private readonly gravity: number;
-    private readonly direction: Vector;
-    private readonly magnitude: number;
+    private readonly timeStep: number;
+    private readonly velocity: number;
+    private readonly directionToMouse: Vector3;
+    private readonly initialVelocityVector: Vector3;
+    public currentPosition: Sphere;
+    public splashRadius: number;
+    private time: number;
 
     constructor(
         damage: number,
-        start: Vector,
-        mousePosition: Vector,
-        FPS: number,
         velocity: number,
-        entities: Entity[],
-        splashRadius: number = 0,
-        splashDamage: number = 0,
-        splashAngle: number = 360,
+        entityPosition: Vector3,
+        mousePosition: Vector3,
+        hutBox: Hitbox,
+
+        splashRadius: number = 0.01,
+        isActive: boolean = true,
         gravity: number = 9.81,
-    ) {
-        super(
-            damage,
-            start,
-            mousePosition,
-            FPS,
-            entities,
-            splashRadius,
-            splashDamage,
-            splashAngle,
-        );
+        FPS: number = 60,
+    ){
+        super(damage, entityPosition, mousePosition, hutBox, isActive, FPS);
+
         this.gravity = gravity;
         this.timeStep = 1 / this.FPS;
         this.velocity = velocity;
-        this.direction = Vector.getDirectionVector(this.start, this.mousePosition);
-        this.magnitude = Vector.getMagnitude(this.direction);
-        this.initialVelocity = this.start.computeEndPoint(this.direction, this.magnitude, this.velocity);
-        this.target = new Vector(this.start.x, this.start.y, this.start.z);
+        this.splashRadius = splashRadius;
+        this.time = 0;
+
+        this.directionToMouse = this.mousePosition.subtract(this.entityPosition);
+
+        this.initialVelocityVector = this.initialVelocity();// new Vector(startPosition, targetPosition, velocity).endPoint;
+
+        this.currentPosition = new Sphere(this.entityPosition, this.splashRadius);
+    }
+
+    private initialVelocity(): Vector3{
+        const directionVector = this.directionToMouse.subtract(this.entityPosition)
+        const magnitude = directionVector.magnitude();
+        const scale = this.velocity / magnitude;
+        return this.entityPosition.add(directionVector.scale(scale))
     }
 
     public update_position(): void {
-        // Apply gravity correctly with frame count
-        this.target.x += this.initialVelocity.x * this.timeStep;
-        this.target.y += this.initialVelocity.y * this.timeStep;
-        this.target.z += this.initialVelocity.z * this.timeStep - (this.gravity * Math.pow(this.timeStep, 2)) / 2;
-
-        // Check if it's a splash or point attack
-        if (this.isSplashAttack) {
-            this.handleSplash(this.target);
-        } else {
-            this.collisionWithEntity(this.entities);
-        }
+        this.currentPosition.updatePosition(
+            this.entityPosition.add(this.initialVelocityVector.scale(this.time))
+        )
+        this.currentPosition.center.z -= (this.gravity * Math.pow(this.time, 2)) / 2;
+        this.time += this.timeStep;
     }
 
-    public current_position(): { x: number, y: number, z: number } {
-        return this.target;
-    }
-
-    private collisionWithEntity(entities: Entity[]): void {
-        entities.forEach(entity => {
-            if (CollisionManager.checkPointCollision(entity.hitbox, this.target)) {
-                this.applyDamage(entity);
-                this.isActive = false;
-            }
-        });
-    }
 }
 
 export { Projectile };

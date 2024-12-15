@@ -1,7 +1,5 @@
 import { Vector3 } from "../../../math/Vector";
-import { OBB } from "./OBB";
-import { Sphere } from "./Sphere"
-import { Point } from "./Point";
+
 
 /**
  * Abstract class representing a 3D hitbox
@@ -32,8 +30,11 @@ abstract class Hitbox {
      * Updates the position of the hitbox.
      * @param vector - The new position of the hitbox center
      */
-    abstract updatePosition(vector: Vector3): void;
+    updatePosition(vector: Vector3): void {
+        this.center = vector;
+    }
+
 }
 
 
-export { Hitbox, Vector3, Point, OBB, Sphere };
+export { Hitbox };

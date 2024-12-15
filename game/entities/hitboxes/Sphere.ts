@@ -1,4 +1,7 @@
-import {Hitbox, Vector3, Point, OBB} from "./Hitbox";
+import {Hitbox} from "./Hitbox";
+import {Vector3} from "../../../math/Vector";
+import {OBB} from "./OBB";
+import {Point} from "./Point";
 
 /**
  * Class representing a sphere hitbox.
@@ -60,14 +63,6 @@ class Sphere extends Hitbox {
      */
     intersectsOBB(other: OBB): boolean {
         return other.intersectsSphere(this);
-    }
-
-    /**
-     * Updates the position of the sphere.
-     * @param vector - The new position of the spheres center
-     */
-    updatePosition(vector: Vector3): void {
-        this.center = vector;
     }
 }
 

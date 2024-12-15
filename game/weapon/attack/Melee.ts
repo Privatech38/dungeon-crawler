@@ -1,77 +1,55 @@
-import { Vector } from "../../Vector";
 import { Attack } from "./Attack";
-import { CollisionManager } from "../../entities/hitboxes/Collision";
-import {Entity} from "../../entities/Entity";
+import {Pattern} from "../Pattern";
+import {Vector3} from "../../../math/Vector";
+import {Hitbox} from "../../entities/hitboxes/Hitbox";
+import {OBB} from "../../entities/hitboxes/OBB";
 
 class Melee extends Attack {
+    private readonly pattern: Pattern;
     private frameCount: number;
-    private readonly duration: number;
-    private readonly timeStep: number;
-    private readonly attackRange: number;
-    private target: Vector;
-    private readonly direction: Vector;
-    private readonly magnitude: number;
+    private readonly directionToMouse: Vector3;
+    private readonly distanceFromEntity: Vector3;
 
     constructor(
         damage: number,
-        start: Vector,
-        mousePosition: Vector,
-        FPS: number,
-        entities: Entity[],
-        duration: number,
-        attackRange: number,
-        splashRadius: number = 0,
-        splashDamage: number = 0,
-        splashAngle: number = 360,
+        entityPosition: Vector3,
+        mousePosition: Vector3,
+        hutBox: Hitbox,
+        pattern: Pattern,
+        distanceFromEntity: Vector3 = new Vector3(0, 0, 0),
+
+        isActive: boolean = true,
+        FPS: number = 60,
     ) {
         super(
             damage,
-            start,
+            entityPosition,
             mousePosition,
+            hutBox,
+            isActive,
             FPS,
-            entities,
-            splashRadius,
-            splashDamage,
-            splashAngle,
         );
-        this.attackRange = attackRange;
+        this.pattern = pattern;
         this.frameCount = 0;
-        this.duration = duration;
-        this.timeStep = 1 / (this.duration * this.FPS);
-        this.direction = Vector.getDirectionVector(this.start, this.mousePosition);
-        this.magnitude = Vector.getMagnitude(this.direction);
-        this.target = new Vector();
+        this.distanceFromEntity = distanceFromEntity;
+        this.directionToMouse = this.mousePosition.subtract(this.entityPosition).normalize().add(this.entityPosition)
     }
 
     public update_position(): void {
-        if (!this.isActive) {
-            return;
+        if (!this.isActive) return;
+
+        const direction: Vector3 = this.pattern.directionVector[this.frameCount].add(this.directionToMouse)
+
+        if (this.hurtBox instanceof OBB){
+            this.hurtBox.updateUpAxis(direction.normalize())
+            this.hurtBox.updatePosition(direction.add(this.distanceFromEntity))
         }
+
         this.frameCount++;
-        if (this.frameCount > this.FPS * this.duration) return;
 
-        let length = this.timeStep * this.frameCount * this.attackRange;
-        this.target = this.target.computeEndPoint(this.direction, this.magnitude, length);
-
-        // Check if it's a splash or point attack
-        if (this.isSplashAttack) {
-            this.handleSplash(this.target); // Call handleSplash instead of directly checking collision
-        } else {
-            this.collisionWithEntity(this.entities);
+        if (this.frameCount >= this.pattern.directionVector.length) {
+            this.isActive = false;
         }
-    }
-
-    public get_position(): { x: number, y: number, z: number } {
-        return this.target;
-    }
-
-    private collisionWithEntity(entities: Entity[]): void {
-        entities.forEach(entity => {
-            if (CollisionManager.checkPointCollision(entity.hitbox, this.target)) {
-                this.applyDamage(entity);
-                this.isActive = false;
-            }
-        });
     }
 }
 

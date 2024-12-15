@@ -1,4 +1,7 @@
-import {Hitbox, OBB, Sphere, Vector3} from "./Hitbox";
+import {Hitbox} from "./Hitbox";
+import {Vector3} from "../../../math/Vector";
+import {OBB} from "./OBB";
+import {Sphere} from "./Sphere";
 
 /**
  * Class representing a point hitbox.
@@ -11,14 +14,6 @@ class Point extends Hitbox {
      */
     constructor(center: Vector3) {
         super(center);
-    }
-
-    /**
-     * Updates the position of the point.
-     * @param vector - New position of the point
-     */
-    updatePosition(vector: Vector3): void {
-        this.center = vector;
     }
 
     /**

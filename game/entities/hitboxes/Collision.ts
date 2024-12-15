@@ -1,4 +1,5 @@
-import { Hitbox, Vector3 } from "./Hitbox";
+import { Hitbox } from "./Hitbox";
+import {Vector3} from "../../../math/Vector";
 
 /**
  * Represents the result of a collision between two hitboxes.
@@ -64,4 +65,4 @@ class CollisionManager {
     }
 }
 
-export { CollisionResult, CollisionManager, Vector3 };
+export { CollisionResult, CollisionManager };

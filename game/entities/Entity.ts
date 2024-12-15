@@ -1,20 +1,20 @@
-import {Vector} from "../Vector";
+import {Vector3} from "../../math/Vector";
 import {Hitbox} from "./hitboxes/Hitbox";
 
 class Entity {
     health: number;
     hitbox: Hitbox;
-    position: Vector;
+    position: Vector3;
 
-    constructor(health: number, hitbox: Hitbox, position: Vector) {
+    constructor(health: number, hitbox: Hitbox, position: Vector3) {
         this.health = health;
         this.hitbox = hitbox;
         this.position = position;
     }
 
-    updatePosition(vector: Vector): void {
+    updatePosition(vector: Vector3): void {
         this.position = vector;
-        this.hitbox.position = vector;
+        this.hitbox.updatePosition(vector);
     }
 
     takeDamage(damage: number): void {

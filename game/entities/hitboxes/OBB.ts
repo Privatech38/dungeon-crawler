@@ -1,11 +1,13 @@
-import {Hitbox, Vector3, Point, Sphere} from "./Hitbox";
+import {Hitbox} from "./Hitbox";
+import {Vector3} from "../../../math/Vector";
+import {Sphere} from "./Sphere";
+import {Point} from "./Point";
 
 /**
  * Class representing an Oriented Bounding Box (OBB).
  * A 3D box that can be rotated, defined by a center, orientation axes, and half-extents.
  */
 class OBB extends Hitbox {
-    center: Vector3; // Center of the box
     axes: [Vector3, Vector3, Vector3]; // Local axes (right, up, forward)
     halfExtents: Vector3; // Half-dimensions along each axis
 
@@ -18,7 +20,6 @@ class OBB extends Hitbox {
      */
     constructor(center: Vector3, axes: [Vector3, Vector3, Vector3], halfExtents: Vector3, isActive: boolean = true) {
         super(center, isActive);
-        this.center = center;
         this.axes = axes.map(axis => axis.normalize()) as [Vector3, Vector3, Vector3];
         this.halfExtents = halfExtents;
     }
@@ -40,19 +41,35 @@ class OBB extends Hitbox {
     }
 
     /**
-     * Updates the position of the OBB.
-     * @param newCenter - The new center position for the OBB
-     */
-    updatePosition(newCenter: Vector3): void {
-        this.center = newCenter;
-    }
-
-    /**
      * Updates the orientation of the OBB.
      * @param newAxes - The new orientation axes for the OBB
      */
     updateOrientation(newAxes: [Vector3, Vector3, Vector3]): void {
         this.axes = newAxes.map(axis => axis.normalize()) as [Vector3, Vector3, Vector3];
+    }
+
+    /**
+     * Updates the forward (Y) axis of the OBB.
+     * @param newY - The new forward (Y) axis
+     */
+    updateForwardAxis(newY: Vector3) {
+        this.axes[1] = newY.normalize();
+    }
+
+    /**
+     * Updates the up (Z) axis of the OBB.
+     * @param newZ - The new up (Z) axis
+     */
+    updateUpAxis(newZ: Vector3) {
+        this.axes[2] = newZ.normalize();
+    }
+
+    /**
+     * Updates the left/right (X) axis of the OBB.
+     * @param newX - The new left/right (X) axis
+     */
+    updateLeftRightAxis(newX: Vector3) {
+        this.axes[0] = newX.normalize();
     }
 
     /**
