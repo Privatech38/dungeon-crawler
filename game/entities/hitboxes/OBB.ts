@@ -130,7 +130,7 @@ class OBB extends Hitbox {
     }
 
     /**
-     * Checks if the OBB intersects with a sphere.
+     * Checks if OBB intersects with a sphere.
      * @param other - The sphere to check for intersection
      * @returns true if the OBB intersects the sphere, false otherwise
      */

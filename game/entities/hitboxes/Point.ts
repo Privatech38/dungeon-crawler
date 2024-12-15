@@ -15,7 +15,7 @@ class Point extends Hitbox {
 
     /**
      * Updates the position of the point.
-     * @param vector - The new position of the point
+     * @param vector - New position of the point
      */
     updatePosition(vector: Vector3): void {
         this.center = vector;

@@ -64,7 +64,7 @@ class Sphere extends Hitbox {
 
     /**
      * Updates the position of the sphere.
-     * @param vector - The new position of the sphere center
+     * @param vector - The new position of the spheres center
      */
     updatePosition(vector: Vector3): void {
         this.center = vector;

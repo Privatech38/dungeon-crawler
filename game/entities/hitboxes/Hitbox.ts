@@ -1,10 +1,10 @@
-import { Vector3 } from "../../Vector";
+import { Vector3 } from "../../../math/Vector";
 import { OBB } from "./OBB";
 import { Sphere } from "./Sphere"
 import { Point } from "./Point";
 
 /**
- * Abstract class representing a 3D hitbox.
+ * Abstract class representing a 3D hitbox
  * A hitbox is a shape that can be used for collision detection.
  */
 abstract class Hitbox {
