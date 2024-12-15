@@ -1,30 +1,43 @@
 import { Vector3 } from "../../math/Vector";
-import {Distribution} from "../../math/Distribution";
+import { Distribution } from "../../math/Distribution";
 
+/**
+ * Represents a Bezier curve and calculates points and tangents on the curve.
+ */
 class BezierCurve {
     protected controlPoints: Vector3[];
     protected t: number;
-
     tangent: Vector3;
     point: Vector3;
 
+    /**
+     * Constructs a BezierCurve instance.
+     *
+     * @param {Vector3[]} controlPoints - The control points defining the curve.
+     * @param {number} t - The parameter (0 <= t <= 1) to calculate the point and tangent on the curve.
+     */
     constructor(controlPoints: Vector3[], t: number) {
         this.controlPoints = controlPoints;
         this.t = t;
-        this.deCasteljau();        // Calculate the point using De Casteljau's algorithm
-        this.tangent = this.calculateTangent();  // Calculate the tangent
+        this.deCasteljau(); // Calculate the point on the curve
+        this.tangent = this.calculateTangent(); // Calculate the tangent vector
     }
 
-    // Calculate the tangent of the Bezier curve
+    /**
+     * Calculates the tangent vector at the given t using De Casteljau's algorithm.
+     *
+     * @returns {Vector3} - The tangent vector at the point on the curve.
+     */
     protected calculateTangent(): Vector3 {
-        // Step 1: Calculate the derivative control points
-        let derivativeControlPoints = this.calculateDerivative();
-
-        // Step 2: Apply De Casteljau's algorithm to derivative control points
-        return this.deCasteljauDerivative(derivativeControlPoints);  // Calculate the tangent directly
+        const derivativeControlPoints = this.calculateDerivative();
+        return this.deCasteljauDerivative(derivativeControlPoints);
     }
 
-    // Calculate the derivative of the control points
+    /**
+     * Computes the derivative control points for the curve.
+     *
+     * @returns {Vector3[]} - The control points of the derivative curve.
+     */
     private calculateDerivative(): Vector3[] {
         let derivativeControlPoints: Vector3[] = [];
         for (let i = 0; i < this.controlPoints.length - 1; i++) {
@@ -33,11 +46,14 @@ class BezierCurve {
         return derivativeControlPoints;
     }
 
-    // De Casteljau's algorithm for the tangent (derivative curve)
+    /**
+     * Applies De Casteljau's algorithm to the derivative control points.
+     *
+     * @param {Vector3[]} points - The derivative control points.
+     * @returns {Vector3} - The tangent vector.
+     */
     private deCasteljauDerivative(points: Vector3[]): Vector3 {
         let localPoints = [...points];
-
-        // Apply De Casteljau's algorithm to get the point on the derivative curve
         while (localPoints.length > 1) {
             let nextPoints: Vector3[] = [];
             for (let i = 0; i < localPoints.length - 1; i++) {
@@ -45,15 +61,14 @@ class BezierCurve {
             }
             localPoints = nextPoints;
         }
-
-        return localPoints[0]; // The final point is the tangent at t
+        return localPoints[0];
     }
 
-    // De Casteljau's algorithm for the main Bezier curve
+    /**
+     * Applies De Casteljau's algorithm to calculate a point on the curve.
+     */
     protected deCasteljau(): void {
         let points = [...this.controlPoints];
-
-        // Recursive step of De Casteljau's algorithm
         while (points.length > 1) {
             let nextPoints: Vector3[] = [];
             for (let i = 0; i < points.length - 1; i++) {
@@ -61,51 +76,74 @@ class BezierCurve {
             }
             points = nextPoints;
         }
-
-        this.point = points[0]; // The final point is the point on the curve at t
+        this.point = points[0];
     }
 }
 
+/**
+ * Represents a specific point on a Bezier curve, including tangent and direction.
+ * Extends BezierCurve.
+ */
 class BezierPoint extends BezierCurve {
     private readonly z: number;
     private readonly centerPoint: Vector3;
-
     public point: Vector3;
     public tangent: Vector3;
     public pointing: Vector3;
 
+    /**
+     * Constructs a BezierPoint instance.
+     *
+     * @param {Vector3[]} controlPoints - The control points defining the curve.
+     * @param {number} t - The parameter (0 <= t <= 1) to calculate the point and tangent on the curve.
+     * @param {number} z - The Z-coordinate offset.
+     * @param {Vector3} centerPoint - The center point to calculate direction from.
+     */
     constructor(controlPoints: Vector3[], t: number, z: number, centerPoint: Vector3) {
         super(controlPoints, t);
-
         this.z = z;
         this.centerPoint = centerPoint;
 
-        const bezier: BezierCurve = new BezierCurve(controlPoints, t);
+        const bezier = new BezierCurve(controlPoints, t);
         this.point = bezier.point;
         this.tangent = bezier.tangent;
         this.getPointing();
     }
 
+    /**
+     * Calculates the direction vector (pointing) from the center point.
+     */
     private getPointing(): void {
         this.pointing = new Vector3(this.tangent.y, -this.tangent.x, this.z);
         this.pointing = this.pointing.subtract(this.centerPoint).normalize();
-        this.pointing.x = Math.round(this.pointing.x * 1000)/1000
-        this.pointing.y = Math.round(this.pointing.y * 1000)/1000
-        this.pointing.z = Math.round(this.pointing.z * 1000)/1000
+        this.pointing.x = Math.round(this.pointing.x * 1000) / 1000;
+        this.pointing.y = Math.round(this.pointing.y * 1000) / 1000;
+        this.pointing.z = Math.round(this.pointing.z * 1000) / 1000;
     }
 }
 
+/**
+ * Represents a movement pattern using Bezier curves and distributions.
+ */
 class Pattern {
     private readonly controlPoints: Vector3[];
     private readonly zPattern: Distribution;
     private readonly timePattern: Distribution;
     private readonly time: number;
     private readonly FPS: number;
-
     private readonly centerPoint: Vector3;
     private readonly steps: number;
     public directionVector: Vector3[] = [];
 
+    /**
+     * Constructs a Pattern instance.
+     *
+     * @param {Vector3[]} controlPoints - The control points defining the Bezier curve.
+     * @param {number[]} zPattern - The Z-coordinate distribution for the pattern.
+     * @param {number[]} timePattern - The time distribution for the pattern.
+     * @param {number} time - The duration of the pattern in seconds.
+     * @param {number} [FPS=60] - The frames per second for the pattern.
+     */
     constructor(
         controlPoints: Vector3[],
         zPattern: number[],
@@ -119,16 +157,25 @@ class Pattern {
         this.FPS = FPS;
 
         this.steps = this.FPS * this.time;
-
         this.zPattern = new Distribution(zPattern, this.steps);
         this.timePattern = new Distribution(timePattern, this.steps);
         this.createPattern();
     }
 
-    private createPattern() {
+    /**
+     * Creates the movement pattern by generating direction vectors.
+     */
+    private createPattern(): void {
         for (let i = 0; i < this.steps; i++) {
-            const bezierPoint = new BezierPoint(this.controlPoints, this.timePattern.list[i], this.zPattern.list[i], this.centerPoint);
-            this.directionVector.push(new Vector3(bezierPoint.pointing.x, bezierPoint.pointing.y, bezierPoint.pointing.z));
+            const bezierPoint = new BezierPoint(
+                this.controlPoints,
+                this.timePattern.list[i],
+                this.zPattern.list[i],
+                this.centerPoint
+            );
+            this.directionVector.push(
+                new Vector3(bezierPoint.pointing.x, bezierPoint.pointing.y, bezierPoint.pointing.z)
+            );
         }
     }
 }
