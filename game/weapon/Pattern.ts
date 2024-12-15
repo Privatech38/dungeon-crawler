@@ -1,4 +1,5 @@
 import { Vector3 } from "../../math/Vector";
+import {Distribution} from "../../math/Distribution";
 
 class BezierCurve {
     protected controlPoints: Vector3[];
@@ -88,69 +89,48 @@ class BezierPoint extends BezierCurve {
     private getPointing(): void {
         this.pointing = new Vector3(this.tangent.y, -this.tangent.x, this.z);
         this.pointing = this.pointing.subtract(this.centerPoint).normalize();
+        this.pointing.x = Math.round(this.pointing.x * 1000)/1000
+        this.pointing.y = Math.round(this.pointing.y * 1000)/1000
+        this.pointing.z = Math.round(this.pointing.z * 1000)/1000
     }
 }
 
 class Pattern {
     private readonly controlPoints: Vector3[];
-    private readonly centerPoint: Vector3;
-    private readonly zPattern: number[];
+    private readonly zPattern: Distribution;
+    private readonly timePattern: Distribution;
     private readonly time: number;
     private readonly FPS: number;
-    private readonly steps: number;
-    private readonly timePattern: number[];
 
+    private readonly centerPoint: Vector3;
+    private readonly steps: number;
     public dots: BezierPoint[] = [];
 
     constructor(
         controlPoints: Vector3[],
-        centerPoint: Vector3,
         zPattern: number[],
         timePattern: number[],
         time: number,
         FPS: number = 60
     ) {
         this.controlPoints = controlPoints;
-        this.centerPoint = centerPoint;
-        this.zPattern = zPattern;
-        this.timePattern = timePattern;
+        this.centerPoint = new Vector3(0, 0, 0);
         this.time = time;
         this.FPS = FPS;
 
         this.steps = this.FPS * this.time;
 
+        this.zPattern = new Distribution(zPattern, this.steps);
+        this.timePattern = new Distribution(timePattern, this.steps);
         this.createPattern();
     }
 
     private createPattern() {
         for (let i = 0; i < this.steps; i++) {
-            const z: number =
-                this.zPattern.length === 2 ? this.calculateZ(i) : this.zPattern[i];
-            const timeStep: number =
-                this.timePattern.length === 0 ? i / this.steps : this.timePattern[i];
-
-            const bezierPoint = new BezierPoint(this.controlPoints, timeStep, z, this.centerPoint);
+            const bezierPoint = new BezierPoint(this.controlPoints, this.timePattern.list[i], this.zPattern.list[i], this.centerPoint);
             this.dots.push(bezierPoint);
         }
     }
-
-    private calculateZ(i: number): number {
-        const step = (this.zPattern[1] - this.zPattern[0]) / this.steps;
-        if (this.zPattern[0] < this.zPattern[1]) {
-            return this.zPattern[0] + step * i;
-        } else {
-            return this.zPattern[0] - step * i;
-        }
-    }
 }
-const controlPoints = [
-    new Vector3(0, 0, 0),
-    new Vector3(1, 0, 0),
-    new Vector3(1, 1, 0),
-    new Vector3(0, 1, 0)
-];
 
-let pattern = new Pattern(controlPoints, new Vector3(0, 0.5, 1), [0, 2], [], 1);
-pattern.dots.forEach(dot => {
-    console.log(dot.pointing);
-})
+export { Pattern };
