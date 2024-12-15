@@ -40,6 +40,19 @@ class Vector3 {
         const length = Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
         return new Vector3(this.x / length, this.y / length, this.z / length);
     }
+
+    magnitude(): number {
+        return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
+    }
+
+    /**
+     * projects this vector onto vector v
+     * @param v - vector to be projected onto
+     * @returns this vector projected onto v
+     */
+    project(v: Vector3): Vector3 {
+        return v.scale(this.dot(v) / Math.pow(v.magnitude(), 2))
+    }
 }
 
 export { Vector3 };
