@@ -36,6 +36,10 @@ class Sphere extends Hitbox {
         return false;
     }
 
+    updateRadius(radius: number){
+        this.radius = radius;
+    }
+
     /**
      * Checks if the sphere contains a point.
      * @param other - The point to check

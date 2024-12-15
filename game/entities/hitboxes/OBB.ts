@@ -8,8 +8,8 @@ import {Point} from "./Point";
  * A 3D box that can be rotated, defined by a center, orientation axes, and half-extents.
  */
 class OBB extends Hitbox {
-    axes: [Vector3, Vector3, Vector3]; // Local axes (right, up, forward)
-    halfExtents: Vector3; // Half-dimensions along each axis
+    private axes: [Vector3, Vector3, Vector3]; // Local axes (right, up, forward)
+    private halfExtents: Vector3; // Half-dimensions along each axis
 
     /**
      * Creates a new Oriented Bounding Box.
@@ -70,6 +70,10 @@ class OBB extends Hitbox {
      */
     updateLeftRightAxis(newX: Vector3) {
         this.axes[0] = newX.normalize();
+    }
+
+    updateHalfExtents(newHalfExtents: Vector3) {
+        this.halfExtents = newHalfExtents;
     }
 
     /**

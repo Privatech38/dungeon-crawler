@@ -9,8 +9,8 @@ class Projectile extends Attack {
     private readonly velocity: number;
     private readonly directionToMouse: Vector3;
     private readonly initialVelocityVector: Vector3;
-    public currentPosition: Sphere;
-    public splashRadius: number;
+    private currentPosition: Sphere;
+    private splashRadius: number;
     private time: number;
 
     constructor(
@@ -47,12 +47,16 @@ class Projectile extends Attack {
         return this.entityPosition.add(directionVector.scale(scale))
     }
 
-    public update_position(): void {
+    public updatePosition(): void {
         this.currentPosition.updatePosition(
             this.entityPosition.add(this.initialVelocityVector.scale(this.time))
         )
         this.currentPosition.center.z -= (this.gravity * Math.pow(this.time, 2)) / 2;
         this.time += this.timeStep;
+    }
+
+    public updateHurtBox(newRadius: number): void {
+        this.splashRadius = newRadius;
     }
 
 }

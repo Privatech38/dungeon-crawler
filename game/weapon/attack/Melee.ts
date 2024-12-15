@@ -3,6 +3,8 @@ import {Pattern} from "../Pattern";
 import {Vector3} from "../../../math/Vector";
 import {Hitbox} from "../../entities/hitboxes/Hitbox";
 import {OBB} from "../../entities/hitboxes/OBB";
+import {Sphere} from "../../entities/hitboxes/Sphere";
+import {Point} from "../../entities/hitboxes/Point";
 
 class Melee extends Attack {
     private readonly pattern: Pattern;
@@ -35,7 +37,7 @@ class Melee extends Attack {
         this.directionToMouse = this.mousePosition.subtract(this.entityPosition).normalize().add(this.entityPosition)
     }
 
-    public update_position(): void {
+    public updatePosition(): void {
         if (!this.isActive) return;
 
         const direction: Vector3 = this.pattern.directionVector[this.frameCount].add(this.directionToMouse)
@@ -49,6 +51,14 @@ class Melee extends Attack {
 
         if (this.frameCount >= this.pattern.directionVector.length) {
             this.isActive = false;
+        }
+    }
+
+    public updateHurtBox(newSize: Vector3 | number){
+        if (this.hurtBox instanceof OBB && newSize instanceof Vector3){
+            this.hurtBox.updateHalfExtents(newSize);
+        } else if (this.hurtBox instanceof Sphere && typeof newSize === 'number'){
+            this.hurtBox.updateRadius(newSize);
         }
     }
 }

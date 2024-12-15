@@ -6,11 +6,9 @@ abstract class Attack {
     protected readonly damage: number;
     protected readonly entityPosition: Vector3;
     protected readonly mousePosition: Vector3;
-    protected entities: Entity[];
-    public hurtBox: Hitbox;
+    protected hurtBox: Hitbox;
 
-    public entitiesHit: Entity[];
-    public isActive: boolean;
+    protected isActive: boolean;
     protected readonly FPS: number;
 
     protected constructor(
@@ -28,6 +26,14 @@ abstract class Attack {
         this.isActive = isActive;
         this.FPS = FPS;
     }
+
+    abstract updatePosition(): void;
+    abstract updateHurtBox(newRadius: number | Vector3): void;
+
+    getHurtBox(): Vector3{
+        return this.hurtBox.center;
+    }
+
 }
 
 export { Attack };
