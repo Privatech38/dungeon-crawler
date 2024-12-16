@@ -33,33 +33,31 @@ abstract class Attack {
     protected isActive: boolean;
 
     /**
-     * The frames per second, used for timing calculations.
+     * Time now used for timing calculations.
      */
-    protected readonly FPS: number;
+    protected readonly timeStart: number;
 
     /**
      * Constructs an instance of the Attack class.
      * @param {number} damage - The amount of damage the attack inflicts.
      * @param {Vector3} entity - Entity that is performing the attack.
      * @param {Vector3} mousePosition - The position of the mouse cursor.
-     * @param {Hitbox} hutBox - The hitbox representing the area affected by the attack.
+     * @param {Hitbox} hurtBox - The hitbox representing the area affected by the attack.
      * @param {boolean} [isActive=true] - Whether the attack is currently active.
-     * @param {number} [FPS=60] - Frames per second for timing calculations.
      */
     protected constructor(
         damage: number,
         entity: Entity,
         mousePosition: Vector3,
-        hutBox: Hitbox,
+        hurtBox: Hitbox,
         isActive: boolean = true,
-        FPS: number = 60,
     ) {
         this.damage = damage;
         this.entity = entity;
         this.mousePosition = mousePosition;
-        this.hurtBox = hutBox;
+        this.hurtBox = hurtBox;
         this.isActive = isActive;
-        this.FPS = FPS;
+        this.timeStart = Date.now()
     }
 
     /**
@@ -75,10 +73,10 @@ abstract class Attack {
 
     /**
      * Retrieves the center position of the hurt box.
-     * @returns {Vector3} The center position of the hurt box.
+     * @returns Hurt box.
      */
-    getHurtBox(): Vector3 {
-        return this.hurtBox.center;
+    getHurtBox(): Hitbox {
+        return this.hurtBox;
     }
 }
 

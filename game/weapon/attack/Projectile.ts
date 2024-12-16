@@ -10,13 +10,11 @@ import {Entity} from "../../entities/Entity";
  */
 class Projectile extends Attack {
     private readonly gravity: number;
-    private readonly timeStep: number;
     private readonly velocity: number;
     private readonly directionToMouse: Vector3;
     private readonly initialVelocityVector: Vector3;
-    private currentPosition: Sphere;
+    currentPosition: Sphere;
     private splashRadius: number;
-    private time: number;
     entityPosition: Vector3;
 
     /**
@@ -26,30 +24,26 @@ class Projectile extends Attack {
      * @param {number} velocity - The initial velocity of the projectile.\n
      * @param {Vector3} entity - Entity that is performing the attack.\n
      * @param {Vector3} mousePosition - The target position indicated by the mouse.\n
-     * @param {Hitbox} hutBox - The hitbox associated with the projectile.\n
+     * @param {Hitbox} hurtBox - The hitbox associated with the projectile.\n
      * @param {number} [splashRadius=0.01] - The radius for splash damage.\n
      * @param {boolean} [isActive=true] - Whether the attack is active.\n
      * @param {number} [gravity=9.81] - The gravitational acceleration affecting the projectile.\n
-     * @param {number} [FPS=60] - The update frequency in frames per second.
      */
     constructor(
         damage: number,
         velocity: number,
         entity: Entity,
         mousePosition: Vector3,
-        hutBox: Hitbox,
+        hurtBox: Hitbox,
         splashRadius: number = 0.01,
         isActive: boolean = true,
         gravity: number = 9.81,
-        FPS: number = 60
     ) {
-        super(damage, entity, mousePosition, hutBox, isActive, FPS);
+        super(damage, entity, mousePosition, hurtBox, isActive);
 
         this.gravity = gravity;
-        this.timeStep = 1 / this.FPS;
         this.velocity = velocity;
         this.splashRadius = splashRadius;
-        this.time = 0;
         this.entityPosition = entity.position;
 
         this.directionToMouse = this.mousePosition.subtract(this.entityPosition);
@@ -63,21 +57,21 @@ class Projectile extends Attack {
      * @returns {Vector3} - The calculated initial velocity vector.
      */
     private initialVelocity(): Vector3 {
-        const directionVector = this.directionToMouse.subtract(this.entityPosition);
-        const magnitude = directionVector.magnitude();
-        const scale = this.velocity / magnitude;
-        return this.entityPosition.add(directionVector.scale(scale));
+        const directionVector = this.directionToMouse.normalize(); // Ensure normalized direction
+        return directionVector.scale(this.velocity);
     }
 
     /**
      * Updates the position of the projectile based on its velocity, gravity, and time.
      */
     public updatePosition(): void {
+        const timeDiff = ( Date.now() - this.timeStart ) / 1000;
+
         this.currentPosition.updatePosition(
-            this.entityPosition.add(this.initialVelocityVector.scale(this.time))
+            this.entityPosition.add(this.initialVelocityVector.scale(timeDiff))
         );
-        this.currentPosition.center.z -= (this.gravity * Math.pow(this.time, 2)) / 2;
-        this.time += this.timeStep;
+        this.currentPosition.center.z -= (this.gravity * Math.pow(timeDiff, 2)) / 2;
+        this.hurtBox.updatePosition(this.currentPosition.center);
     }
 
     /**

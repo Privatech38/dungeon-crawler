@@ -4,7 +4,8 @@ import { Vector3 } from "../../../math/Vector";
 import { Hitbox } from "../../entities/hitboxes/Hitbox";
 import { OBB } from "../../entities/hitboxes/OBB";
 import { Sphere } from "../../entities/hitboxes/Sphere";
-import {Entity} from "../../entities/Entity";
+import { Entity } from "../../entities/Entity";
+import {FindClosest} from "../../searchAlgorithms/FindClosest";
 
 /**
  * Represents a melee attack.
@@ -12,7 +13,6 @@ import {Entity} from "../../entities/Entity";
  */
 class Melee extends Attack {
     private readonly pattern: Pattern;
-    private frameCount: number;
     private readonly directionToMouse: Vector3;
     private readonly distanceFromEntity: Vector3;
     private readonly entityPosition: Vector3;
@@ -23,32 +23,28 @@ class Melee extends Attack {
      * @param {number} damage - The damage dealt by the attack.
      * @param {Vector3} entity - Entity that is attacking.
      * @param {Vector3} mousePosition - The position of the mouse (target direction).
-     * @param {Hitbox} hutBox - The hitbox associated with the attack.
+     * @param {Hitbox} hurtBox - The hitbox associated with the attack.
      * @param {Pattern} pattern - The movement pattern of the attack.
      * @param {Vector3} [distanceFromEntity=new Vector3(0, 0, 0)] - Offset of the hitbox from the entity's position.
      * @param {boolean} [isActive=true] - Whether the attack is active.
-     * @param {number} [FPS=60] - The update frequency in frames per second.
      */
     constructor(
         damage: number,
         entity: Entity,
         mousePosition: Vector3,
-        hutBox: Hitbox,
+        hurtBox: Hitbox,
         pattern: Pattern,
         distanceFromEntity: Vector3 = new Vector3(0, 0, 0),
         isActive: boolean = true,
-        FPS: number = 60
     ) {
         super(
             damage,
             entity,
             mousePosition,
-            hutBox,
+            hurtBox,
             isActive,
-            FPS
         );
         this.pattern = pattern;
-        this.frameCount = 0;
         this.distanceFromEntity = distanceFromEntity;
         this.entityPosition = entity.position;
         this.directionToMouse = this.mousePosition
@@ -64,16 +60,18 @@ class Melee extends Attack {
     public updatePosition(): void {
         if (!this.isActive) return;
 
-        const direction: Vector3 = this.pattern.directionVector[this.frameCount].add(this.directionToMouse);
+        const timeDiff = Date.now() - this.timeStart;
+
+        const closestDot = new FindClosest(this.pattern.timePattern.list, timeDiff/1000).distanceIndex;
+
+        const direction: Vector3 = this.pattern.directionVector[closestDot].add(this.directionToMouse);
 
         if (this.hurtBox instanceof OBB) {
             this.hurtBox.updateUpAxis(direction.normalize());
             this.hurtBox.updatePosition(direction.add(this.distanceFromEntity));
         }
 
-        this.frameCount++;
-
-        if (this.frameCount >= this.pattern.directionVector.length) {
+        if (timeDiff >= this.pattern.directionVector.length) {
             this.isActive = false;
         }
     }
@@ -83,7 +81,7 @@ class Melee extends Attack {
      *
      * @param {Vector3 | number} newSize - The new size or radius for the hurtbox.
      */
-    public updateHurtBox(newSize: Vector3 | number): void {
+    updateHurtBox(newSize: Vector3 | number): void {
         if (this.hurtBox instanceof OBB && newSize instanceof Vector3) {
             this.hurtBox.updateHalfExtents(newSize);
         } else if (this.hurtBox instanceof Sphere && typeof newSize === 'number') {

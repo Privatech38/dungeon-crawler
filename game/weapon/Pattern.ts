@@ -128,11 +128,10 @@ class BezierPoint extends BezierCurve {
 class Pattern {
     private readonly controlPoints: Vector3[];
     private readonly zPattern: Distribution;
-    private readonly timePattern: Distribution;
     private readonly time: number;
-    private readonly FPS: number;
     private readonly centerPoint: Vector3;
     private readonly steps: number;
+    public timePattern: Distribution;
     public directionVector: Vector3[] = [];
 
     /**
@@ -140,23 +139,18 @@ class Pattern {
      *
      * @param {Vector3[]} controlPoints - The control points defining the Bezier curve.
      * @param {number[]} zPattern - The Z-coordinate distribution for the pattern.
-     * @param {number[]} timePattern - The time distribution for the pattern.
-     * @param {number} time - The duration of the pattern in seconds.
-     * @param {number} [FPS=60] - The frames per second for the pattern.
+     * @param {number[]} timePattern - The time distribution for the pattern last value it duration of pattern.
      */
     constructor(
         controlPoints: Vector3[],
         zPattern: number[],
         timePattern: number[],
-        time: number,
-        FPS: number = 60
     ) {
         this.controlPoints = controlPoints;
         this.centerPoint = new Vector3(0, 0, 0);
-        this.time = time;
-        this.FPS = FPS;
+        this.time = timePattern[timePattern.length - 1];
 
-        this.steps = this.FPS * this.time;
+        this.steps = 1000 * this.time;
         this.zPattern = new Distribution(zPattern, this.steps);
         this.timePattern = new Distribution(timePattern, this.steps);
         this.createPattern();
@@ -169,7 +163,7 @@ class Pattern {
         for (let i = 0; i < this.steps; i++) {
             const bezierPoint = new BezierPoint(
                 this.controlPoints,
-                this.timePattern.list[i],
+                this.timePattern.list[i]/this.time,
                 this.zPattern.list[i],
                 this.centerPoint
             );
