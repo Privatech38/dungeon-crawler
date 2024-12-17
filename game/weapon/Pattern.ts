@@ -80,6 +80,7 @@ class BezierCurve {
     }
 }
 
+//todo: change beziers curve so that distance between dots will be the same
 /**
  * Represents a specific point on a Bezier curve, including tangent and direction.
  * Extends BezierCurve.
@@ -126,6 +127,11 @@ class BezierPoint extends BezierCurve {
  * Represents a movement pattern using Bezier curves and distributions.
  */
 class Pattern {
+    /**
+     *
+     * @public {timePattern: Distribution} - return time pattern from time[start] to time[end]
+     * @public {directionVector: Vector3[]}
+     */
     private readonly controlPoints: Vector3[];
     private readonly zPattern: Distribution;
     private readonly time: number;

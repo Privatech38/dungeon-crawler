@@ -2,6 +2,13 @@
  * Represents a distribution of values between control points over a specified length.
  */
 class Distribution {
+    /**
+     * Creates a distribution from number a to b with length of length
+     * @private {controlPoints} - control points are points in array that was given
+     * @private {length} - length of array that will be given as a result
+     * @private {distance} - distance between two control points
+     * @public {list} - array of distributed values using control points and length
+     */
     private readonly controlPoints: number[];
     private readonly length: number;
 

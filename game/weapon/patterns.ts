@@ -12,8 +12,9 @@ const controlPointsSlash: Vector3[] = [
 const slash: Pattern = new Pattern(
     controlPointsSlash,
     [0.5, -0.5],
-    [0, 0.5],
+    [0, 2],
 )
+console.log(slash.timePattern)
 
 export {
     slash,
