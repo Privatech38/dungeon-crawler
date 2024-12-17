@@ -61,7 +61,7 @@ class Melee extends Attack {
         if (!this.isActive) return;
 
         const timeDiff = Date.now() - this.timeStart;
-
+        // find the closest dot for time pattern of current time
         const closestDot = new FindClosest(this.pattern.timePattern.list, timeDiff/1000).distanceIndex;
 
         const direction: Vector3 = this.pattern.directionVector[closestDot].add(this.directionToMouse);
