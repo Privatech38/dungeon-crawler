@@ -109,7 +109,7 @@ class OBB extends Hitbox {
         // Project the point onto each axis and compare to half-extent
         for (let i = 0; i < 3; i++) {
             const distance = Math.abs(localPoint.dot(this.axes[i]));
-            if (distance > this.halfExtents[i]) {
+            if (distance > this.halfExtents.getAxisComponent(i)) {
                 return false;
             }
         }
@@ -122,11 +122,17 @@ class OBB extends Hitbox {
      * @param other - The other OBB to check for intersection
      * @returns true if the OBBs intersect, false otherwise
      */
+
     intersects(other: OBB): boolean {
+        const crossProducts: Vector3[] = this.axes.reduce(
+            (acc, a) => acc.concat(other.axes.map(b => a.cross(b))),
+            [] as Vector3[]
+        );
+
         const axesToTest: Vector3[] = [
             ...this.axes,
             ...other.axes,
-            ...[].concat(...this.axes.map(a => other.axes.map(b => a.cross(b))))
+            ...crossProducts,
         ];
 
         for (const axis of axesToTest) {
@@ -162,7 +168,7 @@ class OBB extends Hitbox {
         for (let i = 0; i < 3; i++) {
             const axis = this.axes[i];
             const distance = other.center.subtract(this.center).dot(axis);
-            const clampedDistance = Math.max(-this.halfExtents[i], Math.min(this.halfExtents[i], distance));
+            const clampedDistance = Math.max(-this.halfExtents.getAxisComponent(i), Math.min(this.halfExtents.getAxisComponent(i), distance));
             closestPoint = closestPoint.add(axis.scale(clampedDistance));
         }
 
