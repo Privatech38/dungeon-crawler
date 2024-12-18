@@ -1,11 +1,11 @@
-import {Effect} from "../../Effect";
+import {Effect} from "../Effect";
 
-class Damage extends Effect {
+abstract class Direct extends Effect {
     private lastAttack: number;
     private readonly damage: number;
     private readonly fireRate: number;
 
-    constructor(duration: number, fireRate: number, damage: number) {
+    protected constructor(duration: number, fireRate: number, damage: number) {
         super(duration);
         this.fireRate = 1000/fireRate;
         this.lastAttack = 0;
@@ -23,4 +23,4 @@ class Damage extends Effect {
 
 }
 
-export { Damage }
+export { Direct }

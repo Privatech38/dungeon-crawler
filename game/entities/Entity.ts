@@ -1,21 +1,21 @@
 import {Vector3} from "../../math/Vector";
 import {Hitbox} from "./hitboxes/Hitbox";
-import {Effect} from "./damage/Effect";
-import {Defence} from "./damage/Defence";
-import {Damage} from "./damage/effects/damage/Damage";
-import {DebuffFreeze} from "./damage/effects/debuff/DebuffFreeze";
-import {DebuffDamage} from "./damage/effects/debuff/DebuffDamage";
+import {Effect} from "./effects/Effect";
+import {Defence} from "./Defence";
+import {Direct} from "./effects/direct/Direct";
+import {DebuffFreeze} from "./effects/debuff/DebuffFreeze";
+import {DebuffDamage} from "./effects/debuff/DebuffDamage";
 
 abstract class Entity {
     protected health: number;
     protected hitbox: Hitbox;
     protected position: Vector3;
     protected effects: Set<Effect>;
-    protected _defense: Set<Defence>;
+    protected defense: Set<Defence>;
     protected damageReduction: number;
     protected speed: number
     protected damageMultiplier: number;
-    protected _alive: boolean;
+    protected alive: boolean;
 
     protected constructor(health: number, speed: number, hitbox: Hitbox) {
         this.health = health;
@@ -24,14 +24,9 @@ abstract class Entity {
         this.position = this.hitbox.center;
         this.effects = new Set();
         this.damageMultiplier = 1;
-        this._defense = new Set<Defence>;
-        this._alive = true;
+        this.defense = new Set<Defence>;
+        this.alive = true;
         this.damageReduction = 0;
-    }
-
-    public updatePosition(vector: Vector3): void {
-        this.position = vector;
-        this.hitbox.updatePosition(vector);
     }
 
     public addEffect(effect: Effect): void {
@@ -39,7 +34,7 @@ abstract class Entity {
     }
 
     public takeEffect(damage: number = 0): void {
-        if (!this._alive) return;
+        if (!this.alive) return;
         if (this.effects.size != 0) {
             this.effects.forEach(effect => this.calcEffects(effect));
         }
@@ -47,21 +42,29 @@ abstract class Entity {
     }
 
     public addDefence(defence: Defence): void {
-        this._defense .add(defence);
+        this.defense .add(defence);
         this.damageReduction = 1;
-        this._defense.forEach(defence => {
+        this.defense.forEach(defence => {
             this.damageReduction *= (defence.reduction);
         })
         this.damageReduction = 1 - this.damageReduction;
     }
 
     public removeDefence(defence: Defence): void {
-        this._defense.delete(defence);
+        this.defense.delete(defence);
+    }
+
+    public revive(){
+        this.alive = true;
+    }
+
+    public kill(){
+        this.alive = false;
     }
 
     private calcEffects(effect: Effect): void{
         if (effect.isActive()){
-            if (effect instanceof Damage) {
+            if (effect instanceof Direct) {
                 this.loseHealth(effect.dealDamage())
             }
             else if (effect instanceof DebuffFreeze){
@@ -84,15 +87,20 @@ abstract class Entity {
 
     private loseHealth(damage: number) {
         this.health -= (1 - this.damageReduction) * damage;
-        if (this.health <= 0) this._alive = false;
+        if (this.health <= 0) this.kill();
     }
 
-    get alive(): boolean{
-        return this._alive;
+    get getLifeState(): boolean{
+        return this.alive;
     }
 
-    set alive(value: boolean){
-        this._alive = value;
+    get getPosition(): Vector3 {
+        return this.hitbox.center;
+    }
+
+    set setPosition(vector: Vector3) {
+        this.position = vector;
+        this.hitbox.updatePosition(vector);
     }
 }
 

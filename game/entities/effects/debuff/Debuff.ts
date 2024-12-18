@@ -1,4 +1,4 @@
-import {Effect} from "../../Effect";
+import {Effect} from "../Effect";
 
 abstract class Debuff extends Effect{
     private readonly _reduction: number;

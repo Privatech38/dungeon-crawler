@@ -13,7 +13,7 @@ class FindClosest {
         this.distanceIndex = this.findClosest(this.array, 0, array.length - 1, this.value)
     }
 
-    private findClosest(array: number[], low: number, high: number, value: number) {
+    private findClosest(array: number[], low: number, high: number, value: number): number {
         if (high >= low) {
             let mid = low + Math.floor((high - low) / 2);
 

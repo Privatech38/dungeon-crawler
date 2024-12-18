@@ -1,4 +1,4 @@
-import {Effect} from "../../Effect";
+import {Effect} from "../Effect";
 import {Debuff} from "./Debuff";
 
 class DebuffDamage extends Debuff{

@@ -1,4 +1,4 @@
-import { Attack } from "./Attack";
+import { Attack } from "../Attack";
 import { Vector3 } from "../../../math/Vector";
 import { Hitbox } from "../../entities/hitboxes/Hitbox";
 import { Sphere } from "../../entities/hitboxes/Sphere";
@@ -13,9 +13,9 @@ class Projectile extends Attack {
     private readonly velocity: number;
     private readonly directionToMouse: Vector3;
     private readonly initialVelocityVector: Vector3;
-    currentPosition: Sphere;
+    private readonly projectile: Sphere;
     private splashRadius: number;
-    entityPosition: Vector3;
+    private readonly entityPosition: Vector3;
 
     /**
      * Constructs a Projectile attack instance.
@@ -44,11 +44,11 @@ class Projectile extends Attack {
         this.gravity = gravity;
         this.velocity = velocity;
         this.splashRadius = splashRadius;
-        this.entityPosition = entity.position;
+        this.entityPosition = entity.getPosition;
 
         this.directionToMouse = this.mousePosition.subtract(this.entityPosition);
         this.initialVelocityVector = this.initialVelocity();
-        this.currentPosition = new Sphere(this.entityPosition, this.splashRadius);
+        this.projectile = new Sphere(this.entityPosition, this.splashRadius);
     }
 
     /**
@@ -67,11 +67,11 @@ class Projectile extends Attack {
     public updatePosition(): void {
         const timeDiff = ( Date.now() - this.timeStart ) / 1000;
 
-        this.currentPosition.updatePosition(
+        this.projectile.updatePosition(
             this.entityPosition.add(this.initialVelocityVector.scale(timeDiff))
         );
-        this.currentPosition.center.z -= (this.gravity * Math.pow(timeDiff, 2)) / 2;
-        this.hurtBox.updatePosition(this.currentPosition.center);
+        this.projectile.center.z -= (this.gravity * Math.pow(timeDiff, 2)) / 2;
+        this.hurtBox.updatePosition(this.projectile.center);
     }
 
     /**
@@ -81,6 +81,14 @@ class Projectile extends Attack {
      */
     public updateHurtBox(newRadius: number): void {
         this.splashRadius = newRadius;
+    }
+
+    get getEntityPosition(): Vector3 {
+        return this.entityPosition;
+    }
+
+    get getProjectile(): Sphere {
+        return this.projectile;
     }
 }
 
