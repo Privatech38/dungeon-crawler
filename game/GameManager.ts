@@ -2,17 +2,21 @@ import {Entity} from "./entities/Entity";
 
 
 class GameManager {
-    entities: Entity[];
+    private entities: Set<Entity>;
 
     constructor() {
-        this.entities = [];
+        this.entities = new Set<Entity>;
     }
 
-    addEntity(entity: Entity){
-        this.entities.push(entity);
+    public addEntity(entity: Entity){
+        this.entities.add(entity);
     }
 
-    getEntities(): Entity[] {
+    public removeEntity(entity: Entity){
+        this.entities.delete(entity);
+    }
+
+    public getEntities(): Set<Entity> {
         return this.entities;
     }
 

@@ -1,9 +1,9 @@
 import {Effect} from "../../Effect";
 
-class DebuffEffect extends Effect{
+abstract class Debuff extends Effect{
     private readonly _reduction: number;
 
-    constructor(duration: number, reduction: number) {
+    protected constructor(duration: number, reduction: number) {
         super(duration);
         this._reduction = reduction;
     }
@@ -13,4 +13,4 @@ class DebuffEffect extends Effect{
     }
 }
 
-export {DebuffEffect};
+export {Debuff};

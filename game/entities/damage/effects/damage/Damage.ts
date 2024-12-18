@@ -1,6 +1,6 @@
 import {Effect} from "../../Effect";
 
-class Fire extends Effect {
+class Damage extends Effect {
     private lastAttack: number;
     private readonly damage: number;
     private readonly fireRate: number;
@@ -23,4 +23,4 @@ class Fire extends Effect {
 
 }
 
-export { Fire }
+export { Damage }

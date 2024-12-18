@@ -1,11 +1,11 @@
 import {Effect} from "../../Effect";
-import {DebuffEffect} from "./DebuffEffect";
+import {Debuff} from "./Debuff";
 
-class DamageDebuff extends DebuffEffect{
+class DebuffDamage extends Debuff{
 
     constructor(duration: number, reduction: number) {
         super(duration, reduction);
     }
 }
 
-export {DamageDebuff};
+export {DebuffDamage};
