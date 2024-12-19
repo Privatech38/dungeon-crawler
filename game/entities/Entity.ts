@@ -21,14 +21,16 @@ abstract class Entity {
     protected constructor(health: number, speed: number, hitbox: Hitbox, initialPosition: Vector3) {
         this.health = health;
         this.speed = speed;
+        this.initialPosition = initialPosition;
         this.hitbox = hitbox;
-        this.position = this.hitbox.center;
+        this.position = initialPosition;
         this.effects = new Set();
         this.damageMultiplier = 1;
         this.defense = new Set<Defence>;
         this.alive = true;
         this.damageReduction = 0;
-        this.initialPosition = initialPosition;
+
+        this.hitbox.updatePosition(this.initialPosition)
     }
 
     public addEffect(effect: Effect): void {
