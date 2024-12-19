@@ -16,8 +16,9 @@ abstract class Entity {
     protected speed: number
     protected damageMultiplier: number;
     protected alive: boolean;
+    protected initialPosition: Vector3;
 
-    protected constructor(health: number, speed: number, hitbox: Hitbox) {
+    protected constructor(health: number, speed: number, hitbox: Hitbox, initialPosition: Vector3) {
         this.health = health;
         this.speed = speed;
         this.hitbox = hitbox;
@@ -27,6 +28,7 @@ abstract class Entity {
         this.defense = new Set<Defence>;
         this.alive = true;
         this.damageReduction = 0;
+        this.initialPosition = initialPosition;
     }
 
     public addEffect(effect: Effect): void {
@@ -90,17 +92,17 @@ abstract class Entity {
         if (this.health <= 0) this.kill();
     }
 
+    protected updatePosition(position: Vector3){
+        this.position = position;
+        this.hitbox.center = position;
+    }
+
     get getLifeState(): boolean{
         return this.alive;
     }
 
     get getPosition(): Vector3 {
-        return this.hitbox.center;
-    }
-
-    set setPosition(vector: Vector3) {
-        this.position = vector;
-        this.hitbox.updatePosition(vector);
+        return this.position;
     }
 }
 

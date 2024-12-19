@@ -1,14 +1,21 @@
 import {Entity} from "./Entity";
-import {Hitbox} from "./hitboxes/Hitbox";
 import {Inventory} from "./inventory/Inventory";
+import {Hitbox} from "./hitboxes/Hitbox";
 import {InventorySlot} from "./inventory/InventorySlot";
+import {Vector3} from "../../math/Vector";
+import {PlayerMovement} from "./PlayerMovement";
 
 class Player extends Entity {
     private inventory: Inventory;
 
-    constructor(health: number, speed: number, hitbox: Hitbox, inventoryAmount: number)
-    {
-        super(health, speed, hitbox);
+    constructor(
+        health: number,
+        speed: number,
+        hitbox: Hitbox,
+        inventoryAmount: number,
+        initialPosition: Vector3,
+    ) {
+        super(health, speed, hitbox, initialPosition);
         this.inventory = new Inventory(inventoryAmount);
     }
 
@@ -29,7 +36,17 @@ class Player extends Entity {
         })
     }
 
+    public setPosition(playerMovement: PlayerMovement) {
+        this.updatePosition(playerMovement.getPosition())
+    }
 
+    get getInitialPosition(): Vector3{
+        return this.initialPosition;
+    }
+
+    get getSpeed(): number{
+        return this.speed;
+    }
 }
 
 export { Player };
