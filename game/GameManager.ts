@@ -11,23 +11,15 @@ class GameManager {
     private playerMovement: PlayerMovement;
 
     constructor(player: Player) {
-        this.entities = new Set<Entity>;
         this.player = player;
         this.deltaTime = 0;
+        this.entities = new Set<Entity>;
         this.lastFrameTime = Date.now();
         this.playerMovement = new PlayerMovement(this.player.getInitialPosition, this.player.getSpeed);
     }
 
-    public addEntity(entity: Entity){
-        this.entities.add(entity);
-    }
-
     public removeEntity(entity: Entity){
         this.entities.delete(entity);
-    }
-
-    public getEntities(): Set<Entity> {
-        return this.entities;
     }
 
     private updateDeltaTime(){
@@ -39,6 +31,18 @@ class GameManager {
         this.updateDeltaTime();
         this.playerMovement.move(keys, this.deltaTime)
         this.player.setPosition(this.playerMovement)
+    }
+
+    public addEntity(entity: Entity){
+        this.entities.add(entity);
+    }
+
+    get getEntities(): Set<Entity> {
+        return this.entities;
+    }
+
+    get getPlayer(): Player {
+        return this.player;
     }
 
 }

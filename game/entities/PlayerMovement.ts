@@ -1,5 +1,5 @@
 import { Vector3 } from "../../math/Vector";
-import { Movement } from "./Movement"; // Assuming Movement is in the same directory
+import { Movement } from "./Movement";
 
 class PlayerMovement {
     private movement: Movement;
