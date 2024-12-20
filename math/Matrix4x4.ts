@@ -40,8 +40,8 @@ class Matrix4x4 {
     rotation(): Vector3[] {
         return [
             new Vector3(this.get(0, 0), this.get(1, 0), this.get(2, 0)), // Right axis
+            new Vector3(this.get(0, 2), this.get(1, 2), this.get(2, 2)),  // Forward axis
             new Vector3(this.get(0, 1), this.get(1, 1), this.get(2, 1)), // Up axis
-            new Vector3(this.get(0, 2), this.get(1, 2), this.get(2, 2))  // Forward axis
         ];
     }
 

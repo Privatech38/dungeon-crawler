@@ -222,7 +222,7 @@ class OBB extends Hitbox {
      * @param matrix {number[][]} - matrix you want to convert.
      * @returns OBB object.
      */
-    public fromMatrix(matrix: Matrix4x4): OBB {
+    static fromMatrix(matrix: Matrix4x4): OBB {
         const center = matrix.translation();
         const rotation = matrix.rotation();
         const scale = matrix.scale();
