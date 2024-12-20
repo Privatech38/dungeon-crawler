@@ -14,12 +14,12 @@ class Movement {
     update(deltaTime: number) {
         // Update position based on velocity and deltaTime
         this.position.x += this.velocity.x * deltaTime;
-        this.position.y += this.velocity.y * deltaTime;
+        this.position.z += this.velocity.z * deltaTime;
     }
 
-    setVelocity(x: number, y: number) {
+    setVelocity(x: number, z: number) {
         this.velocity.x = x;
-        this.velocity.y = y;
+        this.velocity.z = z;
     }
 
     set setSpeed(speed: number) {

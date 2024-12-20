@@ -70,7 +70,7 @@ class Projectile extends Attack {
         this.projectile.updatePosition(
             this.entityPosition.add(this.initialVelocityVector.scale(timeDiff))
         );
-        this.projectile.center.z -= (this.gravity * Math.pow(timeDiff, 2)) / 2;
+        this.projectile.center.y -= (this.gravity * Math.pow(timeDiff, 2)) / 2;
         this.hurtBox.updatePosition(this.projectile.center);
     }
 
