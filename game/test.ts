@@ -2,18 +2,46 @@ import {OBB} from "./entities/hitboxes/OBB";
 import {Vector3} from "../math/Vector";
 import {Player} from "./entities/Player";
 import {GameManager} from "./GameManager";
+import {CollisionManager} from "./entities/hitboxes/Collision";
 
-const playerHitbox = new OBB(
+const OBB1 = new OBB(
     new Vector3(0, 0, 0),
     [
         new Vector3(1, 0, 0),
         new Vector3(0, 1, 0),
         new Vector3(0, 0, 1),
     ],
-    new Vector3(0.5, 0.5, 2),
+    new Vector3(1, 1, 1),
 )
 
-console.log(playerHitbox);
+const OBB2 = new OBB(
+    new Vector3(0, 0, 2),
+    [
+        new Vector3(1, 0, 0),
+        new Vector3(0, 1, 0),
+        new Vector3(0, 0, 1),
+    ],
+    new Vector3(1, 1, 1),
+)
+
+
+toString(OBB1);
+toString(OBB2);
+
+function toString(matrix: OBB) {
+    let s = "((\n"
+    const m = matrix.toMatrix()
+    m.forEach((vector, index) => {
+        s += ("(" + vector + "),\n");
+    })
+
+    console.log(s + "))");
+}
+
+console.log(new CollisionManager(OBB1, OBB2).result.collisionPoint)
+
+
+/*
 
 let player = new Player(
     100,
@@ -22,8 +50,6 @@ let player = new Player(
     10,
     new Vector3(1, 1, 1),
 );
-
-console.log(player);
 
 const keys = {
     up: false,
@@ -91,3 +117,5 @@ function gameLoop() {
 }
 
 gameLoop();
+
+ */

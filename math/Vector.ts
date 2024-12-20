@@ -91,18 +91,16 @@ class Vector3 {
         return v.scale(this.dot(v) / Math.pow(v.magnitude(), 2));
     }
 
+    multiply(v: Vector3): Vector3 {
+        return new Vector3(this.x * v.x, this.y * v.y, this.z * v.z);
+    }
 
-    public getAxisComponent(index: number): number {
-        switch (index) {
-            case 0:
-                return this.x;
-            case 1:
-                return this.y;
-            case 2:
-                return this.z;
-            default:
-                throw new Error("Index out of bounds for Vector3");
-        }
+    get toArray(): number[] {
+        return [this.x, this.y, this.z];
+    }
+
+    toString(): string {
+        return "x: " + this.x + ", y: " + this.y + ", z: " + this.z + ""
     }
 }
 
