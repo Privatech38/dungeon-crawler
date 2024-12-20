@@ -1,7 +1,5 @@
 import {OBB} from "./entities/hitboxes/OBB";
 import {Vector3} from "../math/Vector";
-import {Player} from "./entities/Player";
-import {GameManager} from "./GameManager";
 import {CollisionManager} from "./entities/hitboxes/Collision";
 
 const OBB1 = new OBB(
@@ -31,7 +29,7 @@ toString(OBB2);
 function toString(matrix: OBB) {
     let s = "((\n"
     const m = matrix.toMatrix()
-    m.forEach((vector, index) => {
+    m.forEach((vector) => {
         s += ("(" + vector + "),\n");
     })
 
