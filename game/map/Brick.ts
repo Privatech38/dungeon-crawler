@@ -20,13 +20,23 @@ class Brick {
      */
     private offset: number;
 
+
+    /**
+     * set orientation of brick, witch direction it is facing.
+     * @private
+     * @type {number} - 0 or 90
+     */
+    private readonly orientation: number;
+
     /**
      * Creates a new brick with the specified type.
      * @param {boolean} fullBrick - `true` for a full brick, `false` for a half brick.
+     * @param orientation - orientation of brick, witch direction it is facing 0 / 90deg
      */
-    constructor(fullBrick: boolean) {
+    constructor(fullBrick: boolean, orientation: number) {
         this.brickType = fullBrick;
         this.offset = 5;
+        this.orientation = orientation;
     }
 
     /**
@@ -46,7 +56,7 @@ class Brick {
      * @returns {number} A random offset between `-offset` and `+offset`.
      */
     private randomOffset(): number {
-        return Random.randInt(-this.offset, this.offset);
+        return Random.randInt(0, this.offset * 2);
     }
 
     /**
@@ -62,7 +72,7 @@ class Brick {
      * The orientation is either `0` or `180` degrees, chosen at random.
      * @returns {number} The orientation in degrees.
      */
-    get orientation(): number {
+    get rotationY(): number {
         return Math.round(Math.random()) * 180;
     }
 
@@ -71,8 +81,8 @@ class Brick {
      * The rotation is either `0` or `180` degrees, plus a random offset.
      * @returns {number} The rotation in degrees.
      */
-    get rotation(): number {
-        return Math.round(Math.random()) * 180 + this.randomOffset() - this.offset;
+    get rotationX(): number {
+        return Math.round(Math.random()) * (180 + this.randomOffset() - this.offset) + this.orientation;
     }
 
     /**

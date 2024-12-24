@@ -102,6 +102,10 @@ class Vector3 {
     toString(): string {
         return "x: " + this.x + ", y: " + this.y + ", z: " + this.z + ""
     }
+
+    clone(): Vector3 {
+        return new Vector3(this.x, this.y, this.z);
+    }
 }
 
 export { Vector3 };

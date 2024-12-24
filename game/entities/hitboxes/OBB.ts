@@ -19,7 +19,12 @@ class OBB extends Hitbox {
      * @param halfExtents - The half-extents (size) of the OBB along each axis
      * @param isActive - Whether the OBB is active (default is true)
      */
-    constructor(center: Vector3, axes: [Vector3, Vector3, Vector3], halfExtents: Vector3, isActive: boolean = true) {
+    constructor(
+        axes: [Vector3, Vector3, Vector3],
+        halfExtents: Vector3,
+        center: Vector3 = new Vector3(0, 0, 0),
+        isActive: boolean = true
+    ) {
         super(center, isActive);
         this.axes = axes.map(axis => axis.normalize()) as [Vector3, Vector3, Vector3];
         this.halfExtents = halfExtents;
@@ -228,13 +233,13 @@ class OBB extends Hitbox {
         const scale = matrix.scale();
 
         return new OBB(
-            center,
             [
                 rotation[0].normalize(),
                 rotation[1].normalize(),
                 rotation[2].normalize()
             ],
-            scale.scale(0.5)
+            scale.scale(0.5),
+            center
         )
     }
 }
