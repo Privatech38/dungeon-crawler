@@ -15,7 +15,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Wall",
+			"name":"DoorWallUpper",
 			"rotation":[
 				0,
 				-1,
@@ -28,7 +28,7 @@
 				-1
 			],
 			"translation":[
-				1.4999995231628418,
+				-1.4982800483703613,
 				1.3999947309494019,
 				-6.000002384185791
 			]
@@ -52,7 +52,7 @@
 	],
 	"meshes":[
 		{
-			"name":"Wall",
+			"name":"DoorWall",
 			"primitives":[
 				{
 					"attributes":{
@@ -70,68 +70,68 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":3060,
+			"count":2439,
 			"max":[
 				1.3005564212799072,
-				0.8000001311302185,
-				0.12789364159107208
+				0.8000000715255737,
+				0.16019870340824127
 			],
 			"min":[
 				-1.3005563020706177,
 				-0.8000001907348633,
-				-0.12789350748062134
+				-0.1600007563829422
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":3060,
+			"count":2439,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":3060,
+			"count":2439,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":4686,
+			"count":3711,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":36720,
+			"byteLength":29268,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":36720,
-			"byteOffset":36720,
+			"byteLength":29268,
+			"byteOffset":29268,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24480,
-			"byteOffset":73440,
+			"byteLength":19512,
+			"byteOffset":58536,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":9372,
-			"byteOffset":97920,
+			"byteLength":7422,
+			"byteOffset":78048,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":107292,
-			"uri":"Wall.bin"
+			"byteLength":85472,
+			"uri":"DoorWallUpper.bin"
 		}
 	]
 }

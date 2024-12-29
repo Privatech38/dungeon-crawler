@@ -15,44 +15,36 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Wall",
+			"name":"LowerWall",
 			"rotation":[
 				0,
-				-1,
+				1,
 				0,
 				7.549790126404332e-08
 			],
-			"scale":[
-				-1,
-				-1,
-				-1
-			],
 			"translation":[
-				1.4999995231628418,
-				1.3999947309494019,
-				-6.000002384185791
+				1.5000004768371582,
+				0.30000007152557373,
+				-6
 			]
 		}
 	],
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"RockNoTexture",
+			"name":"Rock",
 			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.15895980596542358,
-					0.1559266299009323,
-					0.15896092355251312,
-					1
-				],
+				"baseColorTexture":{
+					"index":0
+				},
 				"metallicFactor":0,
-				"roughnessFactor":0.800000011920929
+				"roughnessFactor":0.699999988079071
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"Wall",
+			"name":"Cube.007",
 			"primitives":[
 				{
 					"attributes":{
@@ -66,72 +58,91 @@
 			]
 		}
 	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"main-texture",
+			"uri":"../../../../textures/main-texture.png"
+		}
+	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":3060,
+			"count":152,
 			"max":[
-				1.3005564212799072,
-				0.8000001311302185,
-				0.12789364159107208
+				1.2000000476837158,
+				0.30000001192092896,
+				0.21866555511951447
 			],
 			"min":[
-				-1.3005563020706177,
-				-0.8000001907348633,
-				-0.12789350748062134
+				-1.2000000476837158,
+				-0.30000001192092896,
+				-0.2655187249183655
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":3060,
+			"count":152,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":3060,
+			"count":152,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":4686,
+			"count":228,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":36720,
+			"byteLength":1824,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":36720,
-			"byteOffset":36720,
+			"byteLength":1824,
+			"byteOffset":1824,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24480,
-			"byteOffset":73440,
+			"byteLength":1216,
+			"byteOffset":3648,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":9372,
-			"byteOffset":97920,
+			"byteLength":456,
+			"byteOffset":4864,
 			"target":34963
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9728,
+			"minFilter":9984
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":107292,
-			"uri":"Wall.bin"
+			"byteLength":5320,
+			"uri":"LowerWall.bin"
 		}
 	]
 }

@@ -15,22 +15,11 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Wall",
-			"rotation":[
-				0,
-				-1,
-				0,
-				7.549790126404332e-08
-			],
-			"scale":[
-				-1,
-				-1,
-				-1
-			],
+			"name":"HalfBrick",
 			"translation":[
-				1.4999995231628418,
-				1.3999947309494019,
-				-6.000002384185791
+				3.8499999046325684,
+				0.43999993801116943,
+				0
 			]
 		}
 	],
@@ -52,7 +41,7 @@
 	],
 	"meshes":[
 		{
-			"name":"Wall",
+			"name":"Wall.001",
 			"primitives":[
 				{
 					"attributes":{
@@ -70,68 +59,68 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":3060,
+			"count":120,
 			"max":[
-				1.3005564212799072,
-				0.8000001311302185,
-				0.12789364159107208
+				0.12999999523162842,
+				0.16000020503997803,
+				0.12499983608722687
 			],
 			"min":[
-				-1.3005563020706177,
-				-0.8000001907348633,
-				-0.12789350748062134
+				-0.12999999523162842,
+				-0.15999996662139893,
+				-0.12500040233135223
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":3060,
+			"count":120,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":3060,
+			"count":120,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":4686,
+			"count":186,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":36720,
+			"byteLength":1440,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":36720,
-			"byteOffset":36720,
+			"byteLength":1440,
+			"byteOffset":1440,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":24480,
-			"byteOffset":73440,
+			"byteLength":960,
+			"byteOffset":2880,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":9372,
-			"byteOffset":97920,
+			"byteLength":372,
+			"byteOffset":3840,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":107292,
-			"uri":"Wall.bin"
+			"byteLength":4212,
+			"uri":"HalfBrick.bin"
 		}
 	]
 }
