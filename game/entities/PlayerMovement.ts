@@ -1,11 +1,10 @@
 import { Vector3 } from "../../math/Vector";
 import { Movement } from "./Movement";
 
-class PlayerMovement {
-    private movement: Movement;
+class PlayerMovement extends Movement {
 
     constructor(initialPosition: Vector3, speed: number) {
-        this.movement = new Movement(initialPosition, speed);
+        super(initialPosition, speed);
     }
 
     public move(keys: { up: boolean; down: boolean; left: boolean; right: boolean }, deltaTime: number) {
@@ -13,10 +12,10 @@ class PlayerMovement {
         let velocityZ = 0;
 
         // Update velocity based on input
-        if (keys.up) velocityZ -= this.movement.getSpeed;
-        if (keys.down) velocityZ += this.movement.getSpeed;
-        if (keys.left) velocityX -= this.movement.getSpeed;
-        if (keys.right) velocityX += this.movement.getSpeed;
+        if (keys.up) velocityZ -= this.getSpeed;
+        if (keys.down) velocityZ += this.getSpeed;
+        if (keys.left) velocityX -= this.getSpeed;
+        if (keys.right) velocityX += this.getSpeed;
 
         // Normalize diagonal movement
         if (velocityX !== 0 && velocityZ !== 0) {
@@ -26,12 +25,8 @@ class PlayerMovement {
         }
 
         // Set the new velocity and update position
-        this.movement.setVelocity(velocityX, velocityZ);
-        this.movement.update(deltaTime);
-    }
-
-    getPosition(): Vector3 {
-        return this.movement.getPosition;
+        this.setVelocity(velocityX, velocityZ);
+        this.update(deltaTime);
     }
 }
 
