@@ -7,7 +7,8 @@ import {DebuffFreeze} from "./effects/debuff/DebuffFreeze";
 import {DebuffDamage} from "./effects/debuff/DebuffDamage";
 
 abstract class Entity {
-    protected health: number;
+    protected healthPoints: number;
+    protected MAX_HEALTH_POINTS: number = 100;
     protected hitbox: Hitbox;
     protected position: Vector3;
     protected effects: Set<Effect>;
@@ -19,7 +20,8 @@ abstract class Entity {
     protected initialPosition: Vector3;
 
     protected constructor(health: number, speed: number, hitbox: Hitbox, initialPosition: Vector3) {
-        this.health = health;
+        this.healthPoints = health;
+        this.MAX_HEALTH_POINTS = health;
         this.speed = speed;
         this.initialPosition = initialPosition;
         this.hitbox = hitbox;
@@ -42,7 +44,7 @@ abstract class Entity {
         if (this.effects.size != 0) {
             this.effects.forEach(effect => this.calcEffects(effect));
         }
-        this.loseHealth(damage)
+        this.subtractHealthPoints(damage)
     }
 
     public addDefence(defence: Defence): void {
@@ -69,7 +71,7 @@ abstract class Entity {
     private calcEffects(effect: Effect): void{
         if (effect.isActive()){
             if (effect instanceof Direct) {
-                this.loseHealth(effect.dealDamage())
+                this.subtractHealthPoints(effect.dealDamage())
             }
             else if (effect instanceof DebuffFreeze){
                 this.speed *= effect.reduction;
@@ -89,9 +91,31 @@ abstract class Entity {
         }
     }
 
-    private loseHealth(damage: number) {
-        this.health -= (1 - this.damageReduction) * damage;
-        if (this.health <= 0) this.kill();
+    /**
+     * Applies damage reduction to the supplied number and then subtracts it from health points
+     * @param amount - the amount of health points to be subtracted
+     * @private
+     */
+    private subtractHealthPoints(amount: number) {
+        this.healthPoints -= (1 - this.damageReduction) * amount;
+        if (this.healthPoints <= 0) this.kill();
+    }
+
+    /**
+     * Adds health points to the entity, but does not exceed the maximum health points
+     * @param amount - the amount of health points to be added
+     * @private
+     */
+    private addHealthPoints(amount: number) {
+        this.healthPoints += amount;
+        if (this.healthPoints > this.MAX_HEALTH_POINTS) this.healthPoints = this.MAX_HEALTH_POINTS;
+    }
+
+    /**
+     * Returns the current health points of the entity
+     */
+    public get getHealthPoints(): number {
+        return this.healthPoints;
     }
 
     protected updatePosition(position: Vector3){
@@ -99,7 +123,7 @@ abstract class Entity {
         this.hitbox.center = position;
     }
 
-    get getLifeState(): boolean{
+    get isAlive(): boolean{
         return this.alive;
     }
 
