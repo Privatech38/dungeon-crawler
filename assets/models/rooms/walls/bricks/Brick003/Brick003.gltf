@@ -26,16 +26,13 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"RockNoTexture",
+			"name":"MainMaterial",
 			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.15895980596542358,
-					0.1559266299009323,
-					0.15896092355251312,
-					1
-				],
+				"baseColorTexture":{
+					"index":0
+				},
 				"metallicFactor":0,
-				"roughnessFactor":0.800000011920929
+				"roughnessFactor":0.699999988079071
 			}
 		}
 	],
@@ -53,6 +50,19 @@
 					"material":0
 				}
 			]
+		}
+	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"main-texture",
+			"uri":"../../../../../textures/main-texture.png"
 		}
 	],
 	"accessors":[
@@ -115,6 +125,12 @@
 			"byteLength":300,
 			"byteOffset":3264,
 			"target":34963
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9728,
+			"minFilter":9984
 		}
 	],
 	"buffers":[

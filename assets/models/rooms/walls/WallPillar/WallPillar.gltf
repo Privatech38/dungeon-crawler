@@ -15,15 +15,15 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"WallPole",
+			"name":"Cube.001",
 			"rotation":[
 				0,
-				1,
+				0.7048152089118958,
 				0,
-				7.549790126404332e-08
+				0.7093909978866577
 			],
 			"translation":[
-				3.000000476837158,
+				0,
 				0.30000007152557373,
 				-6
 			]
@@ -32,7 +32,7 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Rock",
+			"name":"MainMaterial",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0

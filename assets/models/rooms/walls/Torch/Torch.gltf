@@ -15,44 +15,30 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"DoorWallUpper",
-			"rotation":[
-				0,
-				-1,
-				0,
-				7.549790126404332e-08
-			],
-			"scale":[
-				-1,
-				-1,
-				-1
-			],
+			"name":"Torch",
 			"translation":[
-				-1.4982800483703613,
-				1.3999947309494019,
-				-6.000002384185791
+				-0.012342453002929688,
+				1.6082079410552979,
+				-5.784849166870117
 			]
 		}
 	],
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"RockNoTexture",
+			"name":"MainMaterial",
 			"pbrMetallicRoughness":{
-				"baseColorFactor":[
-					0.15895980596542358,
-					0.1559266299009323,
-					0.15896092355251312,
-					1
-				],
+				"baseColorTexture":{
+					"index":0
+				},
 				"metallicFactor":0,
-				"roughnessFactor":0.800000011920929
+				"roughnessFactor":0.699999988079071
 			}
 		}
 	],
 	"meshes":[
 		{
-			"name":"DoorWall",
+			"name":"Cube.008",
 			"primitives":[
 				{
 					"attributes":{
@@ -66,72 +52,91 @@
 			]
 		}
 	],
+	"textures":[
+		{
+			"sampler":0,
+			"source":0
+		}
+	],
+	"images":[
+		{
+			"mimeType":"image/png",
+			"name":"main-texture",
+			"uri":"../../../../textures/main-texture.png"
+		}
+	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2439,
+			"count":241,
 			"max":[
-				1.3005564212799072,
-				0.8000000715255737,
-				0.16019870340824127
+				0.053458333015441895,
+				0.22620517015457153,
+				0.18929368257522583
 			],
 			"min":[
-				-1.3005563020706177,
-				-0.8000001907348633,
-				-0.1600007563829422
+				-0.053458333015441895,
+				-0.11584046483039856,
+				-0.010469025000929832
 			],
 			"type":"VEC3"
 		},
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2439,
+			"count":241,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2439,
+			"count":241,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":3711,
+			"count":342,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":29268,
+			"byteLength":2892,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":29268,
-			"byteOffset":29268,
+			"byteLength":2892,
+			"byteOffset":2892,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":19512,
-			"byteOffset":58536,
+			"byteLength":1928,
+			"byteOffset":5784,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":7422,
-			"byteOffset":78048,
+			"byteLength":684,
+			"byteOffset":7712,
 			"target":34963
+		}
+	],
+	"samplers":[
+		{
+			"magFilter":9728,
+			"minFilter":9984
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":85472,
-			"uri":"DoorWallUpper.bin"
+			"byteLength":8396,
+			"uri":"Torch.bin"
 		}
 	]
 }

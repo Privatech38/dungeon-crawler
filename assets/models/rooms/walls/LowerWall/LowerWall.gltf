@@ -32,7 +32,7 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"Rock",
+			"name":"MainMaterial",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
