@@ -7,6 +7,7 @@ import {PlayerMovement} from "./PlayerMovement";
 
 class Player extends Entity {
     private inventory: Inventory;
+    private movement: PlayerMovement;
 
     constructor(
         health: number,
@@ -14,9 +15,11 @@ class Player extends Entity {
         hitbox: Hitbox,
         inventoryAmount: number,
         initialPosition: Vector3,
+
     ) {
         super(health, speed, hitbox, initialPosition);
         this.inventory = new Inventory(inventoryAmount);
+        this.movement = new PlayerMovement(initialPosition, speed);
     }
 
     public addItem(item: Item, amount: number): void {
@@ -36,12 +39,13 @@ class Player extends Entity {
         })
     }
 
-    public setPosition(playerMovement: PlayerMovement) {
-        this.updatePosition(playerMovement.getPosition())
+    public move(keys: { up: boolean; down: boolean; left: boolean; right: boolean }, deltaTime: number) {
+        this.movement.move(keys, deltaTime);
+        this.position = this.movement.getPosition.clone();
     }
 
     get getInitialPosition(): Vector3{
-        return this.initialPosition;
+        return this.initialPosition.clone();
     }
 
     get getSpeed(): number{

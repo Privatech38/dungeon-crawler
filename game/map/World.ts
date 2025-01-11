@@ -1,6 +1,6 @@
 import { Room } from "./Room";
 
-class Map {
+class World {
     private readonly rooms: Room[];
     private readonly maxSurfaceArea: number;
     private currentSurfaceArea: number;
@@ -15,6 +15,12 @@ class Map {
         this.currentSurfaceArea += room.getSurfaceArea
     }
 
+    public generateWorld() {}
+
+    get getRooms(): Room[] {
+        return this.rooms;
+    }
 
 }
 
+export { World };

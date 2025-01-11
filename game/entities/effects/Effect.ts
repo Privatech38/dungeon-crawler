@@ -7,12 +7,12 @@ abstract class Effect {
 
     protected constructor(duration: number) {
         this.duration = duration;
-        this.startTime = Date.now();
-        this.endTime = this.startTime + this.duration * 1000;
+        this.startTime = performance.now();
+        this.endTime = this.startTime + this.duration;
     }
 
     public isActive(): boolean{
-        return this.endTime <= Date.now();
+        return this.endTime <= performance.now();
     }
 }
 

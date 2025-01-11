@@ -1,13 +1,17 @@
 import {Random} from "../../math/Random";
 import {Wall} from "./Wall";
 import {Vector3} from "../../math/Vector";
+import {Entity} from "../entities/Entity";
 
 class Room {
-    private walls: Wall[];
+    private readonly walls: Wall[];
     private width: number;
     private depth: number;
     private doorCount: number;
-    private startPoint: Vector3;
+    private readonly startPoint: Vector3;
+    private active: boolean;
+    private readonly corners: Array<Vector3>;
+    private neighbors: Set<Room>;
 
     constructor(startPoint: Vector3) {
         this.walls = [];
@@ -15,7 +19,18 @@ class Room {
         this.depth = 0;
         this.doorCount = 0;
         this.startPoint = startPoint;
+        this.active = false;
         this.generateRoom();
+        this.corners = new Array<Vector3>();
+        this.generateCorners();
+        this.neighbors = new Set<Room>();
+    }
+
+    private generateCorners() {
+        this.corners.push(this.startPoint);
+        this.corners.push(this.startPoint.add(new Vector3(0, 0, 3 * this.width)));
+        this.corners.push(this.startPoint.add(new Vector3(3 * this.depth, 0, 3 * this.width)));
+        this.corners.push(this.startPoint.add(new Vector3(3 * this.depth, 0, 0)));
     }
 
     private distribution(): number {
@@ -50,12 +65,40 @@ class Room {
             else {
                 startPoint.x += 3;
             }
-
         }
     }
 
-    private wallsDepth(): void {
+    public isWithinRoom(entity: Entity): boolean {
+        // Get the entity's position and set y to 0 (not needed)
+        const position = entity.getPosition.clone();
+        position.y = 0; // Set y to 0, as it's not needed in this case
 
+        if (this.corners.length !== 4) {
+            throw new Error("Corners array must contain exactly 4 points.");
+        }
+
+        const crossProducts: number[] = [];
+
+        // Loop through the corners of the room
+        for (let i = 0; i < 4; i++) {
+            const A = this.corners[i];
+            const B = this.corners[(i + 1) % 4];
+
+            // Use only the x and z components for the edge and point vector
+            const edge = new Vector3(B.x - A.x, 0, B.z - A.z); // Edge from A to B in the X-Z plane
+            const toPoint = new Vector3(position.x - A.x, 0, position.z - A.z); // Vector from A to the point
+
+            // Calculate the cross product's z component
+            const cross = edge.cross(toPoint);
+
+            crossProducts.push(cross.z); // Use the z-component to determine direction
+        }
+
+        // Check if all cross products are either positive or negative
+        const allPositive = crossProducts.every(c => c > 0);
+        const allNegative = crossProducts.every(c => c < 0);
+
+        return allPositive || allNegative;
     }
 
     get getWidth(): number {
@@ -76,6 +119,26 @@ class Room {
 
     get getWalls(): Wall[] {
         return this.walls;
+    }
+
+    get isActive(): boolean {
+        return this.active;
+    }
+
+    set isActive(value: boolean) {
+        this.active = value;
+    }
+
+    get getCorners(): Array<Vector3> {
+        return this.corners;
+    }
+
+    set newNeighbor(room: Room) {
+        this.neighbors.add(room);
+    }
+
+    get getNeighbors(): Set<Room> {
+        return this.neighbors;
     }
 
 }

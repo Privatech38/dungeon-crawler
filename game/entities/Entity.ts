@@ -119,8 +119,8 @@ abstract class Entity {
     }
 
     protected updatePosition(position: Vector3){
-        this.position = position;
-        this.hitbox.center = position;
+        this.position = position.clone();
+        this.hitbox.center = position.clone();
     }
 
     get isAlive(): boolean{
@@ -129,6 +129,10 @@ abstract class Entity {
 
     get getPosition(): Vector3 {
         return this.position;
+    }
+
+    get getHitbox(): Hitbox{
+        return this.hitbox;
     }
 }
 

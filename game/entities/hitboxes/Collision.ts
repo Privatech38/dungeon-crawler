@@ -54,51 +54,19 @@ class CollisionResult {
 class CollisionManager{
     /**
      * Checks for a collision between two hitboxes.
-     * @param {Hitbox} hitboxA - The first hitbox.
-     * @param {Hitbox} hitboxB - The second hitbox.
      * @returns {CollisionResult} - The result of the collision check.
      */
-    private hitboxA: Hitbox;
-    private hitboxB: Hitbox;
-    private collisionResult: CollisionResult;
 
-    constructor(hitboxA: Hitbox, hitboxB: Hitbox) {
-        this.hitboxA = hitboxA;
-        this.hitboxB = hitboxB;
-        this.collisionResult = new CollisionResult(hitboxA, hitboxB, null);
-    }
+    public checkCollision(hitboxA: Hitbox, hitboxB: Hitbox): CollisionResult {
+        let collisionResult = new CollisionResult(hitboxA, hitboxB, null);
+        if (!hitboxA.isActive || !hitboxB.isActive) return collisionResult;
 
-    private checkCollision(): CollisionResult {
-        if (!this.hitboxA.isActive || !this.hitboxB.isActive) return this.collisionResult;
-
-        if (this.hitboxA.collides(this.hitboxB)) {
-            this.collisionResult = new CollisionResult(this.hitboxA, this.hitboxB, this.hitboxA.center.add(this.hitboxB.center).scale(0.5));
-            return this.collisionResult;
+        if (hitboxA.collides(hitboxB)) {
+            collisionResult = new CollisionResult(hitboxA, hitboxB, hitboxA.center.add(hitboxB.center).scale(0.5));
+            return collisionResult;
         }
-        return this.collisionResult;
+        return collisionResult;
     }
-
-    get getHitboxA(): Hitbox {
-        return this.hitboxA;
-    }
-
-    set setHitboxA(hitboxA: Hitbox) {
-        this.hitboxA = hitboxA;
-    }
-
-    get getHitboxB(): Hitbox {
-        return this.hitboxB;
-    }
-
-    set setHitboxB(hitboxB: Hitbox) {
-        this.hitboxB = hitboxB;
-    }
-
-    get result(): CollisionResult {
-        this.checkCollision()
-        return this.collisionResult;
-    }
-
 }
 
 export { CollisionResult, CollisionManager };
