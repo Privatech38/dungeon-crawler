@@ -2,6 +2,7 @@ import {Hitbox} from "./Hitbox";
 import {Vector3} from "../../../math/Vector";
 import {Sphere} from "./Sphere";
 import {Point} from "./Point";
+import {Matrix4x4} from "../../../math/Matrix4x4";
 
 /**
  * Class representing an Oriented Bounding Box (OBB).
@@ -18,7 +19,12 @@ class OBB extends Hitbox {
      * @param halfExtents - The half-extents (size) of the OBB along each axis
      * @param isActive - Whether the OBB is active (default is true)
      */
-    constructor(center: Vector3, axes: [Vector3, Vector3, Vector3], halfExtents: Vector3, isActive: boolean = true) {
+    constructor(
+        axes: [Vector3, Vector3, Vector3],
+        halfExtents: Vector3,
+        center: Vector3 = new Vector3(0, 0, 0),
+        isActive: boolean = true
+    ) {
         super(center, isActive);
         this.axes = axes.map(axis => axis.normalize()) as [Vector3, Vector3, Vector3];
         this.halfExtents = halfExtents;
@@ -109,7 +115,7 @@ class OBB extends Hitbox {
         // Project the point onto each axis and compare to half-extent
         for (let i = 0; i < 3; i++) {
             const distance = Math.abs(localPoint.dot(this.axes[i]));
-            if (distance > this.halfExtents[i]) {
+            if (distance > this.halfExtents.toArray[i]) {
                 return false;
             }
         }
@@ -122,11 +128,17 @@ class OBB extends Hitbox {
      * @param other - The other OBB to check for intersection
      * @returns true if the OBBs intersect, false otherwise
      */
+
     intersects(other: OBB): boolean {
+        const crossProducts: Vector3[] = this.axes.reduce(
+            (acc, a) => acc.concat(other.axes.map(b => a.cross(b))),
+            [] as Vector3[]
+        );
+
         const axesToTest: Vector3[] = [
             ...this.axes,
             ...other.axes,
-            ...[].concat(...this.axes.map(a => other.axes.map(b => a.cross(b))))
+            ...crossProducts,
         ];
 
         for (const axis of axesToTest) {
@@ -162,7 +174,7 @@ class OBB extends Hitbox {
         for (let i = 0; i < 3; i++) {
             const axis = this.axes[i];
             const distance = other.center.subtract(this.center).dot(axis);
-            const clampedDistance = Math.max(-this.halfExtents[i], Math.min(this.halfExtents[i], distance));
+            const clampedDistance = Math.max(-this.halfExtents.toArray[i], Math.min(this.halfExtents.toArray[i], distance));
             closestPoint = closestPoint.add(axis.scale(clampedDistance));
         }
 
@@ -180,6 +192,55 @@ class OBB extends Hitbox {
         return Math.abs(this.axes[0].dot(axis)) * this.halfExtents.x +
             Math.abs(this.axes[1].dot(axis)) * this.halfExtents.y +
             Math.abs(this.axes[2].dot(axis)) * this.halfExtents.z;
+    }
+
+    /**
+     * Converts the OBB to a 4x4 transformation matrix
+     */
+    public toMatrix(): number[][] {
+        // Initialize a 4x4 identity matrix
+        const mat: number[][] = [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ];
+
+        // Set rotation + scale (axes scaled by half-lengths)
+        for (let i = 0; i < 3; i++) {
+            const scaledAxis = this.axes[i].multiply(this.halfExtents.scale(2));
+            mat[0][i] = scaledAxis.x;
+            mat[1][i] = scaledAxis.y;
+            mat[2][i] = scaledAxis.z;
+        }
+
+        // Set translation (center)
+        mat[0][3] = this.center.x;
+        mat[1][3] = this.center.y;
+        mat[2][3] = this.center.z;
+
+        return mat;
+    }
+
+    /**
+     * Convert a 4x4 matrix to OBB object.
+     * @param matrix {number[][]} - matrix you want to convert.
+     * @returns OBB object.
+     */
+    static fromMatrix(matrix: Matrix4x4): OBB {
+        const center = matrix.translation();
+        const rotation = matrix.rotation();
+        const scale = matrix.scale();
+
+        return new OBB(
+            [
+                rotation[0].normalize(),
+                rotation[1].normalize(),
+                rotation[2].normalize()
+            ],
+            scale.scale(0.5),
+            center
+        )
     }
 }
 

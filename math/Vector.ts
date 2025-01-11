@@ -90,6 +90,22 @@ class Vector3 {
     project(v: Vector3): Vector3 {
         return v.scale(this.dot(v) / Math.pow(v.magnitude(), 2));
     }
+
+    multiply(v: Vector3): Vector3 {
+        return new Vector3(this.x * v.x, this.y * v.y, this.z * v.z);
+    }
+
+    get toArray(): number[] {
+        return [this.x, this.y, this.z];
+    }
+
+    toString(): string {
+        return "x: " + this.x + ", y: " + this.y + ", z: " + this.z + ""
+    }
+
+    clone(): Vector3 {
+        return new Vector3(this.x, this.y, this.z);
+    }
 }
 
 export { Vector3 };
