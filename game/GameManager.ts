@@ -44,7 +44,6 @@ class GameManager {
     get getPlayer(): Player {
         return this.player;
     }
-
 }
 
 export {GameManager}

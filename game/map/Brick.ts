@@ -28,6 +28,9 @@ class Brick {
      */
     private readonly orientation: number;
 
+    private rotationX: number;
+    private rotationY: number;
+
     /**
      * Creates a new brick with the specified type.
      * @param {boolean} fullBrick - `true` for a full brick, `false` for a half brick.
@@ -37,17 +40,14 @@ class Brick {
         this.brickType = fullBrick;
         this.offset = 5;
         this.orientation = orientation;
+        this.rotationX = 0;
+        this.rotationY = 0;
+        this.generateBrick();
     }
 
-    /**
-     * Generates a random integer within the specified range.
-     * @static
-     * @param {number} min - The minimum value (inclusive).
-     * @param {number} max - The maximum value (inclusive).
-     * @returns {number} A random integer between `min` and `max`.
-     */
-    static brickIndex(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    private generateBrick() {
+        this.rotationY = Math.round(Math.random()) * 180;
+        this.rotationX = Math.round(Math.random()) * 180 + (this.randomOffset() - this.offset) + this.orientation;
     }
 
     /**
@@ -72,8 +72,8 @@ class Brick {
      * The orientation is either `0` or `180` degrees, chosen at random.
      * @returns {number} The orientation in degrees.
      */
-    get rotationY(): number {
-        return Math.round(Math.random()) * 180;
+    get getRotationY(): number {
+        return this.rotationY;
     }
 
     /**
@@ -81,8 +81,8 @@ class Brick {
      * The rotation is either `0` or `180` degrees, plus a random offset.
      * @returns {number} The rotation in degrees.
      */
-    get rotationX(): number {
-        return Math.round(Math.random()) * (180 + this.randomOffset() - this.offset) + this.orientation;
+    get getRotationX(): number {
+        return this.rotationX;
     }
 
     /**

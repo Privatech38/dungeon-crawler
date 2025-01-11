@@ -3,41 +3,48 @@ import {OBB} from "../entities/hitboxes/OBB";
 import {Vector3} from "../../math/Vector";
 
 /**
- * Represents a wall made up of bricks, with optional configurations for a door.
+ * Represents a bricks made up of bricks, with optional configurations for a door.
  */
 class Wall {
     /**
-     * Indicates whether the wall has a door.
+     * Indicates whether the bricks has a door.
      * @private
      * @type {boolean}
      */
     private door: boolean;
 
     /**
-     * A 2D array representing the structure of the wall.
+     * A 2D array representing the structure of the bricks.
      * Each element is a `Brick` object.
      * @private
      * @readonly
      * @type {Array<Array<Brick>>}
      */
-    private readonly wall: Array<Array<Brick>>;
+    private readonly bricks: Array<Array<Brick>>;
 
     /**
-     * Hitbox of wall
+     * Hitbox of bricks
      * @private
      * @type {OBB}
      */
     private hitbox: OBB;
 
     /**
-     * @param orientation Set orientation od wall 0 / 90 deg
+     * @param orientation Set orientation od bricks 0 / 90 deg
      */
     private orientation: number;
 
     /**
-     * @param orientation Set orientation od wall 0 / 90 deg
-     * @param center center of hitbox / wall
+     * @param orientation Set orientation od bricks 0 / 90 deg
+     * @param center center of hitbox / bricks
      */
+
+    /**
+     * Center of the hitbox of the bricks
+     * @private center
+     */
+    private center: Vector3;
+
     constructor(orientation: number, center: Vector3) {
         this.door = false;
         this.orientation = orientation;
@@ -51,13 +58,15 @@ class Wall {
             new Vector3(1.5, 1.1, 0.1),
             center
         )
+        this.center = this.hitbox.center;
 
-        // Initialize the wall as a 5x5 array filled with placeholder values.
-        this.wall = Array.from({ length: 5 }, () => Array(5).fill(0));
+        // Initialize the bricks as a 5x5 array filled with placeholder values.
+        this.bricks = Array.from({ length: 5 }, () => Array(5).fill(0));
+        this.generateWall();
     }
 
     /**
-     * Sets a specific brick at the given position in the wall.
+     * Sets a specific brick at the given position in the bricks.
      * @private
      * @param {number} row - The row index (0-based).
      * @param {number} col - The column index (0-based).
@@ -68,25 +77,25 @@ class Wall {
         if (row < 0 || row >= 5 || col < 0 || col >= 5) {
             throw new Error("Index out of bounds");
         }
-        this.wall[row][col] = value;
+        this.bricks[row][col] = value;
     }
 
     /**
-     * Regenerates the wall structure.
-     * If the wall has a door, this will adjust the wall layout to include it.
-     * Otherwise, creates a solid wall structure with alternating rows of full and half bricks.
+     * Regenerates the bricks structure.
+     * If the bricks has a door, this will adjust the bricks layout to include it.
+     * Otherwise, creates a solid bricks structure with alternating rows of full and half bricks.
      */
     private generateWall(): void {
         if (this.door) {
-            // TODO: Implement logic for a wall with a door.
+            // TODO: Implement logic for a bricks with a door.
             return;
         }
 
-        this.wall.forEach((line, i) => {
+        this.bricks.forEach((line, i) => {
             if (i % 2 === 0) {
                 // Full bricks for even rows.
                 for (let j = 0; j < line.length; j++) {
-                    let fullBrick = new Brick(true, this.orientation)
+                    let fullBrick = new Brick(true, this.orientation);
                     this.setWallValue(i, j, fullBrick);
                 }
             } else {
@@ -104,24 +113,15 @@ class Wall {
     }
 
     /**
-     * Gets the 2D array representing the wall.
-     * @returns {Array<Array<Brick>>} The current wall structure.
-     */
-    get getWall(): Array<Array<Brick>> {
-        this.generateWall();
-        return this.wall;
-    }
-
-    /**
-     * Checks whether the wall has a door.
-     * @returns {boolean} `true` if the wall has a door, `false` otherwise.
+     * Checks whether the bricks has a door.
+     * @returns {boolean} `true` if the bricks has a door, `false` otherwise.
      */
     get isDoor(): boolean {
         return this.door;
     }
 
     /**
-     * Sets whether the wall should have a door.
+     * Sets whether the bricks should have a door.
      * @param {boolean} value - `true` to include a door, `false` otherwise.
      */
     set isDoor(value: boolean) {
@@ -134,6 +134,14 @@ class Wall {
 
     get getHitbox(): OBB {
         return this.hitbox;
+    }
+
+    get getCenter(): Vector3 {
+        return this.center;
+    }
+
+    get getBricks(): Array<Array<Brick>> {
+        return this.bricks
     }
 }
 
