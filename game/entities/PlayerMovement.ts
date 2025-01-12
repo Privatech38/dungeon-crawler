@@ -26,7 +26,7 @@ class PlayerMovement extends Movement {
 
         // Set the new velocity and update position
         this.setVelocity(velocityX, velocityZ);
-        this.update(deltaTime);
+        this.update();
     }
 }
 
