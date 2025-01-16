@@ -7,7 +7,7 @@ class PlayerMovement extends Movement {
         super(initialPosition, speed);
     }
 
-    public move(keys: { up: boolean; down: boolean; left: boolean; right: boolean }, deltaTime: number) {
+    public move(keys: { up: boolean; down: boolean; left: boolean; right: boolean }) {
         let velocityX = 0;
         let velocityZ = 0;
 
@@ -26,7 +26,7 @@ class PlayerMovement extends Movement {
 
         // Set the new velocity and update position
         this.setVelocity(velocityX, velocityZ);
-        this.update(deltaTime);
+        this.update();
     }
 }
 

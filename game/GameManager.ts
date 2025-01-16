@@ -50,7 +50,7 @@ class GameManager {
     public playerMove(keys: { up: boolean; down: boolean; left: boolean; right: boolean }){
         this.updateDeltaTime();
         this.collisionWithWall(this.player)
-        this.playerMovement.move(keys, this.deltaTime)
+        this.playerMovement.move(keys)
         this.playerInRoom();
     }
 
