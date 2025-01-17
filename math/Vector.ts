@@ -106,6 +106,15 @@ class Vector3 {
     clone(): Vector3 {
         return new Vector3(this.x, this.y, this.z);
     }
+
+    /**
+     * Rotates the vector 90 degrees around the Y-axis (counterclockwise).
+     * @returns A new Vector3 representing the rotated vector.
+     */
+    rotateY90(): Vector3 {
+        // Rotation matrix for 90 degrees around the Y-axis
+        return new Vector3(this.z, this.y, -this.x);
+    }
 }
 
 export { Vector3 };

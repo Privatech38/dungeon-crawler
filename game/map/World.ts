@@ -39,4 +39,12 @@ class World {
     }
 }
 
+let world: World = new World(100);
+world.generateWorld();
+world.getRooms.forEach((room: Room) => {
+    room.getWalls.forEach((wall: Wall) => {
+        console.log(wall.getHitbox.toMatrix())
+    })
+})
+
 export { World };

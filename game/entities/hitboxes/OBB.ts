@@ -31,6 +31,22 @@ class OBB extends Hitbox {
     }
 
     /**
+     * Rotates the OBB 90 degrees around the Y-axis.
+     * @param direction - 'left' for counterclockwise, 'right' for clockwise.
+     */
+    rotateY90(direction: 'left' | 'right'): void {
+        if (direction === 'left') {
+            // Rotate each axis by 90° counterclockwise around Y-axis
+            this.axes[0] = this.axes[0].rotateY90();
+            this.axes[2] = this.axes[2].rotateY90();
+        } else if (direction === 'right') {
+            // Rotate each axis by 90° clockwise around Y-axis
+            this.axes[0] = this.axes[0].rotateY90().rotateY90().rotateY90();  // 270° clockwise
+            this.axes[2] = this.axes[2].rotateY90().rotateY90().rotateY90();  // 270° clockwise
+        }
+    }
+
+    /**
      * Checks if the current OBB collides with another hitbox.
      * @param other - The other hitbox to check collision with
      * @returns true if the OBB collides with the other hitbox, false otherwise
@@ -58,7 +74,7 @@ class OBB extends Hitbox {
      * Updates the forward (Y) axis of the OBB.
      * @param newY - The new forward (Y) axis
      */
-    updateForwardAxis(newY: Vector3) {
+    updateUpAxis(newY: Vector3) {
         this.axes[1] = newY.normalize();
     }
 
@@ -66,7 +82,7 @@ class OBB extends Hitbox {
      * Updates the up (Z) axis of the OBB.
      * @param newZ - The new up (Z) axis
      */
-    updateUpAxis(newZ: Vector3) {
+    updateForwardAxis(newZ: Vector3) {
         this.axes[2] = newZ.normalize();
     }
 

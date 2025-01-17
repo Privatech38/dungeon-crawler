@@ -48,8 +48,6 @@ class Wall {
             center
         )
         this.center = this.hitbox.center;
-
-        this.generateWall();
     }
 
     /**
@@ -92,8 +90,12 @@ class Wall {
         return this.center;
     }
 
-    get getOrienattion(): number {
+    get getOrientation(): number {
         return this.orientation;
+    }
+
+    rotateHitbox() {
+        this.hitbox.rotateY90("right")
     }
 }
 
