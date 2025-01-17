@@ -1,5 +1,6 @@
 import { Room } from "./Room";
 import {MapGenerator2} from "./MapGenerator2";
+import {Wall} from "./Wall";
 
 class World {
     private readonly rooms: Room[];
@@ -27,13 +28,23 @@ class World {
                 this.surfaceArea(room);
             }
         }
-        this.mapGenerator.printMap()
+    }
+
+    public printWorld() {
+        this.mapGenerator.printMap();
     }
 
     get getRooms(): Room[] {
         return this.rooms;
     }
-
 }
+
+let world: World = new World(100);
+world.generateWorld();
+world.getRooms.forEach((room: Room) => {
+    room.getWalls.forEach((wall: Wall) => {
+        console.log(wall.getQuaternions, wall.getCenter.toArray)
+    })
+})
 
 export { World };

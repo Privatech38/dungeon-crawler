@@ -6,7 +6,7 @@ import {Vector3} from "../../math/Vector";
 import {PlayerMovement} from "./PlayerMovement";
 
 class Player extends Entity {
-    private inventory: Inventory;
+    public inventory: Inventory;
     private movement: PlayerMovement;
 
     constructor(
@@ -51,6 +51,8 @@ class Player extends Entity {
     get getSpeed(): number{
         return this.speed;
     }
+
+
 }
 
 export { Player };

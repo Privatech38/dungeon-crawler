@@ -34,10 +34,10 @@ class Wall {
      * @private center
      */
     private center: Vector3;
+    private quaternions: number[];
 
     constructor(orientation: number, center: Vector3) {
         this.door = false;
-        this.orientation = orientation;
         this.orientation = orientation;
         this.hitbox = new OBB(
             [
@@ -49,8 +49,7 @@ class Wall {
             center
         )
         this.center = this.hitbox.center;
-
-        this.generateWall();
+        this.quaternions = [0, 0, 0, 1];
     }
 
     /**
@@ -91,6 +90,20 @@ class Wall {
 
     get getCenter(): Vector3 {
         return this.center;
+    }
+
+    get getOrientation(): number {
+        return this.orientation;
+    }
+
+    rotateHitbox() {
+        this.hitbox.rotateY90("right")
+        this.quaternions[1] = Math.sin(Math.PI / 4);
+        this.quaternions[3] = Math.cos(Math.PI / 4);
+    }
+
+    get getQuaternions(): number[] {
+        return this.quaternions;
     }
 }
 

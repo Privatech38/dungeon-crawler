@@ -7,14 +7,18 @@ import {CollisionManager} from "./entities/hitboxes/Collision";
 import {Enemy} from "./entities/Enemy";
 import {Point} from "./entities/hitboxes/Point";
 import {Wall} from "./map/Wall";
-
+import {Vector3} from "../math/Vector";
+import {OBB} from "./entities/hitboxes/OBB";
+import {Weapon} from "./entities/items/Weapon";
+import {Projectile} from "./attack/types/Projectile";
 
 class GameManager {
     private entities: Set<Entity>;
-    private player: Player;
-    private playerMovement: PlayerMovement;
-    private activeEntities: Set<Entity>;
+    private readonly player: Player;
+    private readonly playerMovement: PlayerMovement;
+    private readonly activeEntities: Set<Entity>;
     private activeRooms: Set<Room>;
+    private activeProjectiles: Set<Projectile>;
 
     private deltaTime: number;
     private lastFrameTime: number;
@@ -31,8 +35,9 @@ class GameManager {
         this.world = new World(worldSurfaceArea);
         this.activeEntities = new Set<Entity>();
         this.currentRoom = this.world.getRooms[0]; //starting room
-        this.activeRooms = this.currentRoom.getNeighbors;
+        this.activeRooms = new Set<Room>();
         this.activeRooms.add(this.currentRoom);
+        this.activeProjectiles = new Set<Projectile>();
     }
 
     public removeEntity(entity: Entity){
@@ -50,7 +55,15 @@ class GameManager {
         this.playerInRoom();
     }
 
-    public entetyMove() {
+    public playerAttack([x, y]: [number, number], equippedSlot: number): void {
+        const mousePosition = new Vector3(x, 1, y);
+        let currentItem = this.player.inventory.InventorySlots[equippedSlot].getItem
+        if (currentItem instanceof Weapon) {
+
+        }
+    }
+
+    public entityMove() {
         this.activeEntities.forEach((entity: Entity) => {
             if (this.checkCollision(entity).length !== 0) {return}
             if (entity instanceof Enemy) {
@@ -59,7 +72,7 @@ class GameManager {
                 }
                 this.playerInRoom();
                 this.updateDeltaTime();
-                entity.moveTowordsPlayer(this.player);
+                entity.update(this.player)
             }
         })
     }
@@ -147,6 +160,10 @@ class GameManager {
         })
     }
 
+    public printWorld() {
+        this.world.printWorld()
+    }
+
     private updateDeltaTime(){
         this.deltaTime = performance.now() - this.lastFrameTime;
         this.lastFrameTime = performance.now();
@@ -162,6 +179,30 @@ class GameManager {
     get getPlayer(): Player {
         return this.player;
     }
+
 }
+const defaultAxis: [Vector3, Vector3, Vector3] = [
+    new Vector3(1, 0, 0),
+    new Vector3(0, 1, 0),
+    new Vector3(0, 0, 1),
+]
+
+const playerHitbox = new OBB(
+    defaultAxis,
+    new Vector3(0.25, 1, 0.25),
+)
+
+const player = new Player(
+    100,
+    5,
+    playerHitbox,
+    9,
+    new Vector3(0, 1, 0),
+)
+
+let gameManager: GameManager = new GameManager(player, 300);
+gameManager.generateWorld();
+
+gameManager.printWorld();
 
 export {GameManager}
