@@ -15,7 +15,12 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Wall"
+			"name":"Wall",
+			"translation":[
+				0,
+				1.399999976158142,
+				0
+			]
 		}
 	],
 	"materials":[
