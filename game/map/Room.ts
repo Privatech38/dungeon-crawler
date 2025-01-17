@@ -2,9 +2,11 @@ import {Random} from "../../math/Random";
 import {Wall} from "./Wall";
 import {Vector3} from "../../math/Vector";
 import {Entity} from "../entities/Entity";
+import {Pillar} from "./Pillar";
 
 class Room {
     private readonly walls: Wall[];
+    private readonly pillars: Pillar[];
     private width: number;
     private depth: number;
     private doorCount: number;
@@ -16,6 +18,7 @@ class Room {
 
     constructor(size: number | null = null) {
         this.walls = [];
+        this.pillars = [];
         this.width = 0;
         this.depth = 0;
         this.doorCount = 0;
@@ -53,27 +56,69 @@ class Room {
     }
 
     private generateRoom(): void {
-        this.wallsPlace(new Vector3(0.1, 0, 1.6).add(this.startPoint), this.width, true);
-        this.wallsPlace(new Vector3(this.depth * 3 + 0.2, 0, 1.6).add(this.startPoint), this.width, true);
 
-        this.wallsPlace(new Vector3(1.6, 0, 0.1).add(this.startPoint), this.depth, false);
-        this.wallsPlace(new Vector3(1.6, 0, this.width * 3 + 0.2).add(this.startPoint), this.depth, false);
+        // generate bottom pillars and walls
+        this.generatePillar(
+            new Vector3(0, 0, 0).add(this.startPoint), this.width, "horizontal"
+        )
+        this.generateWalls(
+            new Vector3(1.5, 0, 0).add(this.startPoint), this.width, "horizontal"
+        )
+
+        // generate top pillars
+        this.generatePillar(
+            new Vector3(0, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal"
+        )
+        this.generateWalls(
+            new Vector3(1.5, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal"
+        )
+
+        // generate left pillars
+        this.generatePillar(
+            new Vector3(0, 0, 0).add(this.startPoint), this.depth, "vertical"
+        )
+        this.generateWalls(
+            new Vector3(0, 0, 1.5).add(this.startPoint), this.depth, "vertical"
+        )
+
+        // generate right pillars
+        this.generatePillar(
+            new Vector3(this.width * 3, 0, 0).add(this.startPoint), this.depth, "vertical"
+        )
+        this.generateWalls(
+            new Vector3(this.width * 3, 0, 1.5).add(this.startPoint), this.depth, "vertical"
+        )
     }
 
-    private wallsPlace(startPoint: Vector3, direction: number, isWidth:boolean): void {
-        for (let i = 0; i < direction; i++) {
-            let wall = new Wall(isWidth? 0 : 90, startPoint.clone());
-            if (!isWidth) {
+    private generatePillar(center: Vector3, amount: number, direction: string): void {
+        for (let i = 0; i < amount; i++) {
+            let pillar;
+            if (i === 0 || i === amount - 1) {
+                pillar = new Pillar(center.clone(), false)
+            } else {
+                pillar = new Pillar(center.clone(), true);
+            }
+            if (direction === 'horizontal') {
+                center.x += 3;
+            } else {
+                center.z += 3;
+            }
+            this.pillars.push(pillar);
+        }
+    }
+
+    private generateWalls(center: Vector3, amount: number, direction: string): void {
+        for (let i = 0; i < amount; i++) {
+            let wall;
+            if (direction === 'horizontal') {
+                wall = new Wall(0, center.clone());
+                center.x += 3;
+            } else { // direction === 'vertical'
+                wall = new Wall(90, center.clone())
                 wall.rotateHitbox();
+                center.z += 3;
             }
             this.walls.push(wall);
-
-            if (isWidth) {
-                startPoint.z += 3;
-            }
-            else {
-                startPoint.x += 3;
-            }
         }
     }
 
@@ -135,6 +180,10 @@ class Room {
         return this.walls;
     }
 
+    get getPillars(): Pillar[] {
+        return this.pillars;
+    }
+
     get isActive(): boolean {
         return this.active;
     }
@@ -168,6 +217,5 @@ class Room {
     }
 
 }
-
 
 export { Room }
