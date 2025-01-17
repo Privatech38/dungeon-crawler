@@ -1,4 +1,4 @@
-import {Effect} from "../Effect";
+import {Effect} from "../Effect.js";
 
 abstract class Direct extends Effect {
     private lastAttack: number;

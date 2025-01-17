@@ -1,4 +1,4 @@
-import {Defence} from "../Defence";
+import {Defence} from "../Defence.js";
 
 abstract class Effect {
     private readonly duration: number;

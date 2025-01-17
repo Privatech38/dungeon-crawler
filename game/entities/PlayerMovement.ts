@@ -1,5 +1,5 @@
-import { Vector3 } from "../../math/Vector";
-import { Movement } from "./Movement";
+import { Vector3 } from "../../math/Vector.js";
+import { Movement } from "./Movement.js";
 
 class PlayerMovement extends Movement {
 

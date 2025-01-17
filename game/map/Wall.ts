@@ -1,5 +1,5 @@
-import {OBB} from "../entities/hitboxes/OBB";
-import {Vector3} from "../../math/Vector";
+import {OBB} from "../entities/hitboxes/OBB.js";
+import {Vector3} from "../../math/Vector.js";
 
 /**
  * Represents a bricks made up of bricks, with optional configurations for a door.
@@ -33,8 +33,9 @@ class Wall {
      * Center of the hitbox of the bricks
      * @private center
      */
-    private center: Vector3;
+    private readonly center: Vector3;
     private quaternions: number[];
+
 
     constructor(orientation: number, center: Vector3) {
         this.door = false;

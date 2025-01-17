@@ -1,4 +1,4 @@
-import { Vector3 } from "./Vector";
+import { Vector3 } from "./Vector.js";
 
 class Matrix4x4 {
     private readonly data: number[][];

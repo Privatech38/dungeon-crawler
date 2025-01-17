@@ -1,16 +1,16 @@
-import {Entity} from "./entities/Entity";
-import {Player} from "./entities/Player";
-import {PlayerMovement} from "./entities/PlayerMovement";
-import { World } from "./map/World";
-import {Room} from "./map/Room";
-import {CollisionManager} from "./entities/hitboxes/Collision";
-import {Enemy} from "./entities/Enemy";
-import {Point} from "./entities/hitboxes/Point";
-import {Wall} from "./map/Wall";
-import {Vector3} from "../math/Vector";
-import {OBB} from "./entities/hitboxes/OBB";
-import {Weapon} from "./entities/items/Weapon";
-import {Projectile} from "./attack/types/Projectile";
+import {Entity} from "./entities/Entity.js";
+import {Player} from "./entities/Player.js";
+import {PlayerMovement} from "./entities/PlayerMovement.js";
+import { World } from "./map/World.js";
+import {Room} from "./map/Room.js";
+import {CollisionManager} from "./entities/hitboxes/Collision.js";
+import {Enemy} from "./entities/Enemy.js";
+import {Point} from "./entities/hitboxes/Point.js";
+import {Wall} from "./map/Wall.js";
+import {Vector3} from "../math/Vector.js";
+import {OBB} from "./entities/hitboxes/OBB.js";
+import {Weapon} from "./entities/items/Weapon.js";
+import {Projectile} from "./attack/types/Projectile.js";
 
 class GameManager {
     private entities: Set<Entity>;

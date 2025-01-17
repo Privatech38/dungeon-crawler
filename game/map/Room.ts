@@ -1,8 +1,8 @@
-import {Random} from "../../math/Random";
-import {Wall} from "./Wall";
-import {Vector3} from "../../math/Vector";
-import {Entity} from "../entities/Entity";
-import {Pillar} from "./Pillar";
+import {Random} from "../../math/Random.js";
+import {Wall} from "./Wall.js";
+import {Vector3} from "../../math/Vector.js";
+import {Entity} from "../entities/Entity.js";
+import {Pillar} from "./Pillar.js";
 
 class Room {
     private readonly walls: Wall[];

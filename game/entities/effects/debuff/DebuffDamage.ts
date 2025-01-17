@@ -1,5 +1,4 @@
-import {Effect} from "../Effect";
-import {Debuff} from "./Debuff";
+import {Debuff} from "./Debuff.js";
 
 class DebuffDamage extends Debuff{
 

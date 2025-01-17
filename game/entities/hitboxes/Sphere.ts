@@ -1,7 +1,7 @@
-import {Hitbox} from "./Hitbox";
-import {Vector3} from "../../../math/Vector";
-import {OBB} from "./OBB";
-import {Point} from "./Point";
+import {Hitbox} from "./Hitbox.js";
+import {Vector3} from "../../../math/Vector.js";
+import {OBB} from "./OBB.js";
+import {Point} from "./Point.js";
 
 /**
  * Class representing a sphere hitbox.

@@ -1,8 +1,8 @@
-import {Hitbox} from "./Hitbox";
-import {Vector3} from "../../../math/Vector";
-import {Sphere} from "./Sphere";
-import {Point} from "./Point";
-import {Matrix4x4} from "../../../math/Matrix4x4";
+import {Hitbox} from "./Hitbox.js";
+import {Vector3} from "../../../math/Vector.js";
+import {Sphere} from "./Sphere.js";
+import {Point} from "./Point.js";
+import {Matrix4x4} from "../../../math/Matrix4x4.js";
 
 /**
  * Class representing an Oriented Bounding Box (OBB).

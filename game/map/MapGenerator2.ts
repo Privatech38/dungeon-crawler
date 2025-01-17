@@ -1,5 +1,5 @@
-import {Room} from "./Room";
-import {Vector3} from "../../math/Vector";
+import {Room} from "./Room.js";
+import {Vector3} from "../../math/Vector.js";
 
 class MapGenerator2 {
     private readonly maxSize: number;

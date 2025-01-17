@@ -1,9 +1,9 @@
-import {Weapon} from "./Weapon";
-import {Effect} from "../effects/Effect";
-import {Hitbox} from "../hitboxes/Hitbox";
-import {Projectile} from "../../attack/types/Projectile";
-import {Entity} from "../Entity";
-import {Vector3} from "../../../math/Vector";
+import {Weapon} from "./Weapon.js";
+import {Effect} from "../effects/Effect.js";
+import {Hitbox} from "../hitboxes/Hitbox.js";
+import {Projectile} from "../../attack/types/Projectile.js";
+import {Entity} from "../Entity.js";
+import {Vector3} from "../../../math/Vector.js";
 
 class ProjectileWeapon extends Weapon {
     projectile: any;

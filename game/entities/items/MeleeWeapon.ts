@@ -1,9 +1,9 @@
-import {Weapon} from "./Weapon";
-import {Entity} from "../Entity";
-import {Effect} from "../effects/Effect";
-import {Hitbox} from "../hitboxes/Hitbox";
-import {Vector3} from "../../../math/Vector";
-import {Melee} from "../../attack/types/Melee";
+import {Weapon} from "./Weapon.js";
+import {Entity} from "../Entity.js";
+import {Effect} from "../effects/Effect.js";
+import {Hitbox} from "../hitboxes/Hitbox.js";
+import {Vector3} from "../../../math/Vector.js";
+import {Melee} from "../../attack/types/Melee.js";
 
 class MeleeWeapon extends Weapon {
     attacker: Entity;

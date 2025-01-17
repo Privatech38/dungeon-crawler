@@ -1,4 +1,4 @@
-import { Vector3 } from "../../math/Vector";
+import { Vector3 } from "../../math/Vector.js";
 
 class Movement {
     private position: Vector3;

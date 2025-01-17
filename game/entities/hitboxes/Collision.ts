@@ -1,5 +1,5 @@
-import {Hitbox} from "./Hitbox";
-import {Vector3} from "../../../math/Vector";
+import {Hitbox} from "./Hitbox.js";
+import {Vector3} from "../../../math/Vector.js";
 
 /**
  * Represents the result of a collision between two hitboxes.

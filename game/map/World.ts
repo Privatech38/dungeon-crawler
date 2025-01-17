@@ -1,6 +1,6 @@
-import { Room } from "./Room";
-import {MapGenerator2} from "./MapGenerator2";
-import {Wall} from "./Wall";
+import { Room } from "./Room.js";
+import {MapGenerator2} from "./MapGenerator2.js";
+import {Wall} from "./Wall.js";
 
 class World {
     private readonly rooms: Room[];

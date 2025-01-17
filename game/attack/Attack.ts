@@ -1,6 +1,6 @@
-import { Vector3 } from "../../math/Vector";
-import { Hitbox } from "../entities/hitboxes/Hitbox";
-import {Entity} from "../entities/Entity";
+import { Vector3 } from "../../math/Vector.js";
+import { Hitbox } from "../entities/hitboxes/Hitbox.js";
+import {Entity} from "../entities/Entity.js";
 
 /**
  * Represents an abstract attack that can be performed by an entity.
