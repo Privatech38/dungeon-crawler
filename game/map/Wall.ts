@@ -45,7 +45,7 @@ class Wall {
                 new Vector3(0, 1, 0),
                 new Vector3(0, 0, 1),
             ],
-            new Vector3(1.5, 1.1, 0.1),
+            new Vector3(1.6, 1.1, 0.3),
             center
         )
         this.center = this.hitbox.center;
