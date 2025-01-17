@@ -4,8 +4,8 @@ import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 
 import { OrbitController } from 'engine/controllers/OrbitController.js';
-import { RotateAnimator } from 'engine/animators/RotateAnimator.js';
-import { LinearAnimator } from 'engine/animators/LinearAnimator.js';
+import { createWall } from "./game/init/WorldBuilder.js";
+import { createPillar } from "./game/init/WorldBuilder.js";
 
 import {
     Camera,
@@ -15,44 +15,50 @@ import {
 } from 'engine/core.js';
 
 import { Renderer } from './Renderer.js';
+import { UnlitRenderer } from "./engine/renderers/UnlitRenderer.js";
 import { Light } from './Light.js';
+import { Room } from "./game/map/Room.js";
 
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
+// const renderer = new UnlitRenderer(canvas);
+// await renderer.initialize();
 
 const gltfLoader = new GLTFLoader();
-await gltfLoader.load('./models/monkey/monkey.gltf');
+await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 
 const camera = scene.find(node => node.getComponentOfType(Camera));
-camera.addComponent(new OrbitController(camera, document.body, {
-    distance: 8,
-}));
-
-const model = scene.find(node => node.getComponentOfType(Model));
-model.addComponent(new RotateAnimator(model, {
-    startRotation: [0, 0, 0, 1],
-    endRotation: [0.7071, 0, 0.7071, 0],
-    duration: 5,
-    loop: true,
-}));
+camera.addComponent(new OrbitController(camera, canvas));
 
 const light = new Node();
-light.addComponent(new Transform({
-    translation: [3, 3, 3],
-}));
 light.addComponent(new Light({
-    ambient: 0.3,
+    color: [255, 184, 92],
+    direction: [0, 0, 1],
 }));
-light.addComponent(new LinearAnimator(light, {
-    startPosition: [3, 3, 3],
-    endPosition: [-3, -3, -3],
-    duration: 1,
-    loop: true,
+light.addComponent(new Transform({
+    translation: [1, 2, 1],
 }));
 scene.addChild(light);
+
+let room = new Room();
+room.generateNewRoom()
+
+room.getWalls.forEach(wall => {
+    createWall(new Transform({
+        translation: wall.getCenter.toArray,
+        scale: wall.getQuaternions,
+    }), scene);
+});
+
+room.getPillars.forEach(pillar => {
+    createPillar(new Transform({
+        translation: pillar.getCenter.toArray,
+    }), scene);
+})
+
 
 function update(time, dt) {
     scene.traverse(node => {
