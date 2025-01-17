@@ -1,16 +1,20 @@
-import {Attack} from "../../attack/Attack";
 import {Effect} from "../effects/Effect";
+import {Hitbox} from "../hitboxes/Hitbox";
 
-class Weapon{
-    public attack: Attack;
-    public effects: Set<Effect>;
 
-    constructor(
-        attack: Attack,
+abstract class Weapon{
+    protected effects: Set<Effect>;
+    protected readonly attackDamage: number;
+    protected hurtbox: Hitbox;
+
+    protected constructor(
+        attackDamage: number,
         effects: Set<Effect> = new Set(),
+        hurtbox: Hitbox,
     ) {
-        this.attack = attack;
+        this.attackDamage = attackDamage;
         this.effects = effects;
+        this.hurtbox = hurtbox;
     }
 }
 

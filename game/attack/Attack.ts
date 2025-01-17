@@ -72,7 +72,7 @@ abstract class Attack {
     abstract updateHurtBox(newRadius: number | Vector3): void;
 
     /**
-     * Retrieves the center position of the hurt box.
+     * Retrieves the hurt box.
      * @returns Hurt box.
      */
     getHurtBox(): Hitbox {

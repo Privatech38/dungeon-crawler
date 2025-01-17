@@ -59,7 +59,7 @@ class GameManager {
                 }
                 this.playerInRoom();
                 this.updateDeltaTime();
-                entity.moveTowordsPlayer(this.player);
+                entity.update(this.player)
             }
         })
     }
