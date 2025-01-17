@@ -1,9 +1,11 @@
 export class Light {
 
     constructor({
-        ambient = 0,
+        color = [255, 255, 255],
+        direction = [0, 0, 1],
     } = {}) {
-        this.ambient = ambient;
+        this.color = color;
+        this.direction = direction;
     }
 
 }

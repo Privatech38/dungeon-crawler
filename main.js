@@ -19,10 +19,10 @@ import { UnlitRenderer } from "./engine/renderers/UnlitRenderer.js";
 import { Light } from './Light.js';
 
 const canvas = document.querySelector('canvas');
-// const renderer = new Renderer(canvas);
-// await renderer.initialize();
-const renderer = new UnlitRenderer(canvas);
+const renderer = new Renderer(canvas);
 await renderer.initialize();
+// const renderer = new UnlitRenderer(canvas);
+// await renderer.initialize();
 
 const gltfLoader = new GLTFLoader();
 await gltfLoader.load('./assets/default/DefaultScene.gltf');
@@ -30,6 +30,18 @@ await gltfLoader.load('./assets/default/DefaultScene.gltf');
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 
 const camera = scene.find(node => node.getComponentOfType(Camera));
+camera.addComponent(new OrbitController(camera, canvas));
+
+const light = new Node();
+light.addComponent(new Light({
+    color: [255, 184, 92],
+    direction: [0, 0, 1],
+}));
+light.addComponent(new Transform({
+    translation: [1, 2, 1],
+}));
+scene.addChild(light);
+
 
 function update(time, dt) {
     scene.traverse(node => {
