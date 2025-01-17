@@ -1,17 +1,17 @@
 class InventorySlot {
-    private item: Item;
+    private item: any;
     private amount: number;
 
-    constructor(item: Item, amount: number) {
+    constructor(item: any, amount: number) {
         this.item = item;
         this.amount = amount;
     }
 
-    get getItem(): Item {
+    get getItem(): any {
         return this.item;
     }
 
-    set setItem(item: Item) {
+    set setItem(item: any) {
         this.item = item;
     }
 

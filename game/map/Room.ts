@@ -62,7 +62,7 @@ class Room {
 
     private wallsPlace(startPoint: Vector3, direction: number, isWidth:boolean): void {
         for (let i = 0; i < direction; i++) {
-            let wall = new Wall(0, startPoint.clone());
+            let wall = new Wall(isWidth? 0 : 90, startPoint.clone());
             this.walls.push(wall);
 
             if (isWidth) {

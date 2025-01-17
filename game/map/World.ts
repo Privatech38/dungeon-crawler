@@ -1,5 +1,6 @@
 import { Room } from "./Room";
 import {MapGenerator2} from "./MapGenerator2";
+import {Wall} from "./Wall";
 
 class World {
     private readonly rooms: Room[];
@@ -27,13 +28,15 @@ class World {
                 this.surfaceArea(room);
             }
         }
-        this.mapGenerator.printMap()
+    }
+
+    public printWorld() {
+        this.mapGenerator.printMap();
     }
 
     get getRooms(): Room[] {
         return this.rooms;
     }
-
 }
 
 export { World };

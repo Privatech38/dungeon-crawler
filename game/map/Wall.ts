@@ -38,7 +38,6 @@ class Wall {
     constructor(orientation: number, center: Vector3) {
         this.door = false;
         this.orientation = orientation;
-        this.orientation = orientation;
         this.hitbox = new OBB(
             [
                 new Vector3(1, 0, 0),
@@ -91,6 +90,10 @@ class Wall {
 
     get getCenter(): Vector3 {
         return this.center;
+    }
+
+    get getOrienattion(): number {
+        return this.orientation;
     }
 }
 

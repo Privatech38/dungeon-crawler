@@ -4,9 +4,6 @@ import {Vector3} from "../../math/Vector";
 import {Movement} from "./Movement";
 import {Player} from "./Player";
 import {Weapon} from "./items/Weapon";
-import {Attack} from "../attack/Attack";
-import {Projectile} from "../attack/types/Projectile";
-import {Melee} from "../attack/types/Melee";
 
 class Enemy extends Entity {
     movement: Movement;
