@@ -59,7 +59,7 @@ class Room {
 
         // generate bottom pillars and walls
         this.generatePillar(
-            new Vector3(0, 0, 0).add(this.startPoint), this.width, "horizontal"
+            new Vector3(0, 0, 0).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, 1)
         )
         this.generateWalls(
             new Vector3(1.5, 0, 0).add(this.startPoint), this.width, "horizontal"
@@ -67,7 +67,7 @@ class Room {
 
         // generate top pillars
         this.generatePillar(
-            new Vector3(0, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal"
+            new Vector3(0, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, -1)
         )
         this.generateWalls(
             new Vector3(1.5, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal"
@@ -75,7 +75,7 @@ class Room {
 
         // generate left pillars
         this.generatePillar(
-            new Vector3(0, 0, 0).add(this.startPoint), this.depth, "vertical"
+            new Vector3(0, 0, 0).add(this.startPoint), this.depth, "vertical", new Vector3(1, 0, 0)
         )
         this.generateWalls(
             new Vector3(0, 0, 1.5).add(this.startPoint), this.depth, "vertical"
@@ -83,20 +83,20 @@ class Room {
 
         // generate right pillars
         this.generatePillar(
-            new Vector3(this.width * 3, 0, 0).add(this.startPoint), this.depth, "vertical"
+            new Vector3(this.width * 3, 0, 0).add(this.startPoint), this.depth, "vertical", new Vector3(-1, 0, 0)
         )
         this.generateWalls(
             new Vector3(this.width * 3, 0, 1.5).add(this.startPoint), this.depth, "vertical"
         )
     }
 
-    private generatePillar(center: Vector3, amount: number, direction: string): void {
+    private generatePillar(center: Vector3, amount: number, direction: string, orientation: Vector3): void {
         for (let i = 0; i < amount; i++) {
             let pillar;
             if (i === 0 || i === amount - 1) {
-                pillar = new Pillar(center.clone(), false)
+                pillar = new Pillar(center.clone(), false, orientation)
             } else {
-                pillar = new Pillar(center.clone(), true);
+                pillar = new Pillar(center.clone(), true, orientation);
             }
             if (direction === 'horizontal') {
                 center.x += 3;
@@ -217,5 +217,17 @@ class Room {
     }
 
 }
+
+let room: Room = new Room();
+room.generateNewRoom()
+
+room.getWalls.forEach(wall => {
+    wall.getCenter.toArray;
+    console.log(wall.getQuaternions)
+})
+
+room.getPillars.forEach(pillar => {
+    pillar.getCenter.toArray;
+})
 
 export { Room }
