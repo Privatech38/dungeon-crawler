@@ -8,22 +8,27 @@ class Room {
     private width: number;
     private depth: number;
     private doorCount: number;
-    private readonly startPoint: Vector3;
+    private startPoint: Vector3;
     private active: boolean;
     private readonly corners: Array<Vector3>;
+    private ID: number;
     private neighbors: Set<Room>;
 
-    constructor(startPoint: Vector3) {
+    constructor(size: number | null = null) {
         this.walls = [];
         this.width = 0;
         this.depth = 0;
         this.doorCount = 0;
-        this.startPoint = startPoint;
+        this.startPoint = new Vector3(0, 0, 0);
         this.active = false;
-        this.generateRoom();
         this.corners = new Array<Vector3>();
-        this.generateCorners();
         this.neighbors = new Set<Room>();
+        this.ID = 0;
+        if (size === null) {
+            this.generateSize(this.distribution());
+        } else {
+            this.generateSize(size);
+        }
     }
 
     private generateCorners() {
@@ -38,17 +43,18 @@ class Room {
         return ((Math.floor(Math.log2(rand)) + 3) % 4) + 1; // Rotated distribution
     }
 
-    private generateRoom(): void {
-        const size = this.distribution();
+    private generateSize(setSize: number) {
+        const size = setSize;
         const minSize = size;
         const maxSize = size + Math.ceil(size / 2);
         this.width = Random.randInt(minSize, maxSize);
         this.depth = Random.randInt(minSize, maxSize);
         this.doorCount = Random.randInt(1, size + 1);
+    }
 
+    private generateRoom(): void {
         this.wallsPlace(new Vector3(0.1, 0, 1.6).add(this.startPoint), this.width, true);
         this.wallsPlace(new Vector3(this.depth * 3 + 0.2, 0, 1.6).add(this.startPoint), this.width, true);
-
 
         this.wallsPlace(new Vector3(1.6, 0, 0.1).add(this.startPoint), this.depth, false);
         this.wallsPlace(new Vector3(1.6, 0, this.width * 3 + 0.2).add(this.startPoint), this.depth, false);
@@ -66,6 +72,11 @@ class Room {
                 startPoint.x += 3;
             }
         }
+    }
+
+    public generateNewRoom(): void {
+        this.generateRoom();
+        this.generateCorners();
     }
 
     public isWithinRoom(entity: Entity): boolean {
@@ -139,6 +150,18 @@ class Room {
 
     get getNeighbors(): Set<Room> {
         return this.neighbors;
+    }
+
+    set setStartPoint(startPoint: Vector3) {
+        this.startPoint = startPoint.clone();
+    }
+
+    set setID(id: number) {
+        this.ID = id;
+    }
+
+    get getID(): number {
+        return this.ID;
     }
 
 }
