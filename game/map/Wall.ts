@@ -1,4 +1,3 @@
-import { Brick } from "./Brick";
 import {OBB} from "../entities/hitboxes/OBB";
 import {Vector3} from "../../math/Vector";
 
@@ -12,15 +11,6 @@ class Wall {
      * @type {boolean}
      */
     private door: boolean;
-
-    /**
-     * A 2D array representing the structure of the bricks.
-     * Each element is a `Brick` object.
-     * @private
-     * @readonly
-     * @type {Array<Array<Brick>>}
-     */
-    private readonly bricks: Array<Array<Brick>>;
 
     /**
      * Hitbox of bricks
@@ -60,24 +50,7 @@ class Wall {
         )
         this.center = this.hitbox.center;
 
-        // Initialize the bricks as a 5x5 array filled with placeholder values.
-        this.bricks = Array.from({ length: 5 }, () => Array(5).fill(0));
         this.generateWall();
-    }
-
-    /**
-     * Sets a specific brick at the given position in the bricks.
-     * @private
-     * @param {number} row - The row index (0-based).
-     * @param {number} col - The column index (0-based).
-     * @param {Brick} value - The `Brick` object to place in the specified position.
-     * @throws {Error} If the row or column indices are out of bounds.
-     */
-    private setWallValue(row: number, col: number, value: Brick): void {
-        if (row < 0 || row >= 5 || col < 0 || col >= 5) {
-            throw new Error("Index out of bounds");
-        }
-        this.bricks[row][col] = value;
     }
 
     /**
@@ -90,26 +63,6 @@ class Wall {
             // TODO: Implement logic for a bricks with a door.
             return;
         }
-
-        this.bricks.forEach((line, i) => {
-            if (i % 2 === 0) {
-                // Full bricks for even rows.
-                for (let j = 0; j < line.length; j++) {
-                    let fullBrick = new Brick(true, this.orientation);
-                    this.setWallValue(i, j, fullBrick);
-                }
-            } else {
-                // Half bricks at the edges and full bricks in the middle for odd rows.
-                let halfBrick = new Brick(false, this.orientation)
-                this.setWallValue(i, 0, halfBrick);
-                this.setWallValue(i, line.length - 1, halfBrick);
-
-                for (let j = 1; j < line.length - 1; j++) {
-                    let fullBrick = new Brick(true, this.orientation)
-                    this.setWallValue(i, j, fullBrick);
-                }
-            }
-        });
     }
 
     /**
@@ -138,10 +91,6 @@ class Wall {
 
     get getCenter(): Vector3 {
         return this.center;
-    }
-
-    get getBricks(): Array<Array<Brick>> {
-        return this.bricks
     }
 }
 

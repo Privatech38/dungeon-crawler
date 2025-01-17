@@ -22,13 +22,13 @@ class GameManager {
 
     private currentRoom: Room;
 
-    constructor(player: Player) {
+    constructor(player: Player, worldSurfaceArea: number) {
         this.player = player;
         this.deltaTime = 0;
         this.entities = new Set<Entity>;
         this.lastFrameTime = performance.now();
         this.playerMovement = new PlayerMovement(this.player.getInitialPosition, this.player.getSpeed);
-        this.world = new World();
+        this.world = new World(worldSurfaceArea);
         this.activeEntities = new Set<Entity>();
         this.currentRoom = this.world.getRooms[0]; //starting room
         this.activeRooms = this.currentRoom.getNeighbors;
@@ -41,10 +41,6 @@ class GameManager {
 
     public addEntity(entity: Entity){
         this.entities.add(entity);
-    }
-
-    public generateWorld() {
-        this.world.generateWorld();
     }
 
     public playerMove(keys: { up: boolean; down: boolean; left: boolean; right: boolean }){
@@ -66,6 +62,10 @@ class GameManager {
                 entity.moveTowordsPlayer(this.player);
             }
         })
+    }
+
+    public generateWorld() {
+        this.world.generateWorld();
     }
 
     private collisionWithWall(entity: Entity): boolean {
