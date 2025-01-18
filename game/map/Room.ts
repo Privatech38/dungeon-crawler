@@ -114,11 +114,12 @@ class Room {
 
         // Generate floor
         let center = new Vector3(1.5, 0, 1.5);
-        for (let i = 1; i <= this.depth; i++) {
-            for (let j = 1; j <= this.width; j++) {
-                this.floors.push(new Floor(center.clone()));
-                center.x += j * 3;
-                center.z += i * 3;
+        for (let i = 0; i < this.depth; i++) {
+            for (let j = 0; j < this.width; j++) {
+                let currentCenter = center.clone();
+                currentCenter.x += j * 3;
+                currentCenter.z += i * 3;
+                this.floors.push(new Floor(currentCenter));
             }
         }
     }
