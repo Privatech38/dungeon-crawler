@@ -1,43 +1,46 @@
-import {OBB} from "../entities/hitboxes/OBB.js";
-import {Vector3} from "../../math/Vector.js";
+import { OBB } from "../entities/hitboxes/OBB.js";
+import { Vector3 } from "../../math/Vector.js";
+import { Structure } from "./Structure.js";
 
 /**
- * Represents a bricks made up of bricks, with optional configurations for a door.
+ * Represents a wall structure made up of bricks, with optional configurations for a door.
  */
-class Wall {
+class Wall extends Structure {
     /**
-     * Indicates whether the bricks has a door.
+     * Indicates whether the wall has a door.
      * @private
      * @type {boolean}
      */
     private door: boolean;
 
     /**
-     * Hitbox of bricks
+     * Hitbox of the wall.
      * @private
      * @type {OBB}
      */
     private hitbox: OBB;
 
     /**
-     * @param orientation Set orientation od bricks 0 / 90 deg
+     * Orientation of the wall (0 or 90 degrees).
+     * @private
+     * @type {number}
      */
     private orientation: number;
 
     /**
-     * @param orientation Set orientation od bricks 0 / 90 deg
-     * @param center center of hitbox / bricks
+     * Quaternions representing the wall's rotation.
+     * @private
+     * @type {number[]}
      */
-
-    /**
-     * Center of the hitbox of the bricks
-     * @private center
-     */
-    private readonly center: Vector3;
     private quaternions: number[];
 
-
+    /**
+     * Creates a new Wall instance.
+     * @param {number} orientation - The orientation of the wall (0 or 90 degrees).
+     * @param {Vector3} center - The center of the wall's hitbox.
+     */
     constructor(orientation: number, center: Vector3) {
+        super(center);
         this.door = false;
         this.orientation = orientation;
         this.hitbox = new OBB(
@@ -48,64 +51,79 @@ class Wall {
             ],
             new Vector3(1.5, 1.1, 0.3),
             center
-        )
-        this.center = this.hitbox.center;
+        );
         this.quaternions = [0, 0, 0, 1];
     }
 
     /**
-     * Regenerates the bricks structure.
-     * If the bricks has a door, this will adjust the bricks layout to include it.
-     * Otherwise, creates a solid bricks structure with alternating rows of full and half bricks.
+     * Regenerates the wall structure.
+     * If the wall has a door, this adjusts the wall layout to include it.
+     * Otherwise, creates a solid wall structure with alternating rows of full and half bricks.
+     * @private
      */
     private generateWall(): void {
         if (this.door) {
-            // TODO: Implement logic for a bricks with a door.
+            // TODO: Implement logic for a wall with a door.
             return;
         }
     }
 
     /**
-     * Checks whether the bricks has a door.
-     * @returns {boolean} `true` if the bricks has a door, `false` otherwise.
+     * Checks whether the wall has a door.
+     * @returns {boolean} `true` if the wall has a door, `false` otherwise.
      */
     get isDoor(): boolean {
         return this.door;
     }
 
     /**
-     * Sets whether the bricks should have a door.
+     * Sets whether the wall should have a door.
      * @param {boolean} value - `true` to include a door, `false` otherwise.
      */
     set isDoor(value: boolean) {
         this.door = value;
     }
 
+    /**
+     * Updates the center of the wall's hitbox.
+     * @param {Vector3} vector - The new center position.
+     */
     set setHitboxCenter(vector: Vector3) {
         this.hitbox.updatePosition(vector);
     }
 
+    /**
+     * Retrieves the wall's hitbox.
+     * @returns {OBB} The wall's hitbox.
+     */
     get getHitbox(): OBB {
         return this.hitbox;
     }
 
-    get getCenter(): Vector3 {
-        return this.center;
-    }
-
+    /**
+     * Retrieves the wall's orientation.
+     * @returns {number} The wall's orientation (0 or 90 degrees).
+     */
     get getOrientation(): number {
         return this.orientation;
     }
 
-    rotateHitbox() {
-        this.hitbox.rotateY90("right")
+    /**
+     * Rotates the wall's hitbox by 90 degrees around the Y-axis.
+     */
+    rotateHitbox(): void {
+        this.hitbox.rotateY90("right");
         this.quaternions[1] = Math.sin(Math.PI / 4);
         this.quaternions[3] = Math.cos(Math.PI / 4);
     }
 
-    randomise() {
-        let y = Math.round(Math.random());
-        let z = Math.round(Math.random());
+    /**
+     * Randomizes the wall's rotation along the Y and Z axes.
+     */
+    randomise(): void {
+        const y = Math.round(Math.random());
+        const z = Math.round(Math.random());
+
         if (y === 1) {
             this.quaternions = this.multiplyQuaternions(this.getQuaternions, [1, 0, 0, 0]);
         }
@@ -114,6 +132,13 @@ class Wall {
         }
     }
 
+    /**
+     * Multiplies two quaternions.
+     * @private
+     * @param {number[]} q1 - The first quaternion.
+     * @param {number[]} q2 - The second quaternion.
+     * @returns {number[]} The resulting quaternion.
+     */
     private multiplyQuaternions(q1: number[], q2: number[]): number[] {
         const [x1, y1, z1, w1] = q1;
         const [x2, y2, z2, w2] = q2;
@@ -126,7 +151,10 @@ class Wall {
         ];
     }
 
-
+    /**
+     * Retrieves the wall's current quaternion values.
+     * @returns {number[]} The wall's quaternions.
+     */
     get getQuaternions(): number[] {
         return this.quaternions;
     }

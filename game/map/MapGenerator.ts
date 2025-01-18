@@ -1,121 +1,131 @@
+import {Room} from "./Room.js";
 import {Vector3} from "../../math/Vector.js";
 
+/**
+ * Class responsible for generating a map with rooms, using a breadth-first search (BFS) algorithm.
+ * It places rooms on a 2D grid and ensures rooms don't overlap.
+ */
 class MapGenerator {
-    private readonly mapGrid: number[][]; // The map grid
-    private readonly roomCenters: [number, number][]; // To store the center of each room
-    private roomId: number; // Unique identifier for each room
-    private readonly mapWidth: number; // Width of the map
-    private readonly mapHeight: number; // Height of the map
-    private readonly roomsCoordinates: Array<Vector3>;
+    private readonly maxSize: number;
+    private readonly mapGrid: number[][];
+    private roomId: number;
+    private readonly rooms: Array<Room>;
     private roomCount: number;
 
     /**
-     * Creates an instance of MapGenerator.
-     *
-     * @param mapWidth - The width of the map grid.
-     * @param mapHeight - The height of the map grid.
+     * Initializes a new map generator with the given map size.
+     * @param mapSize - The size of the map grid (width and height).
      */
-    constructor(mapWidth: number, mapHeight: number) {
-        this.mapWidth = mapWidth;
-        this.mapHeight = mapHeight;
-        this.mapGrid = Array.from({ length: mapHeight }, () => Array(mapWidth).fill(0));
-        this.roomCenters = [];
+    constructor(mapSize: number) {
+        this.maxSize = mapSize;
+        this.mapGrid = Array.from({ length: mapSize }, () => Array(mapSize).fill(0));
         this.roomId = 1;
-        this.roomsCoordinates = new Array<Vector3>();
+        this.rooms = new Array<Room>();
         this.roomCount = 0;
     }
 
     /**
-     * Attempts to add a room to the map at a random position.
-     * If the room cannot be placed after multiple attempts, it will not be added.
+     * Performs Breadth-First Search (BFS) on a 2D grid to find a valid spot for placing a room.
      *
-     * @param roomWidth - The width of the room.
-     * @param roomHeight - The height of the room.
-     * @returns `true` if the room was successfully placed, `false` otherwise.
+     * @param start - The starting position as [row, col].
+     * @param room - The room to add to the grid.
+     * @returns True if a valid location was found for the room, otherwise false.
      */
-    addRoom(roomWidth: number, roomHeight: number): boolean {
-        let placed = false;
+    private bfs2D(start: [number, number], room: Room): boolean {
+        const rows = this.mapGrid.length;
+        const cols = this.mapGrid[0].length;
+        const visited: boolean[][] = Array.from({ length: rows }, () => Array(cols).fill(false));
 
-        for (let attempt = 0; attempt < 100; attempt++) {
-            // Generate a random position for the top-left corner of the room
-            const x = Math.floor(Math.random() * (this.mapWidth - roomWidth));
-            const y = Math.floor(Math.random() * (this.mapHeight - roomHeight));
+        // Direction vectors for moving up, down, left, and right
+        const directions = [
+            [-1, 0], // Up
+            [1, 0],  // Down
+            [0, -1], // Left
+            [0, 1],  // Right
+        ];
 
-            // Check if the room can fit in this position
-            let canPlace = true;
-            for (let i = 0; i < roomHeight; i++) {
-                for (let j = 0; j < roomWidth; j++) {
-                    if (this.mapGrid[y + i][x + j] !== 0) {
-                        canPlace = false;
-                        break;
-                    }
-                }
-                if (!canPlace) break;
+        const queue: [number, number][] = [start]; // Initialize the queue with the start position
+        visited[start[0]][start[1]] = true; // Mark the start as visited
+
+        while (queue.length > 0) {
+            const [row, col] = queue.shift()!; // Dequeue the front element
+            if (this.canPlace(row, col, room)) {
+                return true;
             }
 
-            if (canPlace) {
-                this.roomsCoordinates.push(new Vector3(x, 0, y - roomHeight));
-                this.roomCount++;
+            // Check all neighboring cells
+            for (const [dRow, dCol] of directions) {
+                const newRow = row + dRow;
+                const newCol = col + dCol;
 
-                // Place the room
-                for (let i = 0; i < roomHeight; i++) {
-                    for (let j = 0; j < roomWidth; j++) {
-                        this.mapGrid[y + i][x + j] = this.roomId;
-                    }
+                // Ensure the new cell is within bounds and hasn't been visited yet
+                if (
+                    newRow >= 0 &&
+                    newRow < rows &&
+                    newCol >= 0 &&
+                    newCol < cols &&
+                    !visited[newRow][newCol]
+                ) {
+                    visited[newRow][newCol] = true; // Mark the cell as visited
+                    queue.push([newRow, newCol]); // Add the cell to the queue
                 }
-
-                // Store the center of the room
-                const centerX = x + Math.floor(roomWidth / 2);
-                const centerY = y + Math.floor(roomHeight / 2);
-                this.roomCenters.push([centerX, centerY]);
-
-                this.roomId++;
-                placed = true;
-
-                // Connect the new room to the previous room with corridors if needed
-                if (this.roomCenters.length > 1) {
-                    const [prevCenterX, prevCenterY] = this.roomCenters[this.roomCenters.length - 2];
-
-                    // Create horizontal corridor
-                    if (prevCenterX < centerX) {
-                        for (let corridorX = prevCenterX; corridorX <= centerX; corridorX++) {
-                            if (this.mapGrid[prevCenterY][corridorX] === 0) {
-                                this.mapGrid[prevCenterY][corridorX] = -1;
-                            }
-                        }
-                    } else {
-                        for (let corridorX = centerX; corridorX <= prevCenterX; corridorX++) {
-                            if (this.mapGrid[prevCenterY][corridorX] === 0) {
-                                this.mapGrid[prevCenterY][corridorX] = -1;
-                            }
-                        }
-                    }
-
-                    // Create vertical corridor
-                    if (prevCenterY < centerY) {
-                        for (let corridorY = prevCenterY; corridorY <= centerY; corridorY++) {
-                            if (this.mapGrid[corridorY][centerX] === 0) {
-                                this.mapGrid[corridorY][centerX] = -1;
-                            }
-                        }
-                    } else {
-                        for (let corridorY = centerY; corridorY <= prevCenterY; corridorY++) {
-                            if (this.mapGrid[corridorY][centerX] === 0) {
-                                this.mapGrid[corridorY][centerX] = -1;
-                            }
-                        }
-                    }
-                }
-
-                break;
             }
         }
+        return false;
+    }
 
-        if (!placed) {
-            console.log(`Room ${this.roomId} (size ${roomWidth}x${roomHeight}) could not be placed.`);
+    /**
+     * Determines if a room can be placed at the given position on the grid.
+     *
+     * @param row - The row index where the room is to be placed.
+     * @param col - The column index where the room is to be placed.
+     * @param room - The room to be placed.
+     * @returns True if the room can be placed, otherwise false.
+     */
+    private canPlace(row: number, col: number, room: Room): boolean {
+        if ((room.getDepth + col >= this.mapGrid.length) || (room.getWidth + row >= this.mapGrid[0].length)) {
+            return false;
         }
+        for (let i = 0; i < room.getDepth; i++) {
+            for (let j = 0; j < room.getWidth; j++) {
+                if (this.mapGrid[col + i][row + j] !== 0) {
+                    return false;
+                }
+            }
+        }
+        this.placeRoom(row, col, room);
+        return true;
+    }
 
-        return placed;
+    /**
+     * Places a room at the specified location on the grid.
+     *
+     * @param row - The row index where the room is to be placed.
+     * @param col - The column index where the room is to be placed.
+     * @param room - The room to be placed.
+     */
+    private placeRoom(row: number, col: number, room: Room) {
+        for (let i = 0; i < room.getDepth; i++) {
+            for (let j = 0; j < room.getWidth; j++) {
+                this.mapGrid[col + i][row + j] = this.roomId;
+            }
+        }
+        room.setID = this.roomId;
+        room.setStartPoint = new Vector3(row, 0, this.maxSize - col);
+        room.generateNewRoom();
+        this.rooms.push(room);
+        this.roomId++;
+        this.roomCount++;
+    }
+
+    /**
+     * Attempts to add a room to the map using BFS to find a valid location.
+     *
+     * @param room - The room to be added to the map.
+     * @returns True if the room was successfully added, otherwise false.
+     */
+    public addRoom(room: Room): boolean {
+        return this.bfs2D([Math.floor(this.maxSize/2), Math.floor(this.maxSize/2)], room);
     }
 
     /**
@@ -123,12 +133,12 @@ class MapGenerator {
      * Rooms are represented by positive integers, corridors by `.`,
      * and empty spaces by ` ` (spaces).
      */
-    printMap(): void {
+    public printMap(): void {
         for (const row of this.mapGrid) {
             console.log(
                 row
-                    .map((cell) => (cell > 0 ? cell.toString() : cell === -1 ? "." : " "))
-                    .join(" ")
+                    .map((cell) => (cell > 0 ? cell.toString() : " ")) // Positive numbers for rooms, spaces for empty cells
+                    .join(" ") // Add spaces between cells for better readability
             );
         }
     }
@@ -142,13 +152,32 @@ class MapGenerator {
         return this.mapGrid;
     }
 
-    get getRoomsCoordinates(): Array<Vector3> {
-        return this.roomsCoordinates;
+    /**
+     * Retrieves the list of rooms currently on the map.
+     *
+     * @returns An array of Room objects representing the rooms on the map.
+     */
+    get getRooms(): Array<Room> {
+        return this.rooms;
     }
 
+    /**
+     * Retrieves the total number of rooms on the map.
+     *
+     * @returns The number of rooms on the map.
+     */
     get getRoomCount(): number {
         return this.roomCount;
     }
+
+    /**
+     * Retrieves the last room added to the map.
+     *
+     * @returns The most recently added Room object.
+     */
+    get getLastRoom(): Room {
+        return this.rooms[this.getRoomCount - 1];
+    }
 }
 
-export {MapGenerator}
+export { MapGenerator };

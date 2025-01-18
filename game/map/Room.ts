@@ -3,10 +3,15 @@ import {Wall} from "./Wall.js";
 import {Vector3} from "../../math/Vector.js";
 import {Entity} from "../entities/Entity.js";
 import {Pillar} from "./Pillar.js";
+import {Floor} from "./Floor.js";
 
+/**
+ * Represents a room in a 3D space with walls, pillars, floors, and other elements.
+ */
 class Room {
     private readonly walls: Wall[];
     private readonly pillars: Pillar[];
+    private readonly floors: Floor[];
     private width: number;
     private depth: number;
     private doorCount: number;
@@ -16,9 +21,14 @@ class Room {
     private ID: number;
     private neighbors: Set<Room>;
 
+    /**
+     * Initializes the room with a specified or random size.
+     * @param size - Optional size for the room. If null, a random size is generated.
+     */
     constructor(size: number | null = null) {
         this.walls = [];
         this.pillars = [];
+        this.floors = [];
         this.width = 0;
         this.depth = 0;
         this.doorCount = 0;
@@ -34,6 +44,9 @@ class Room {
         }
     }
 
+    /**
+     * Generates the corners of the room based on the starting point and dimensions.
+     */
     private generateCorners() {
         this.corners.push(this.startPoint);
         this.corners.push(this.startPoint.add(new Vector3(0, 0, 3 * this.width)));
@@ -41,11 +54,19 @@ class Room {
         this.corners.push(this.startPoint.add(new Vector3(3 * this.depth, 0, 0)));
     }
 
+    /**
+     * Determines a random distribution value for room size generation.
+     * @returns A random distribution value between 1 and 4.
+     */
     private distribution(): number {
         const rand: number = Random.randInt(1, 15); // Random int from 1 to 15
         return ((Math.floor(Math.log2(rand)) + 3) % 4) + 1; // Rotated distribution
     }
 
+    /**
+     * Generates random size for the room.
+     * @param setSize - The base size of the room.
+     */
     private generateSize(setSize: number) {
         const size = setSize;
         const minSize = size;
@@ -55,46 +76,65 @@ class Room {
         this.doorCount = Random.randInt(1, size + 1);
     }
 
+    /**
+     * Generates the room by creating walls, pillars, and floors.
+     */
     private generateRoom(): void {
-
-        // generate bottom pillars and walls
+        // Generate bottom pillars and walls
         this.generatePillar(
             new Vector3(0, 0, 0).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, 1)
-        )
+        );
         this.generateWalls(
             new Vector3(1.5, 0, 0).add(this.startPoint), this.width, "horizontal"
-        )
+        );
 
-        // generate top pillars
+        // Generate top pillars
         this.generatePillar(
             new Vector3(0, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, -1)
-        )
+        );
         this.generateWalls(
             new Vector3(1.5, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal"
-        )
+        );
 
-        // generate left pillars
+        // Generate left pillars
         this.generatePillar(
             new Vector3(0, 0, 0).add(this.startPoint), this.depth, "vertical", new Vector3(1, 0, 0)
-        )
+        );
         this.generateWalls(
             new Vector3(0, 0, 1.5).add(this.startPoint), this.depth, "vertical"
-        )
+        );
 
-        // generate right pillars
+        // Generate right pillars
         this.generatePillar(
             new Vector3(this.width * 3, 0, 0).add(this.startPoint), this.depth, "vertical", new Vector3(-1, 0, 0)
-        )
+        );
         this.generateWalls(
             new Vector3(this.width * 3, 0, 1.5).add(this.startPoint), this.depth, "vertical"
-        )
+        );
+
+        // Generate floor
+        let center = new Vector3(1.5, 0, 1.5);
+        for (let i = 1; i <= this.depth; i++) {
+            for (let j = 1; j <= this.width; j++) {
+                this.floors.push(new Floor(center.clone()));
+                center.x += j * 3;
+                center.z += i * 3;
+            }
+        }
     }
 
+    /**
+     * Generates a series of pillars along a given direction.
+     * @param center - The starting position for the pillars.
+     * @param amount - The number of pillars to generate.
+     * @param direction - The direction of the pillars ('horizontal' or 'vertical').
+     * @param orientation - The orientation vector for pillar placement.
+     */
     private generatePillar(center: Vector3, amount: number, direction: string, orientation: Vector3): void {
         for (let i = 0; i < amount; i++) {
             let pillar;
             if (i === 0 || i === amount - 1) {
-                pillar = new Pillar(center.clone(), false, orientation)
+                pillar = new Pillar(center.clone(), false, orientation);
             } else {
                 pillar = new Pillar(center.clone(), true, orientation);
             }
@@ -107,6 +147,12 @@ class Room {
         }
     }
 
+    /**
+     * Generates a series of walls along a given direction.
+     * @param center - The starting position for the walls.
+     * @param amount - The number of walls to generate.
+     * @param direction - The direction of the walls ('horizontal' or 'vertical').
+     */
     private generateWalls(center: Vector3, amount: number, direction: string): void {
         for (let i = 0; i < amount; i++) {
             let wall;
@@ -114,7 +160,7 @@ class Room {
                 wall = new Wall(0, center.clone());
                 center.x += 3;
             } else { // direction === 'vertical'
-                wall = new Wall(90, center.clone())
+                wall = new Wall(90, center.clone());
                 wall.rotateHitbox();
                 center.z += 3;
             }
@@ -123,11 +169,19 @@ class Room {
         }
     }
 
+    /**
+     * Generates a new room, including walls, pillars, and floors.
+     */
     public generateNewRoom(): void {
         this.generateRoom();
         this.generateCorners();
     }
 
+    /**
+     * Checks if an entity is within the boundaries of the room.
+     * @param entity - The entity to check.
+     * @returns True if the entity is within the room; otherwise, false.
+     */
     public isWithinRoom(entity: Entity): boolean {
         // Get the entity's position and set y to 0 (not needed)
         const position = entity.getPosition.clone();
@@ -161,62 +215,125 @@ class Room {
         return allPositive || allNegative;
     }
 
+    /**
+     * Gets the width of the room.
+     * @returns The width of the room.
+     */
     get getWidth(): number {
         return this.width;
     }
 
+    /**
+     * Gets the depth of the room.
+     * @returns The depth of the room.
+     */
     get getDepth(): number {
         return this.depth;
     }
 
+    /**
+     * Gets the surface area of the room.
+     * @returns The surface area of the room (width * depth).
+     */
     get getSurfaceArea(): number {
         return this.width * this.depth;
     }
 
+    /**
+     * Gets the number of doors in the room.
+     * @returns The number of doors in the room.
+     */
     get getDoorCount(): number {
         return this.doorCount;
     }
 
+    /**
+     * Gets the walls of the room.
+     * @returns An array of walls in the room.
+     */
     get getWalls(): Wall[] {
         return this.walls;
     }
 
+    /**
+     * Gets the floors of the room.
+     * @returns An array of floors in the room.
+     */
+    get getFloors(): Floor[] {
+        return this.floors;
+    }
+
+    /**
+     * Gets the pillars of the room.
+     * @returns An array of pillars in the room.
+     */
     get getPillars(): Pillar[] {
         return this.pillars;
     }
 
+    /**
+     * Checks if the room is active.
+     * @returns True if the room is active; otherwise, false.
+     */
     get isActive(): boolean {
         return this.active;
     }
 
+    /**
+     * Sets the active status of the room.
+     * @param value - The value to set the active status to.
+     */
     set isActive(value: boolean) {
         this.active = value;
     }
 
+    /**
+     * Gets the corners of the room.
+     * @returns An array of corners for the room.
+     */
     get getCorners(): Array<Vector3> {
         return this.corners;
     }
 
+    /**
+     * Adds a neighboring room.
+     * @param room - The neighboring room to add.
+     */
     set newNeighbor(room: Room) {
         this.neighbors.add(room);
     }
 
+    /**
+     * Gets the neighboring rooms.
+     * @returns A set of neighboring rooms.
+     */
     get getNeighbors(): Set<Room> {
         return this.neighbors;
     }
 
+    /**
+     * Sets the starting point of the room.
+     * @param startPoint - The new starting point for the room.
+     */
     set setStartPoint(startPoint: Vector3) {
         this.startPoint = startPoint.clone();
     }
 
+    /**
+     * Sets the ID for the room.
+     * @param id - The ID to assign to the room.
+     */
     set setID(id: number) {
         this.ID = id;
     }
 
+    /**
+     * Gets the ID of the room.
+     * @returns The ID of the room.
+     */
     get getID(): number {
         return this.ID;
     }
-
 }
 
-export { Room }
+export { Room };
