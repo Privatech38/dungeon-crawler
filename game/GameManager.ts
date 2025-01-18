@@ -203,6 +203,11 @@ const player = new Player(
 let gameManager: GameManager = new GameManager(player, 300);
 gameManager.generateWorld();
 
+gameManager.getWorld.getStructure('wall').forEach(wall => {
+    wall.getCenter.toArray
+    wall.getQuaternions
+})
+
 gameManager.printWorld();
 
 export {GameManager}

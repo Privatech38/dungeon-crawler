@@ -1,6 +1,9 @@
 import { Room } from "./Room.js";
 import { MapGenerator } from "./MapGenerator.js";
 import { Structure } from "./Structures/Structure.js";
+import {Wall} from "./Structures/Wall.js";
+import {Pillar} from "./Structures/Pillar.js";
+import {Floor} from "./Structures/Floor.js";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.
@@ -74,7 +77,7 @@ class World {
      * @param {string} type - The type of structure to retrieve ("wall", "pillar", or other for floors).
      * @returns {Structure[]} An array of unique Structure instances of the specified type.
      */
-    public getStructure(type: string): Structure[] {
+    public getStructure(type: string): Wall[] | Pillar[] | Floor[] {
         const structures: Structure[] = [];
 
         this.rooms.forEach(room => {
@@ -97,7 +100,6 @@ class World {
                 }
             });
         });
-
         return structures;
     }
 

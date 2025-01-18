@@ -9,11 +9,20 @@ abstract class Structure {
     protected readonly center: Vector3;
 
     /**
+     * Quaternions representing the wall's rotation.
+     * @private
+     * @type {number[]}
+     */
+    protected quaternions: number[];
+
+    /**
      * Constructor to initialize the center of the structure.
      * @param center - The center point of the structure in 3D space.
+     * @param quaternions - orientation in quaternions
      */
-    protected constructor(center: Vector3) {
+    protected constructor(center: Vector3, quaternions: number[] = [0, 0, 0, 1]) {
         this.center = center;
+        this.quaternions = quaternions;
     }
 
     /**
@@ -22,6 +31,14 @@ abstract class Structure {
      */
     get getCenter(): Vector3 {
         return this.center;
+    }
+
+    /**
+     * Retrieves the wall's current quaternion values.
+     * @returns {number[]} The wall's quaternions.
+     */
+    get getQuaternions(): number[] {
+        return this.quaternions;
     }
 }
 

@@ -28,19 +28,13 @@ class Wall extends Structure {
     private orientation: number;
 
     /**
-     * Quaternions representing the wall's rotation.
-     * @private
-     * @type {number[]}
-     */
-    private quaternions: number[];
-
-    /**
      * Creates a new Wall instance.
      * @param {number} orientation - The orientation of the wall (0 or 90 degrees).
      * @param {Vector3} center - The center of the wall's hitbox.
+     * @param quaternions - orientation in quaternions
      */
-    constructor(orientation: number, center: Vector3) {
-        super(center);
+    constructor(orientation: number, center: Vector3, quaternions = [0, 0, 0, 1]) {
+        super(center, quaternions);
         this.door = false;
         this.orientation = orientation;
         this.hitbox = new OBB(
@@ -52,7 +46,6 @@ class Wall extends Structure {
             new Vector3(1.5, 1.1, 0.3),
             center
         );
-        this.quaternions = [0, 0, 0, 1];
     }
 
     /**
@@ -149,14 +142,6 @@ class Wall extends Structure {
             w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2, // z
             w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2  // w
         ];
-    }
-
-    /**
-     * Retrieves the wall's current quaternion values.
-     * @returns {number[]} The wall's quaternions.
-     */
-    get getQuaternions(): number[] {
-        return this.quaternions;
     }
 }
 
