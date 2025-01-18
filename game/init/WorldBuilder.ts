@@ -62,3 +62,17 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
         wallPillar.addChild(torch);
     }
 }
+
+/**
+ * Creates a floor at the specified location.
+ * @param {Transform} location the location of the floor
+ * @param {Node} scene the scene to which the floor will be added
+ */
+export async function createFloor(location: Transform, scene: Node): Promise<void> {
+    const floorLoader = new GLTFLoader();
+    await floorLoader.load('../../assets/models/rooms/floor/Floor.gltf');
+    const floor: Node = floorLoader.loadNode('Floor');
+    floor.isStatic = true;
+    floor.addComponent(location);
+    scene.addChild(floor);
+}
