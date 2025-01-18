@@ -18,8 +18,6 @@ export function createCamera(): Node {
     return camera;
 }
 
-// TODO - Add a random rotation for the pillar and wall
-
 /**
  * Creates a wall at the specified location.
  * @param location the location of the wall
