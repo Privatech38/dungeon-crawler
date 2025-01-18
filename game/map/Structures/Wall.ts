@@ -1,5 +1,5 @@
-import { OBB } from "../entities/hitboxes/OBB.js";
-import { Vector3 } from "../../math/Vector.js";
+import { OBB } from "../../entities/hitboxes/OBB.js";
+import { Vector3 } from "../../../math/Vector.js";
 import { Structure } from "./Structure.js";
 
 /**

@@ -6,7 +6,7 @@ import {Room} from "./map/Room.js";
 import {CollisionManager} from "./entities/hitboxes/Collision.js";
 import {Enemy} from "./entities/Enemy.js";
 import {Point} from "./entities/hitboxes/Point.js";
-import {Wall} from "./map/Wall.js";
+import {Wall} from "./map/Structures/Wall.js";
 import {Vector3} from "../math/Vector.js";
 import {OBB} from "./entities/hitboxes/OBB.js";
 import {Weapon} from "./entities/items/Weapon.js";

@@ -1,6 +1,6 @@
 import { Room } from "./Room.js";
 import { MapGenerator } from "./MapGenerator.js";
-import { Structure } from "./Structure.js";
+import { Structure } from "./Structures/Structure.js";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.

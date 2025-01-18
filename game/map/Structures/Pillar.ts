@@ -1,4 +1,4 @@
-import {Vector3} from "../../math/Vector.js";
+import {Vector3} from "../../../math/Vector.js";
 import {Structure} from "./Structure.js";
 
 /**

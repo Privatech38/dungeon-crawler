@@ -1,4 +1,4 @@
-import {Vector3} from "../../math/Vector.js";
+import {Vector3} from "../../../math/Vector.js";
 
 /**
  * Abstract class representing a structure in a 3D space.
