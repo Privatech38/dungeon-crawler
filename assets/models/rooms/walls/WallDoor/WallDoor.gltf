@@ -28,9 +28,9 @@
 				-1
 			],
 			"translation":[
-				-1.4982800483703613,
+				0,
 				1.3999947309494019,
-				-6.000002384185791
+				0
 			]
 		}
 	],
@@ -80,7 +80,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2631,
+			"count":2675,
 			"max":[
 				1.3005564212799072,
 				1.3999948501586914,
@@ -96,45 +96,45 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2631,
+			"count":2675,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2631,
+			"count":2675,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":3975,
+			"count":4041,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":31572,
+			"byteLength":32100,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":31572,
-			"byteOffset":31572,
+			"byteLength":32100,
+			"byteOffset":32100,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":21048,
-			"byteOffset":63144,
+			"byteLength":21400,
+			"byteOffset":64200,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":7950,
-			"byteOffset":84192,
+			"byteLength":8082,
+			"byteOffset":85600,
 			"target":34963
 		}
 	],
@@ -146,7 +146,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":92144,
+			"byteLength":93684,
 			"uri":"WallDoor.bin"
 		}
 	]
