@@ -18,14 +18,7 @@ class Wall extends Structure {
      * @private
      * @type {OBB}
      */
-    private hitbox: OBB;
-
-    /**
-     * Orientation of the wall (0 or 90 degrees).
-     * @private
-     * @type {number}
-     */
-    private orientation: number;
+    private readonly hitbox: OBB;
 
     /**
      * Creates a new Wall instance.
@@ -36,7 +29,6 @@ class Wall extends Structure {
     constructor(orientation: number, center: Vector3, quaternions = [0, 0, 0, 1]) {
         super(center, quaternions);
         this.door = false;
-        this.orientation = orientation;
         this.hitbox = new OBB(
             [
                 new Vector3(1, 0, 0),
@@ -94,54 +86,14 @@ class Wall extends Structure {
     }
 
     /**
-     * Retrieves the wall's orientation.
-     * @returns {number} The wall's orientation (0 or 90 degrees).
-     */
-    get getOrientation(): number {
-        return this.orientation;
-    }
-
-    /**
      * Rotates the wall's hitbox by 90 degrees around the Y-axis.
      */
     rotateHitbox(): void {
         this.hitbox.rotateY90("right");
-        this.quaternions[1] = Math.sin(Math.PI / 4);
-        this.quaternions[3] = Math.cos(Math.PI / 4);
     }
 
-    /**
-     * Randomizes the wall's rotation along the Y and Z axes.
-     */
-    randomise(): void {
-        const y = Math.round(Math.random());
-        const z = Math.round(Math.random());
-
-        if (y === 1) {
-            this.quaternions = this.multiplyQuaternions(this.getQuaternions, [1, 0, 0, 0]);
-        }
-        if (z === 1) {
-            this.quaternions = this.multiplyQuaternions(this.getQuaternions, [0, 0, 1, 0]);
-        }
-    }
-
-    /**
-     * Multiplies two quaternions.
-     * @private
-     * @param {number[]} q1 - The first quaternion.
-     * @param {number[]} q2 - The second quaternion.
-     * @returns {number[]} The resulting quaternion.
-     */
-    private multiplyQuaternions(q1: number[], q2: number[]): number[] {
-        const [x1, y1, z1, w1] = q1;
-        const [x2, y2, z2, w2] = q2;
-
-        return [
-            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2, // x
-            w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2, // y
-            w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2, // z
-            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2  // w
-        ];
+    get getCenter(): Vector3 {
+        return this.center;
     }
 }
 

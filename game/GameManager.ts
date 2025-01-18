@@ -200,14 +200,22 @@ const player = new Player(
     new Vector3(0, 1, 0),
 )
 
-let gameManager: GameManager = new GameManager(player, 300);
-gameManager.generateWorld();
+let world = new World();
+world.generateWorld();
 
-gameManager.getWorld.getStructure('wall').forEach(wall => {
+world.getStructure('wall').forEach(wall => {
     wall.getCenter.toArray
     wall.getQuaternions
 })
 
-gameManager.printWorld();
+world.getStructure('pillar').forEach(pillar => {
+    pillar.getCenter.toArray
+})
+
+world.getStructure('floor').forEach(floor => {
+    floor.getCenter.toArray
+})
+
+world.printWorld();
 
 export {GameManager}

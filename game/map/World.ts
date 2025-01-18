@@ -4,6 +4,7 @@ import { Structure } from "./Structures/Structure.js";
 import {Wall} from "./Structures/Wall.js";
 import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
+import {BottomWall} from "./Structures/BottomWall.js";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.
@@ -74,58 +75,60 @@ class World {
     /**
      * Retrieves structures of a specific type (e.g., walls, pillars, floors) from all rooms.
      * Ensures no duplicate structures are included.
-     * @param {string} type - The type of structure to retrieve ("wall", "pillar", or other for floors).
+     * @param {string} type - The type of structure to retrieve ("wall", "pillar", "floor", "bottomWall").
      * @returns {Structure[]} An array of unique Structure instances of the specified type.
      */
-    public getStructure(type: string): Wall[] | Pillar[] | Floor[] {
-        const structures: Structure[] = [];
-
-        this.rooms.forEach(room => {
-            let currentStructures: Structure[];
-
-            switch (type) {
-                case "wall":
-                    currentStructures = room.getWalls;
-                    break;
-                case "pillar":
-                    currentStructures = room.getPillars;
-                    break;
-                default:
-                    currentStructures = room.getFloors;
-            }
-
-            currentStructures.forEach(cur => {
-                if (!this.isStructureDuplicate(structures, cur)) {
-                    structures.push(cur);
-                }
-            });
-        });
-        return structures;
+    public getStructure(type: "wall" | "bottomWall" | "floor" | "pillar"): Wall[] | Pillar[] | Floor[] | BottomWall[] {
+        switch (type) {
+            case "wall": return this.collectUniqueStructures<Wall>("getWalls");
+            case "pillar": return this.collectUniqueStructures<Pillar>("getPillars");
+            case "floor": return this.collectUniqueStructures<Floor>("getFloors");
+            case "bottomWall": return this.collectUniqueStructures<BottomWall>("getBottomWalls");
+        }
     }
 
     /**
-     * Checks if a structure is a duplicate in the given array of structures.
-     * @private
-     * @param {Structure[]} structures - The array of structures to check against.
-     * @param {Structure} structure - The structure to check for duplication.
-     * @returns {boolean} True if the structure is a duplicate, otherwise false.
+     * Collects unique structures of a specific type from all rooms.
+     * @template T The type of structure to collect (must extend Structure).
+     * @param {string} roomMethod - The method name to call on each room (e.g., "getWalls").
+     * @returns {T[]} An array of unique structures.
      */
-    private isStructureDuplicate(structures: Structure[], structure: Structure): boolean {
-        if (structures.length === 0) {
-            return false;
-        }
-
-        for (const w of structures) {
-            if (
-                w.getCenter.toArray[0] === structure.getCenter.toArray[0] &&
-                w.getCenter.toArray[2] === structure.getCenter.toArray[2]
-            ) {
-                return true;
+    private collectUniqueStructures<T extends Structure>(roomMethod: keyof Room): T[] {
+        const uniqueStructures: T[] = [];
+        this.rooms.forEach((room: Room) => {
+            const structures = room[roomMethod];
+            if (Array.isArray(structures)) {
+                structures.forEach((structure) => {
+                    if (this.isStructureDuplicate(uniqueStructures, structure as T)) {
+                        uniqueStructures.push(structure as T);
+                    }
+                });
             }
-        }
+        });
+        return uniqueStructures;
+    }
 
-        return false;
+    /**
+     * Checks if a structure is already included in the list based on its center (x, z).
+     * @template T The type of structure to check.
+     * @param {T[]} collection - The list of structures.
+     * @param {T} structure - The structure to check for duplication.
+     * @returns {boolean} True if the structure is already in the list, false otherwise.
+     */
+    private isStructureDuplicate<T extends Structure>(collection: T[], structure: T): boolean {
+        collection.forEach((existingStructure) => {
+            const existingCenter = existingStructure.getCenter;
+            const structureCenter = structure.getCenter;
+            if (existingCenter.x === structureCenter.x && existingCenter.z === structureCenter.z) {
+                return false;
+            }
+        })
+        return true;
     }
 }
+
+let world: World = new World();
+world.generateWorld();
+console.log(world.getStructure("bottomWall"))
 
 export { World };

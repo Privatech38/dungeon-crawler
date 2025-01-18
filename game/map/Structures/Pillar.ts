@@ -13,9 +13,10 @@ class Pillar extends Structure {
      * @param center - The center position of the pillar.
      * @param isCorner - Indicates whether the pillar is a corner pillar.
      * @param orientation - The orientation vector of the pillar.
+     * @param quaternions - orientation in quaternions.
      */
-    constructor(center: Vector3, isCorner: boolean, orientation: Vector3) {
-        super(center);
+    constructor(center: Vector3, isCorner: boolean, orientation: Vector3, quaternions = [0, 0, 0, 1]) {
+        super(center, quaternions);
         this.isCorner = isCorner;
         this.orientation = orientation;
     }
@@ -34,6 +35,10 @@ class Pillar extends Structure {
      */
     get getOrientation() {
         return this.orientation;
+    }
+
+    get getCenter(): Vector3 {
+        return this.center;
     }
 }
 

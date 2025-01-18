@@ -4,6 +4,7 @@ import {Vector3} from "../../math/Vector.js";
 import {Entity} from "../entities/Entity.js";
 import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
+import {BottomWall} from "./Structures/BottomWall.js";
 
 /**
  * Represents a room in a 3D space with walls, pillars, floors, and other elements.
@@ -12,6 +13,7 @@ class Room {
     private readonly walls: Wall[];
     private readonly pillars: Pillar[];
     private readonly floors: Floor[];
+    private readonly bottomWalls: Floor[];
     private width: number;
     private depth: number;
     private doorCount: number;
@@ -29,6 +31,7 @@ class Room {
         this.walls = [];
         this.pillars = [];
         this.floors = [];
+        this.bottomWalls = [];
         this.width = 0;
         this.depth = 0;
         this.doorCount = 0;
@@ -113,13 +116,16 @@ class Room {
         );
 
         // Generate floor
-        let center = new Vector3(1.5, 0, 1.5);
-        for (let i = 1; i <= this.depth; i++) {
-            for (let j = 1; j <= this.width; j++) {
-                this.floors.push(new Floor(center.clone()));
-                center.x += j * 3;
-                center.z += i * 3;
+        let center = new Vector3(1.5, 0, 1.5).add(this.startPoint);
+        for (let z = 0; z < this.depth; z++) {
+            for (let x = 0; x < this.width; x++) {
+                center.x += x * 3;
+                let floor = new Floor(center.clone());
+                floor.rotate(["Y"], 90, 4);
+                this.floors.push(floor);
             }
+            center.x -= this.width * 3;
+            center.z += z * 3;
         }
     }
 
@@ -143,6 +149,7 @@ class Room {
             } else {
                 center.z += 3;
             }
+            pillar.rotate(["Y"], 90, 4);
             this.pillars.push(pillar);
         }
     }
@@ -156,15 +163,20 @@ class Room {
     private generateWalls(center: Vector3, amount: number, direction: string): void {
         for (let i = 0; i < amount; i++) {
             let wall;
+            let bottomWall;
             if (direction === 'horizontal') {
                 wall = new Wall(0, center.clone());
+                bottomWall = new BottomWall(0, center.clone());
                 center.x += 3;
             } else { // direction === 'vertical'
                 wall = new Wall(90, center.clone());
+                bottomWall = new BottomWall(90, center.clone());
                 wall.rotateHitbox();
                 center.z += 3;
             }
-            wall.randomise();
+            bottomWall.rotate(["Y"], 180);
+            this.bottomWalls.push(bottomWall);
+            wall.rotate(["Y", "X", "Z"], 180)
             this.walls.push(wall);
         }
     }
@@ -261,6 +273,14 @@ class Room {
      */
     get getFloors(): Floor[] {
         return this.floors;
+    }
+
+    /**
+     * Gets the bottomWalls of the room.
+     * @returns An array of bottomWalls in the room.
+     */
+    get getBottomWalls(): Floor[] {
+        return this.bottomWalls;
     }
 
     /**
