@@ -103,6 +103,30 @@ class Wall {
         this.quaternions[3] = Math.cos(Math.PI / 4);
     }
 
+    randomise() {
+        let y = Math.round(Math.random());
+        let z = Math.round(Math.random());
+        if (y === 1) {
+            this.quaternions = this.multiplyQuaternions(this.getQuaternions, [1, 0, 0, 0]);
+        }
+        if (z === 1) {
+            this.quaternions = this.multiplyQuaternions(this.getQuaternions, [0, 0, 1, 0]);
+        }
+    }
+
+    private multiplyQuaternions(q1: number[], q2: number[]): number[] {
+        const [x1, y1, z1, w1] = q1;
+        const [x2, y2, z2, w2] = q2;
+
+        return [
+            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2, // x
+            w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2, // y
+            w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2, // z
+            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2  // w
+        ];
+    }
+
+
     get getQuaternions(): number[] {
         return this.quaternions;
     }

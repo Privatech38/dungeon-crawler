@@ -12,7 +12,7 @@ import { GLTFLoader } from '../../engine/loaders/GLTFLoader.js';
  * Creates a camera located at (0,0,0).
  * @returns {Node} The camera node.
  */
-function createCamera(): Node {
+export function createCamera(): Node {
     const camera = new Node();
     camera.addComponent(new Camera());
     return camera;
@@ -25,7 +25,7 @@ function createCamera(): Node {
  * @param location the location of the wall
  * @param scene the scene to which the wall will be added
  */
-async function createWall(location: Transform, scene: Node): Promise<void> {
+export async function createWall(location: Transform, scene: Node): Promise<void> {
     const wallLoader = new GLTFLoader();
     await wallLoader.load('../../assets/models/rooms/walls/Wall/Wall.gltf');
     const wall: Node = wallLoader.loadNode('Wall');
@@ -46,7 +46,7 @@ async function createWall(location: Transform, scene: Node): Promise<void> {
  * @param {Node} scene the scene to which the wall pillar will be added
  * @param {Transform} torchTransform the rotation of the torch on the wall pillar, pass null if you don't want a torch
  */
-async function createWallPillar(location: Transform, scene: Node, torchTransform: Transform = null): Promise<void> {
+export async function createWallPillar(location: Transform, scene: Node, torchTransform: Transform = null): Promise<void> {
     const wallPillarLoader = new GLTFLoader();
     await wallPillarLoader.load('../../assets/models/rooms/walls/WallPillar/WallPillar.gltf');
     const wallPillar: Node = wallPillarLoader.loadNode('WallPillar');

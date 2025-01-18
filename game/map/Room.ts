@@ -118,6 +118,7 @@ class Room {
                 wall.rotateHitbox();
                 center.z += 3;
             }
+            wall.randomise();
             this.walls.push(wall);
         }
     }
@@ -217,17 +218,5 @@ class Room {
     }
 
 }
-
-let room: Room = new Room();
-room.generateNewRoom()
-
-room.getWalls.forEach(wall => {
-    wall.getCenter.toArray;
-    console.log(wall.getQuaternions)
-})
-
-room.getPillars.forEach(pillar => {
-    pillar.getCenter.toArray;
-})
 
 export { Room }
