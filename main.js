@@ -5,7 +5,7 @@ import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 
 import { OrbitController } from 'engine/controllers/OrbitController.js';
 import { createWall } from "./game/init/WorldBuilder.js";
-import { createPillar } from "./game/init/WorldBuilder.js";
+import { createWallPillar } from "./game/init/WorldBuilder.js";
 
 import {
     Camera,
@@ -18,7 +18,6 @@ import { Renderer } from './Renderer.js';
 import { UnlitRenderer } from "./engine/renderers/UnlitRenderer.js";
 import { Light } from './Light.js';
 import { Room } from "./game/map/Room.js";
-
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
@@ -49,12 +48,12 @@ room.generateNewRoom()
 room.getWalls.forEach(wall => {
     createWall(new Transform({
         translation: wall.getCenter.toArray,
-        scale: wall.getQuaternions,
+        rotation: wall.getQuaternions,
     }), scene);
 });
 
 room.getPillars.forEach(pillar => {
-    createPillar(new Transform({
+    createWallPillar(new Transform({
         translation: pillar.getCenter.toArray,
     }), scene);
 })
