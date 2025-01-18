@@ -49,7 +49,7 @@ export async function createWall(location: Transform, scene: Node): Promise<void
 export async function createWallPillar(location: Transform, scene: Node, torchTransform: Transform = null): Promise<void> {
     const wallPillarLoader = new GLTFLoader();
     await wallPillarLoader.load('../../assets/models/rooms/walls/WallPillar/WallPillar.gltf');
-    const wallPillar: Node = wallPillarLoader.loadNode('WallPillar');
+    const wallPillar: Node = wallPillarLoader.loadNode('WallPole');
     wallPillar.isStatic = true;
     wallPillar.addComponent(location);
     scene.addChild(wallPillar);
