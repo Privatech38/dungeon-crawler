@@ -42,10 +42,13 @@ light.addComponent(new Transform({
 }));
 scene.addChild(light);
 
-let room = new Room();
+let room = new Room(4);
 room.generateNewRoom()
 
+room.getWalls.forEach(wall => {console.log(wall.getQuaternions)})
+
 room.getWalls.forEach(wall => {
+    console.log(wall.getQuaternions);
     createWall(new Transform({
         translation: wall.getCenter.toArray,
         rotation: wall.getQuaternions,

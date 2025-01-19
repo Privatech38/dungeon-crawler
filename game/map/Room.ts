@@ -117,15 +117,15 @@ class Room {
 
         // Generate floor
         let center = new Vector3(1.5, 0, 1.5).add(this.startPoint);
-        for (let z = 0; z < this.depth; z++) {
-            for (let x = 0; x < this.width; x++) {
-                center.x += x * 3;
+        for (let i = 0; i < this.depth; i++) {
+            for (let j = 0; j < this.width; j++) {
                 let floor = new Floor(center.clone());
-                floor.rotate(["Y"], 90, 4);
+                floor.rotate(["Y"], 90, 3);
                 this.floors.push(floor);
+                center.x += 3;
             }
-            center.x -= this.width * 3;
-            center.z += z * 3;
+            center.x -= 3 * this.width;
+            center.z += 3;
         }
     }
 
@@ -137,7 +137,7 @@ class Room {
      * @param orientation - The orientation vector for pillar placement.
      */
     private generatePillar(center: Vector3, amount: number, direction: string, orientation: Vector3): void {
-        for (let i = 0; i < amount; i++) {
+        for (let i = 0; i <= amount; i++) {
             let pillar;
             if (i === 0 || i === amount - 1) {
                 pillar = new Pillar(center.clone(), false, orientation);
@@ -149,7 +149,7 @@ class Room {
             } else {
                 center.z += 3;
             }
-            pillar.rotate(["Y"], 90, 4);
+            pillar.rotate(["Y"], 90, 3);
             this.pillars.push(pillar);
         }
     }
@@ -172,6 +172,7 @@ class Room {
                 wall = new Wall(90, center.clone());
                 bottomWall = new BottomWall(90, center.clone());
                 wall.rotateHitbox();
+                wall.rotate(["Y"], 90, 0, false);
                 center.z += 3;
             }
             bottomWall.rotate(["Y"], 180);
