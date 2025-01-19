@@ -18,6 +18,8 @@ import {
 import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
 import { Room } from "./game/map/Room.js";
+import {World} from "./game/map/World.js";
+
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
@@ -38,30 +40,27 @@ light.addComponent(new Light({
     direction: [0, 0, 1],
 }));
 light.addComponent(new Transform({
-    translation: [1, 2, 1],
+    translation: [1, 5, 1],
 }));
 scene.addChild(light);
 
-let room = new Room(4);
-room.generateNewRoom()
+let world = new World(200);
+world.generateWorld();
 
-room.getWalls.forEach(wall => {console.log(wall.getQuaternions)})
-
-room.getWalls.forEach(wall => {
-    console.log(wall.getQuaternions);
+world.getStructure("wall").forEach(wall => {
     createWall(new Transform({
         translation: wall.getCenter.toArray,
         rotation: wall.getQuaternions,
     }), scene);
 });
 
-room.getPillars.forEach(pillar => {
+world.getStructure("pillar").forEach(pillar => {
     createWallPillar(new Transform({
         translation: pillar.getCenter.toArray,
     }), scene);
 });
 
-room.getFloors.forEach(floor => {
+world.getStructure("floor").forEach(floor => {
     createFloor(new Transform({
         translation: floor.getCenter.toArray,
     }), scene);

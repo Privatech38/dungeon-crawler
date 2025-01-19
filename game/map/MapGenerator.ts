@@ -111,7 +111,7 @@ class MapGenerator {
             }
         }
         room.setID = this.roomId;
-        room.setStartPoint = new Vector3(row, 0, this.maxSize - col);
+        room.setStartPoint = new Vector3((row * 3) - Math.floor(this.maxSize/2) * 3, 0, (col * 3) - Math.floor(this.maxSize/2) * 3);
         room.generateNewRoom();
         this.rooms.push(room);
         this.roomId++;

@@ -26,11 +26,11 @@ class World {
      * Creates a new World instance.
      * @param {number} [maxSurfaceArea=100] - The maximum allowable surface area for the world (default: 10x10).
      */
-    constructor(maxSurfaceArea: number = 10 * 10) {
+    constructor(maxSurfaceArea: number = 100) {
         this.rooms = [];
         this.maxSurfaceArea = maxSurfaceArea;
         this.currentSurfaceArea = 0;
-        this.mapGenerator = new MapGenerator(30);
+        this.mapGenerator = new MapGenerator((maxSurfaceArea/10) * 3);
     }
 
     /**
@@ -126,9 +126,5 @@ class World {
         return true;
     }
 }
-
-let world: World = new World();
-world.generateWorld();
-console.log(world.getStructure("bottomWall"))
 
 export { World };

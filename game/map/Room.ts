@@ -63,7 +63,7 @@ class Room {
      */
     private distribution(): number {
         const rand: number = Random.randInt(1, 15); // Random int from 1 to 15
-        return ((Math.floor(Math.log2(rand)) + 3) % 4) + 1; // Rotated distribution
+        return ((Math.floor(Math.log2(rand)) + 2) % 4) + 1; // Rotated distribution
     }
 
     /**
