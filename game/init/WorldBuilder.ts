@@ -7,6 +7,48 @@ import {
 } from '../../engine/core.js';
 // @ts-ignore
 import { GLTFLoader } from '../../engine/loaders/GLTFLoader.js';
+import {World} from "../map/World.js";
+
+export async function initalize(scene: Node, playerNode: Node): Promise<void> {
+    // Create the world
+    const world: World = new World();
+    world.generateWorld();
+    await buildWorld(scene, world);
+    // Move the player
+    playerNode.addComponent(new Transform({
+        translation: world.getRooms[0].getFloors[0].getCenter.toArray,
+    }));
+}
+
+async function buildWorld(scene: Node, world: World): Promise<void> {
+    world.getWalls().forEach(wall => {
+        if (wall.isDoor) {
+            createDoor(new Transform({
+                translation: wall.getCenter.toArray,
+                rotation: wall.getQuaternions,
+            }), scene);
+        } else {
+            createWall(new Transform({
+                translation: wall.getCenter.toArray,
+                rotation: wall.getQuaternions,
+            }), scene);
+        }
+    });
+
+    world.getPillars().forEach(pillar => {
+        createWallPillar(new Transform({
+            translation: pillar.getCenter.toArray,
+            rotation: pillar.getQuaternions,
+        }), scene);
+    });
+
+    world.getFloors().forEach(floor => {
+        createFloor(new Transform({
+            translation: floor.getCenter.toArray,
+            rotation: floor.getQuaternions,
+        }), scene);
+    });
+}
 
 /**
  * Creates a camera located at (0,0,0).

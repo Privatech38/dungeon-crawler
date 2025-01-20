@@ -18,7 +18,7 @@ import {
 
 import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
-import {World} from "./game/map/World.js";
+import {initalize} from "./game/init/WorldBuilder.js";
 
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
@@ -30,6 +30,7 @@ const gltfLoader = new GLTFLoader();
 await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
+const playerNode = gltfLoader.loadNode("Player");
 
 const camera = scene.find(node => node.getComponentOfType(Camera));
 camera.addComponent(new OrbitController(camera, canvas));
@@ -44,37 +45,7 @@ light.addComponent(new Transform({
 }));
 scene.addChild(light);
 
-let world = new World(100);
-world.generateWorld();
-
-world.getWalls().forEach(wall => {
-    if (wall.isDoor) {
-        createDoor(new Transform({
-            translation: wall.getCenter.toArray,
-            rotation: wall.getQuaternions,
-        }), scene);
-    } else {
-        createWall(new Transform({
-            translation: wall.getCenter.toArray,
-            rotation: wall.getQuaternions,
-        }), scene);
-    }
-});
-
-world.getPillars().forEach(pillar => {
-    createWallPillar(new Transform({
-        translation: pillar.getCenter.toArray,
-        rotation: pillar.getQuaternions,
-    }), scene);
-});
-
-world.getFloors().forEach(floor => {
-    createFloor(new Transform({
-        translation: floor.getCenter.toArray,
-        rotation: floor.getQuaternions,
-    }), scene);
-});
-
+initalize(scene, playerNode);
 
 function update(time, dt) {
     scene.traverse(node => {
