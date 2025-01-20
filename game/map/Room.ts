@@ -117,7 +117,9 @@ class Room {
         for (let i = 0; i < this.depth; i++) {
             for (let j = 0; j < this.width; j++) {
                 let floor = new Floor(center.clone());
-                floor.rotate(["Y"], 90, 3);
+                floor.rotate(["Y"], 90);
+                floor.rotate(["Y"], 90);
+                floor.rotate(["Y"], 90);
                 this.floors.push(floor);
                 center.x += 3;
             }
@@ -146,7 +148,9 @@ class Room {
             } else {
                 center.z += 3;
             }
-            pillar.rotate(["Y"], 90, 3);
+            pillar.rotate(["Y"], 90);
+            pillar.rotate(["Y"], 90);
+            pillar.rotate(["Y"], 90);
             this.pillars.push(pillar);
         }
     }

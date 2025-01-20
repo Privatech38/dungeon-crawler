@@ -68,6 +68,10 @@ class Wall extends Structure {
     set isDoor(value: boolean) {
         this.door = value;
         this.hitbox.isActive = !value;
+        if (value) {
+            this.quaternions = [0, 0, 0, 1];
+            this.rotate(["Y"], 180);
+        }
     }
 
     /**
