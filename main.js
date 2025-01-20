@@ -48,7 +48,7 @@ let world = new World(100);
 world.generateWorld();
 
 world.getStructure("wall").forEach(wall => {
-    if (wall.isDoor === true) {
+    if (wall.isDoor) {
         createDoor(new Transform({
             translation: wall.getCenter.toArray,
             rotation: wall.getQuaternions,
