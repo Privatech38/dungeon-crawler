@@ -20,6 +20,8 @@ class Wall extends Structure {
      */
     private readonly hitbox: OBB;
 
+
+    private readonly orientation: number;
     /**
      * Creates a new Wall instance.
      * @param {number} orientation - The orientation of the wall (0 or 90 degrees).
@@ -38,6 +40,7 @@ class Wall extends Structure {
             new Vector3(1.5, 1.1, 0.3),
             center
         );
+        this.orientation = orientation;
     }
 
     /**
@@ -71,6 +74,7 @@ class Wall extends Structure {
         if (value) {
             this.quaternions = [0, 0, 0, 1];
             this.rotate(["Y"], 180);
+            this.rotate(["Y"], this.orientation, 1, false);
         }
     }
 
