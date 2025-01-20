@@ -7,6 +7,7 @@ import { OrbitController } from 'engine/controllers/OrbitController.js';
 import { createWall } from "./game/init/WorldBuilder.js";
 import { createWallPillar } from "./game/init/WorldBuilder.js";
 import { createFloor } from "./game/init/WorldBuilder.js";
+import { createDoor } from "./game/init/WorldBuilder.js";
 
 import {
     Camera,
@@ -17,7 +18,6 @@ import {
 
 import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
-import { Room } from "./game/map/Room.js";
 import {World} from "./game/map/World.js";
 
 const canvas = document.querySelector('canvas');
@@ -53,18 +53,25 @@ world.getStructure("wall").forEach(wall => {
             translation: wall.getCenter.toArray,
             rotation: wall.getQuaternions,
         }), scene);
+    } else {
+        createDoor(new Transform({
+            translation: wall.getCenter.toArray,
+            rotation: wall.getQuaternions,
+        }), scene);
     }
 });
 
 world.getStructure("pillar").forEach(pillar => {
     createWallPillar(new Transform({
         translation: pillar.getCenter.toArray,
+        rotation: pillar.getQuaternions,
     }), scene);
 });
 
 world.getStructure("floor").forEach(floor => {
     createFloor(new Transform({
         translation: floor.getCenter.toArray,
+        rotation: floor.getQuaternions,
     }), scene);
 });
 

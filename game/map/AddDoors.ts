@@ -11,7 +11,7 @@ class AddDoors {
     }
 
     public addDoorsAll() {
-        this.world.printWorld()
+        this.world.printWorld();
         this.rooms.forEach(room1 => {
             this.rooms.forEach(room2 => {
                 if (room1 !== room2) {
