@@ -75,58 +75,84 @@ class World {
         return this.rooms;
     }
 
-    /**
-     * Retrieves structures of a specific type (e.g., walls, pillars, floors) from all rooms.
-     * Ensures no duplicate structures are included.
-     * @param {string} type - The type of structure to retrieve ("wall", "pillar", "floor", "bottomWall").
-     * @returns {Structure[]} An array of unique Structure instances of the specified type.
-     */
-    public getStructure(type: "wall" | "bottomWall" | "floor" | "pillar"): Wall[] | Pillar[] | Floor[] | BottomWall[] {
-        switch (type) {
-            case "wall": return this.collectUniqueStructures<Wall>("getWalls");
-            case "pillar": return this.collectUniqueStructures<Pillar>("getPillars");
-            case "floor": return this.collectUniqueStructures<Floor>("getFloors");
-            case "bottomWall": return this.collectUniqueStructures<BottomWall>("getBottomWalls");
+    public getWalls(): Wall[] {
+        function isTheSame(walls: Wall[], wall: Wall): boolean {
+            for (const w of walls) {
+                if (w.getCenter.equals(wall.getCenter)) {return true}
+            }
+            return false;
         }
-    }
 
-    /**
-     * Collects unique structures of a specific type from all rooms.
-     * @template T The type of structure to collect (must extend Structure).
-     * @param {string} roomMethod - The method name to call on each room (e.g., "getWalls").
-     * @returns {T[]} An array of unique structures.
-     */
-    private collectUniqueStructures<T extends Structure>(roomMethod: keyof Room): T[] {
-        const uniqueStructures: T[] = [];
+        let uniqueWall: Wall[] = [];
+
         this.rooms.forEach((room: Room) => {
-            const structures = room[roomMethod];
-            if (Array.isArray(structures)) {
-                structures.forEach((structure) => {
-                    if (this.isStructureDuplicate(uniqueStructures, structure as T)) {
-                        uniqueStructures.push(structure as T);
-                    }
-                });
-            }
-        });
-        return uniqueStructures;
+            room.getWalls.forEach((wall: Wall) => {
+                if (!isTheSame(uniqueWall, wall)) {
+                    uniqueWall.push(wall);
+                }
+            })
+        })
+        return uniqueWall;
     }
 
-    /**
-     * Checks if a structure is already included in the list based on its center (x, z).
-     * @template T The type of structure to check.
-     * @param {T[]} collection - The list of structures.
-     * @param {T} structure - The structure to check for duplication.
-     * @returns {boolean} True if the structure is already in the list, false otherwise.
-     */
-    private isStructureDuplicate<T extends Structure>(collection: T[], structure: T): boolean {
-        collection.forEach((existingStructure) => {
-            const existingCenter = existingStructure.getCenter;
-            const structureCenter = structure.getCenter;
-            if (existingCenter.x === structureCenter.x && existingCenter.z === structureCenter.z) {
-                return false;
+    public getBottomWalls(): BottomWall[] {
+        function isTheSame(bottomWalls: BottomWall[], bottomWall: BottomWall): boolean {
+            for (const w of bottomWalls) {
+                if (w.getCenter.equals(bottomWall.getCenter)) {return true}
             }
+            return false;
+        }
+
+        let uniqueBottomWall: BottomWall[] = [];
+
+        this.rooms.forEach((room: Room) => {
+            room.getWalls.forEach((bottomWall: BottomWall) => {
+                if (!isTheSame(uniqueBottomWall, bottomWall)) {
+                    uniqueBottomWall.push(bottomWall);
+                }
+            })
         })
-        return true;
+        return uniqueBottomWall;
+    }
+
+    public getFloors(): Floor[] {
+        function isTheSame(Floors: Floor[], Floor: Floor): boolean {
+            for (const w of Floors) {
+                if (w.getCenter.equals(Floor.getCenter)) {return true}
+            }
+            return false;
+        }
+
+        let uniqueFloor: Floor[] = [];
+
+        this.rooms.forEach((room: Room) => {
+            room.getFloors.forEach((floor: Floor) => {
+                if (!isTheSame(uniqueFloor, floor)) {
+                    uniqueFloor.push(floor);
+                }
+            })
+        })
+        return uniqueFloor;
+    }
+
+    public getPillars(): Pillar[] {
+        function isTheSame(Pillars: Pillar[], Pillar: Pillar): boolean {
+            for (const w of Pillars) {
+                if (w.getCenter.equals(Pillar.getCenter)) {return true}
+            }
+            return false;
+        }
+
+        let uniquePillar: Pillar[] = [];
+
+        this.rooms.forEach((room: Room) => {
+            room.getPillars.forEach((pillar: Pillar) => {
+                if (!isTheSame(uniquePillar, pillar)) {
+                    uniquePillar.push(pillar);
+                }
+            })
+        })
+        return uniquePillar;
     }
 
     get getGrid(): number[][] {

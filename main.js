@@ -47,7 +47,7 @@ scene.addChild(light);
 let world = new World(100);
 world.generateWorld();
 
-world.getStructure("wall").forEach(wall => {
+world.getWalls().forEach(wall => {
     if (wall.isDoor) {
         createDoor(new Transform({
             translation: wall.getCenter.toArray,
@@ -61,14 +61,14 @@ world.getStructure("wall").forEach(wall => {
     }
 });
 
-world.getStructure("pillar").forEach(pillar => {
+world.getPillars().forEach(pillar => {
     createWallPillar(new Transform({
         translation: pillar.getCenter.toArray,
         rotation: pillar.getQuaternions,
     }), scene);
 });
 
-world.getStructure("floor").forEach(floor => {
+world.getFloors().forEach(floor => {
     createFloor(new Transform({
         translation: floor.getCenter.toArray,
         rotation: floor.getQuaternions,

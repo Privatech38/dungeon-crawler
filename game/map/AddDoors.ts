@@ -11,7 +11,6 @@ class AddDoors {
     }
 
     public addDoorsAll() {
-        this.world.printWorld();
         this.rooms.forEach(room1 => {
             this.rooms.forEach(room2 => {
                 if (room1 !== room2) {
@@ -38,7 +37,6 @@ class AddDoors {
     // check if they are neighbors
     private alreadyNeighbors(room: Room, neighbor: Room): boolean {
         for (const cur of room.getNeighbors) {
-            console.log(cur.getID, neighbor.getID);
             if (cur.getID === neighbor.getID) {return true;}
         }
         return false;
