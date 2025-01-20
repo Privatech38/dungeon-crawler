@@ -57,7 +57,7 @@ class World {
             }
         }
 
-        new AddDoors(this, 2).addDoorsAll();
+        new AddDoors(this).addDoorsAll();
     }
 
     /**

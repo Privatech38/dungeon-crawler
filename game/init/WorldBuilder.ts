@@ -84,7 +84,7 @@ export async function createFloor(location: Transform, scene: Node): Promise<voi
 export async function createDoor(location: Transform, scene: Node): Promise<void> {
     const doorLoader = new GLTFLoader();
     await doorLoader.load('../../assets/models/rooms/walls/WallDoor/WallDoor.gltf');
-    const door: Node = doorLoader.loadNode('Door');
+    const door: Node = doorLoader.loadNode('Wall');
     door.isStatic = true;
     door.addComponent(location);
     scene.addChild(door);
