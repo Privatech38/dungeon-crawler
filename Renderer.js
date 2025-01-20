@@ -250,7 +250,7 @@ export class Renderer extends BaseRenderer {
         const baseTexture = this.prepareTexture(material.baseTexture);
 
         const materialUniformBuffer = this.device.createBuffer({
-            size: 16,
+            size: 48,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -342,7 +342,18 @@ export class Renderer extends BaseRenderer {
 
     renderPrimitive(primitive) {
         const { materialUniformBuffer, materialBindGroup } = this.prepareMaterial(primitive.material);
-        this.device.queue.writeBuffer(materialUniformBuffer, 0, new Float32Array(primitive.material.baseFactor));
+        const ambientLightColor = vec3.scale(vec3.create(), primitive.material.ambientColor, 1 / 255);
+
+        // Create the MaterialUniforms data
+        const materialData = new Float32Array([
+            ...primitive.material.baseFactor, // vec4f
+            primitive.material.ambientFactor, // f32
+            ...ambientLightColor, // vec3f
+        ]);
+
+        // Write the full struct to the buffer
+        this.device.queue.writeBuffer(materialUniformBuffer, 0, materialData);
+
         this.renderPass.setBindGroup(3, materialBindGroup);
 
         const { vertexBuffer, indexBuffer } = this.prepareMesh(primitive.mesh, vertexBufferLayout);

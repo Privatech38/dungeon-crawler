@@ -36,6 +36,8 @@ struct ModelUniforms {
 
 struct MaterialUniforms {
     baseFactor: vec4f,
+    ambientFactor: f32,
+    ambientColor: vec3f
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
@@ -60,14 +62,13 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
     let N = normalize(input.normal);
     let L = light.direction;
-
     let lambert = max(dot(N, L), 0.0);
-    let diffuseLight = lambert * light.color;
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    let finalColor = baseColor.rgb * diffuseLight;
 
-    output.color = pow(vec4(finalColor, 1), vec4(1 / 2.2));
+    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
+
+    output.color = pow(finalColor, vec4(1 / 2.2));
 
     return output;
 }

@@ -5,6 +5,7 @@ import {Wall} from "./Structures/Wall.js";
 import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
 import {BottomWall} from "./Structures/BottomWall.js";
+import {AddDoors} from "./AddDoors.js";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.
@@ -55,6 +56,8 @@ class World {
                 this.surfaceArea(room);
             }
         }
+
+        new AddDoors(this, 2).addDoorsAll();
     }
 
     /**
@@ -125,6 +128,9 @@ class World {
         })
         return true;
     }
-}
 
+    get getGrid(): number[][] {
+        return this.mapGenerator.getMap;
+    }
+}
 export { World };

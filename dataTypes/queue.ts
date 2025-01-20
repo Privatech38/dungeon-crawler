@@ -74,3 +74,5 @@ class Queue<T> {
         return this.items.join(", ");
     }
 }
+
+export {Queue};

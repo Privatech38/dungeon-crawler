@@ -67,6 +67,7 @@ class Wall extends Structure {
      */
     set isDoor(value: boolean) {
         this.door = value;
+        this.hitbox.isActive = !value;
     }
 
     /**

@@ -37,21 +37,23 @@ camera.addComponent(new OrbitController(camera, canvas));
 const light = new Node();
 light.addComponent(new Light({
     color: [255, 184, 92],
-    direction: [0, 0, 1],
+    direction: [0, 1, 0],
 }));
 light.addComponent(new Transform({
-    translation: [1, 5, 1],
+    translation: [0, 10, 0],
 }));
 scene.addChild(light);
 
-let world = new World(200);
+let world = new World(100);
 world.generateWorld();
 
 world.getStructure("wall").forEach(wall => {
-    createWall(new Transform({
-        translation: wall.getCenter.toArray,
-        rotation: wall.getQuaternions,
-    }), scene);
+    if (wall.isDoor !== true) {
+        createWall(new Transform({
+            translation: wall.getCenter.toArray,
+            rotation: wall.getQuaternions,
+        }), scene);
+    }
 });
 
 world.getStructure("pillar").forEach(pillar => {

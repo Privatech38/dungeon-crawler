@@ -16,7 +16,6 @@ class Room {
     private readonly bottomWalls: Floor[];
     private width: number;
     private depth: number;
-    private doorCount: number;
     private startPoint: Vector3;
     private active: boolean;
     private readonly corners: Array<Vector3>;
@@ -34,7 +33,6 @@ class Room {
         this.bottomWalls = [];
         this.width = 0;
         this.depth = 0;
-        this.doorCount = 0;
         this.startPoint = new Vector3(0, 0, 0);
         this.active = false;
         this.corners = new Array<Vector3>();
@@ -76,7 +74,6 @@ class Room {
         const maxSize = size + Math.ceil(size / 2);
         this.width = Random.randInt(minSize, maxSize);
         this.depth = Random.randInt(minSize, maxSize);
-        this.doorCount = Random.randInt(1, size + 1);
     }
 
     /**
@@ -253,14 +250,6 @@ class Room {
     }
 
     /**
-     * Gets the number of doors in the room.
-     * @returns The number of doors in the room.
-     */
-    get getDoorCount(): number {
-        return this.doorCount;
-    }
-
-    /**
      * Gets the walls of the room.
      * @returns An array of walls in the room.
      */
@@ -320,7 +309,7 @@ class Room {
      * Adds a neighboring room.
      * @param room - The neighboring room to add.
      */
-    set newNeighbor(room: Room) {
+    public newNeighbor(room: Room) {
         this.neighbors.add(room);
     }
 
