@@ -19,6 +19,8 @@ import {
 import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
 import {initalize} from "./game/init/WorldBuilder.js";
+import {FirstPersonController} from "./engine/controllers/FirstPersonController.js";
+import { PlayerController } from "./game/PlayerController.js";
 
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
@@ -31,9 +33,10 @@ await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 const playerNode = gltfLoader.loadNode("Player");
+playerNode.addComponent(new PlayerController(playerNode, canvas));
 
 const camera = scene.find(node => node.getComponentOfType(Camera));
-camera.addComponent(new OrbitController(camera, canvas));
+// camera.addComponent(new FirstPersonController(camera, canvas));
 
 const light = new Node();
 light.addComponent(new Light({
