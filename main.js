@@ -33,7 +33,8 @@ await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 const playerNode = gltfLoader.loadNode("Player");
-playerNode.addComponent(new PlayerController(playerNode, canvas));
+const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
+playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas));
 
 const camera = scene.find(node => node.getComponentOfType(Camera));
 // camera.addComponent(new FirstPersonController(camera, canvas));

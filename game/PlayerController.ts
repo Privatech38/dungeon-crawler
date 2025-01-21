@@ -8,6 +8,7 @@ import {Node} from "../engine/core/Node.js";
 
 export class PlayerController {
     private node: Node;
+    private armatureNode: Node;
     private domElement: Element;
     private keys: Set<string>;
     private velocity: number[];
@@ -16,7 +17,7 @@ export class PlayerController {
     private decay: number;
     private pointerSensitivity: number;
 
-    constructor(node: Node, domElement: Element, {
+    constructor(node: Node, armatureNode: Node, domElement: Element, {
         velocity = [0, 0, 0],
         acceleration = 50,
         maxSpeed = 5,
@@ -24,6 +25,7 @@ export class PlayerController {
         pointerSensitivity = 0.002,
     } = {}) {
         this.node = node;
+        this.armatureNode = armatureNode;
         this.domElement = domElement;
 
         this.keys = new Set<string>();
@@ -92,6 +94,32 @@ export class PlayerController {
             // Update translation based on velocity.
             vec3.scaleAndAdd(transform.translation,
                 transform.translation, this.velocity, dt);
+        }
+
+        const armatureTransform = this.armatureNode.getComponentOfType(Transform);
+        if (armatureTransform) {
+            // Update rotation
+            let rotation = quat.create();
+            if (this.keys.has('KeyS') && this.keys.has('KeyA')) {
+                quat.rotateY(rotation, rotation, -Math.PI / 4);
+            } else if (this.keys.has('KeyS') && this.keys.has('KeyD')) {
+                quat.rotateY(rotation, rotation, Math.PI / 4);
+            } else if (this.keys.has('KeyW') && this.keys.has('KeyA')) {
+                quat.rotateY(rotation, rotation, -3 * Math.PI / 4);
+            } else if (this.keys.has('KeyW') && this.keys.has('KeyD')) {
+                quat.rotateY(rotation, rotation, 3 * Math.PI / 4);
+            } else if (this.keys.has('KeyS')) {
+                quat.rotateY(rotation, rotation, 0);
+            } else if (this.keys.has('KeyW')) {
+                quat.rotateY(rotation, rotation, Math.PI);
+            } else if (this.keys.has('KeyA')) {
+                quat.rotateY(rotation, rotation, -Math.PI / 2);
+            } else if (this.keys.has('KeyD')) {
+                quat.rotateY(rotation, rotation, Math.PI / 2);
+            } else {
+                rotation = armatureTransform.rotation;
+            }
+            armatureTransform.rotation = rotation;
         }
     }
 
