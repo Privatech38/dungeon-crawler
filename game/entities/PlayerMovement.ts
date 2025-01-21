@@ -7,15 +7,15 @@ class PlayerMovement extends Movement {
         super(initialPosition, speed);
     }
 
-    public move(keys: { up: boolean; down: boolean; left: boolean; right: boolean }) {
+    public move(keys: Set<string>) {
         let velocityX = 0;
         let velocityZ = 0;
 
         // Update velocity based on input
-        if (keys.up) velocityZ -= this.getSpeed;
-        if (keys.down) velocityZ += this.getSpeed;
-        if (keys.left) velocityX -= this.getSpeed;
-        if (keys.right) velocityX += this.getSpeed;
+        if (keys.has('keyW')) velocityZ -= this.getSpeed;
+        if (keys.has('keyS')) velocityZ += this.getSpeed;
+        if (keys.has('keyA')) velocityX -= this.getSpeed;
+        if (keys.has('keyD')) velocityX += this.getSpeed;
 
         // Normalize diagonal movement
         if (velocityX !== 0 && velocityZ !== 0) {

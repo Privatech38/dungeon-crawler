@@ -39,7 +39,7 @@ class Player extends Entity {
         })
     }
 
-    public move(keys: { up: boolean; down: boolean; left: boolean; right: boolean }, deltaTime: number) {
+    public move(keys: Set<string>, deltaTime: number) {
         this.movement.move(keys);
         this.position = this.movement.getPosition.clone();
     }
