@@ -1,0 +1,117 @@
+
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{erk}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage[top=22.5mm, bottom=22.5mm, left=22.5mm, right=22.5mm]{geometry}
+
+\usepackage[slovene,english]{babel}
+\usepackage{hyperref}
+\usepackage{url}
+
+\let\oldfootnotesize\footnotesize
+\renewcommand*{\footnotesize}{\oldfootnotesize\scriptsize}
+
+\begin{document}
+
+\title{Poročilo seminarske naloge pri predmetu Računalniška grafika}
+\author{Matic Grobolšek\and Žiga Slatnar Štagar}
+\maketitle
+
+\selectlanguage{slovene}
+
+\begin{abstract}{Abstract}
+Osnovna ideja igre je preprosta: igralec prične v prazni sobi in se 
+mora prebiti skozi več drugih sob, kjer so lahko sovražniki, katere 
+mora premagati, če želi napredovati.
+Igra spada v žanr tako imenovanih ``dungeon crawler'' iger.
+Z realizacijo igre smo se odločili uporabiti
+programski jezik TypeScript in knjižnico WebGPU. Za izdelavo modelov,
+tekstur in animacij smo uporabili Blender.
+Igra je bila razvita za
+spletni brskalnik.
+\end{abstract}
+
+\section{Pregled igre}\label{sec:pregled-igre}
+Igra spada pod žanr ``dungeon crawler'' iger, ki pa spadajo pod žanr RPG oz.\ iger igranja vlog.
+Igralec mora v igri napredovati skozi labirint, v tem primeru naključno ustvarjen iz sob.
+V sobah se lahko nahajajo sovražniki, ki jih mora igralec premagati, da lahko napreduje.\\
+Zahtevnost igre je statična in se je ne da prilagajati.
+Igralec mora imeti dovolj sposobnosti, da se zna taktično premikati in pravilno uporabljati svoje orožje.\\
+Ideja zgodbe je zelo preprosta, igralec se znajde v ``ječi'' in mora najti izhod iz nje.
+To stori tako, da obišče vse sobe.
+
+\subsection{Opis sveta}\label{subsec:opis-sveta}
+Svet igre je sestavljen iz več naključno ustvarjenih sob, ki so med seboj povezane.
+Stil sveta je srednjeveški, zato so tudi sovražniki in igralec srednjeveški liki.
+Kot stil bi lahko opisali tudi tako imenovani ``low poly'' oz.\ stil, kjer so poligoni očitni.
+Igralec, kot tudi sovražniki, se premikajo po dveh dimenzijah.
+
+\subsubsection{Pregled}
+Svet je naključno sestavljen ob začetku igre in sicer s tem, da uporablja le en model za zid, steber in vrata.
+Vtis naključnosti je povečan z naključnim obračanjem teh modelov.
+
+\subsubsection{Ozadje}
+Ozadje je temno, namreč smo le v ječi in zato zunanje svetlobe ni ali pa je minimalna.
+
+\subsubsection{Ključne lokacije}
+Posebnih lokacij ni, razen soba, v kateri igralec prične, kjer se sovražniki ne morejo pojaviti.
+
+\subsubsection{Velikost}
+Vsak zid je dolg tri metre.\ Skupna površina sob ima največjo vrednost, ki hkrati med ustvarjanjem svet
+definira število sob, saj se program za ustvarjanje ustavi, ko doseže to vrednost.
+
+\subsubsection{Objekti}
+Vsi objekti v igri so ročno ustvarjeni v programih
+Blender\footnote{\url{https://www.blender.org/}} in Paint.NET\footnote{\url{https://www.getpaint.net/}}.
+
+\subsubsection{Čas}
+Čas v igri je statičen oziroma ni definiran, saj igra nima nobenega elementa, ki bi bil odvisen od internega časa.
+Če pa bi primerjali z resničnim svetom, bi vzeli ta čas.
+
+\subsection{Igralni pogon in uporabljene tehnologije}\label{subsec:igralni-pogon-in-uporabljene-tehnologije}
+Igralni pogon je napisan v programskem jeziku TypeScript\footnote{\url{https://www.typescriptlang.org/}}.
+Za izrisovanje uporablja knjižnico WebGPU\footnote{\url{https://www.w3.org/TR/webgpu/}}.
+Kot povezava med najinim gonilnikom in WebGPU je uporabljen repozitorij webgpu-examples\footnote{\url{https://github.com/UL-FRI-LGM/webgpu-examples}} od UL FRI LGM.
+Za izdelavo modelov, UV koordinat in animacij smo uporabili Blender\footnote[1].
+Za izdelavo tekstur pa Paint.NET\footnote[2].
+
+\subsection{Pogled}\label{subsec:pogled}
+Za pogled je uporabljena perspektivna kamera, ki je postavljena nad igralcem in obrnjena proti njemu.
+Kamera se premika skupaj z igralcem, vendar se ne obrača z njim.
+
+\section{Osebek}\label{sec:osebek}
+Igralčev osebek predstavlja srednjeveškega viteza, sicer brez rok in nog, zaradi stila igre (tudi zaradi lažjega animiranja).
+Igralec osebka premika z uporabo tipk W, A, S in D. Osebek se obrne v smeri premikanja.
+Igralec pa nima nadzora nad sovražniki, v našem primeru so to okostnjaki, prav tako brez rok in nog.
+
+\section{Uporabniški vmesnik}\label{sec:uporabniski-vmesnik}
+Samega uporabniškega vmesnika ni.
+
+\section{Glasba in zvok}\label{sec:glasba-in-zvok}
+Glasba in zvok nista prisotna.
+
+\section{Gameplay}\label{sec:gameplay}
+Igra se prične tako, da se igralec nahaja v prvi sobi, kjer ni sovražnikov.
+Igralec mora v vsaki sobi ubiti vse sovražnike.
+Ko to stori, se igra zaključi.
+
+\section{Zaključki in možne nadgradnje}\label{sec:zakljucki-in-mozne-nadgradnje}
+Pri izdelavi igre sva se največ naučila o WebGPU knjižnici\footnote[4].
+Ker je WebGPU relativno nov pojem, sva za pomoč uporabljala repozitorij webgpu-examples\footnote[5] in repozitorij vaj\footnote{\url{https://github.com/UL-FRI-LGM/vaje-rgti}}.
+Poleg tega sva nadgradila znanje TypeScript\footnote[3] jezika.
+Prvič sva se srečala z glTF\footnote{\url{https://www.khronos.org/gltf/}} formatom datotek za shranjevanje modelov in njihovih podatkov.
+\\
+Predmet sam nama je dal dovolj znanja za razumevanje senčilnikov in kako jih pisati.
+\\
+Predviden scenarij je bilo dosti več nivojev, v smislu okolice npr. travnik, gozd, nebo itd.
+Prav tako bi bilo več sovražnikov, orožij in celo uroki.
+Dodati sva želela tudi gospodarja sovražnikov, ki bi bil zadnji sovražnik igre oz. nivoja.
+
+\small
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
