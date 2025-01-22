@@ -3,12 +3,6 @@ import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
 
 import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
 
-import { OrbitController } from 'engine/controllers/OrbitController.js';
-import { createWall } from "./game/init/WorldBuilder.js";
-import { createWallPillar } from "./game/init/WorldBuilder.js";
-import { createFloor } from "./game/init/WorldBuilder.js";
-import { createDoor } from "./game/init/WorldBuilder.js";
-
 import {
     Camera,
     Model,
@@ -19,7 +13,6 @@ import {
 import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
 import {initalize} from "./game/init/WorldBuilder.js";
-import {FirstPersonController} from "./engine/controllers/FirstPersonController.js";
 import { PlayerController } from "./game/PlayerController.js";
 
 const canvas = document.querySelector('canvas');

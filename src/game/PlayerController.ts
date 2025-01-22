@@ -2,9 +2,9 @@
 import { quat, vec3, mat4 } from 'glm';
 
 // @ts-ignore
-import { Transform } from '../engine/core/Transform.js';
+import { Transform } from '../../dist/engine/core/Transform.js';
 // @ts-ignore
-import {Node} from "../engine/core/Node.js";
+import {Node} from "../../dist/engine/core/Node.js";
 
 export class PlayerController {
     private node: Node;

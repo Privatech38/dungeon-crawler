@@ -48,7 +48,7 @@ class GameManager {
         this.entities.add(entity);
     }
 
-    public playerMove(keys: { up: boolean; down: boolean; left: boolean; right: boolean }){
+    public playerMove(keys: Set<string>): void {
         this.updateDeltaTime();
         this.collisionWithWall(this.player)
         this.playerMovement.move(keys)

@@ -4,9 +4,9 @@ import {
     Node,
     Transform,
     // @ts-ignore
-} from '../../engine/core.js';
+} from '../../../dist/engine/core.js';
 // @ts-ignore
-import { GLTFLoader } from '../../engine/loaders/GLTFLoader.js';
+import { GLTFLoader } from '../../../dist/engine/loaders/GLTFLoader.js';
 import {World} from "../map/World";
 
 export async function initalize(scene: Node, playerNode: Node): Promise<void> {
