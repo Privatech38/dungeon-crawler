@@ -74,6 +74,7 @@ Blender\footnote{\url{https://www.blender.org/}} in Paint.NET\footnote{\url{http
 \subsection{Igralni pogon in uporabljene tehnologije}\label{subsec:igralni-pogon-in-uporabljene-tehnologije}
 Igralni pogon je napisan v programskem jeziku TypeScript\footnote{\url{https://www.typescriptlang.org/}}.
 Za izrisovanje uporablja knjižnico WebGPU\footnote{\url{https://www.w3.org/TR/webgpu/}}.
+Kot povezava med najinim gonilnikom in WebGPU je uporabljen repozitorij webgpu-examples\footnote{\url{https://github.com/UL-FRI-LGM/webgpu-examples}} od UL FRI LGM.
 Za izdelavo modelov, UV koordinat in animacij smo uporabili Blender\footnote[1].
 Za izdelavo tekstur pa Paint.NET\footnote[2].
 
@@ -93,10 +94,21 @@ Samega uporabniškega vmesnika ni.
 Glasba in zvok nista prisotna.
 
 \section{Gameplay}\label{sec:gameplay}
-
+Igra se prične tako, da se igralec nahaja v prvi sobi, kjer ni sovražnikov.
+Igralec mora v vsaki sobi ubiti vse sovražnike.
+Ko to stori, se igra zaključi.
 
 \section{Zaključki in možne nadgradnje}\label{sec:zakljucki-in-mozne-nadgradnje}
-
+Pri izdelavi igre sva se največ naučila o WebGPU knjižnici\footnote[4].
+Ker je WebGPU relativno nov pojem, sva za pomoč uporabljala repozitorij webgpu-examples\footnote[5] in repozitorij vaj\footnote{\url{https://github.com/UL-FRI-LGM/vaje-rgti}}.
+Poleg tega sva nadgradila znanje TypeScript\footnote[3] jezika.
+Prvič sva se srečala z glTF\footnote{\url{https://www.khronos.org/gltf/}} formatom datotek za shranjevanje modelov in njihovih podatkov.
+\\
+Predmet sam nama je dal dovolj znanja za razumevanje senčilnikov in kako jih pisati.
+\\
+Predviden scenarij je bilo dosti več nivojev, v smislu okolice npr. travnik, gozd, nebo itd.
+Prav tako bi bilo več sovražnikov, orožij in celo uroki.
+Dodati sva želela tudi gospodarja sovražnikov, ki bi bil zadnji sovražnik igre oz. nivoja.
 
 \small
 \bibliographystyle{plain}
