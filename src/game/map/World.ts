@@ -106,7 +106,7 @@ class World {
         let uniqueBottomWall: BottomWall[] = [];
 
         this.rooms.forEach((room: Room) => {
-            room.getWalls.forEach((bottomWall: BottomWall) => {
+            room.getBottomWalls.forEach((bottomWall: BottomWall) => {
                 if (!isTheSame(uniqueBottomWall, bottomWall)) {
                     uniqueBottomWall.push(bottomWall);
                 }

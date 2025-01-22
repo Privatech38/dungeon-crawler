@@ -118,7 +118,7 @@ abstract class Entity {
         return this.healthPoints;
     }
 
-    protected updatePosition(position: Vector3){
+    public updatePosition(position: Vector3){
         this.position = position.clone();
         this.hitbox.center = position.clone();
     }

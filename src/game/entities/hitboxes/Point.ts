@@ -11,9 +11,10 @@ class Point extends Hitbox {
     /**
      * Creates a new Point hitbox.
      * @param center - The center of the point
+     * @param isActive
      */
-    constructor(center: Vector3) {
-        super(center);
+    constructor(center: Vector3, isActive: boolean = true) {
+        super(center, isActive);
     }
 
     /**
@@ -57,6 +58,10 @@ class Point extends Hitbox {
      */
     containsPoint(other: Point): boolean {
         return this.center.equals(other.center);
+    }
+
+    public clone(): Hitbox {
+        return new Point(this.center.clone(), this.isActive);
     }
 }
 

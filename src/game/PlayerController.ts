@@ -5,6 +5,10 @@ import { quat, vec3, mat4 } from 'glm';
 import { Transform } from '../engine/core/Transform.js';
 // @ts-ignore
 import {Node} from "../engine/core/Node.js";
+import {Player} from "./entities/Player.js";
+import {Vector3} from "../math/Vector.js";
+import {World} from "./map/World.js";
+import {GameManager} from "./GameManager.js";
 
 export class PlayerController {
     private node: Node;
@@ -16,14 +20,22 @@ export class PlayerController {
     private maxSpeed: number;
     private decay: number;
     private pointerSensitivity: number;
+    private gameManager: GameManager;
 
-    constructor(node: Node, armatureNode: Node, domElement: Element, {
+    private player: Player;
+    private world: World;
+
+    constructor(node: Node, armatureNode: Node, domElement: Element, gameManager: GameManager, {
         velocity = [0, 0, 0],
         acceleration = 50,
-        maxSpeed = 5,
+        maxSpeed = gameManager.getPlayer.getSpeed,
         decay = 0.99999,
         pointerSensitivity = 0.002,
     } = {}) {
+        this.gameManager = gameManager;
+        this.world = gameManager.getWorld;
+        this.player = gameManager.getPlayer;
+
         this.node = node;
         this.armatureNode = armatureNode;
         this.domElement = domElement;
@@ -48,6 +60,13 @@ export class PlayerController {
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
+    }
+
+    checkCollision(newPosition: Vector3) {
+        let newHitbox = this.player.getHitbox.clone();
+        newHitbox.updatePosition(newPosition);
+
+        return this.gameManager.collisionWithWall(newHitbox);
     }
 
     update(t: any, dt: number) {
@@ -91,9 +110,27 @@ export class PlayerController {
 
         const transform = this.node.getComponentOfType(Transform);
         if (transform) {
-            // Update translation based on velocity.
-            vec3.scaleAndAdd(transform.translation,
-                transform.translation, this.velocity, dt);
+            // Calculate the potential new position.
+            const newPosition = vec3.create();
+            vec3.scaleAndAdd(newPosition, transform.translation, this.velocity, dt);
+
+            let myPosition = new Vector3(
+                newPosition[0],
+                newPosition[1],
+                newPosition[2],
+            )
+
+            console.log(myPosition);
+            // Collision detection
+            if (!this.checkCollision(myPosition)) {
+                // If no collision, apply the new position.
+                vec3.copy(transform.translation, newPosition);
+                this.gameManager.getPlayer.updatePosition(myPosition);
+                console.log("player position:" + myPosition);
+            } else {
+                // Handle collision response (e.g., stop, slide, or bounce).
+                vec3.scale(this.velocity, this.velocity, 0); // Example: Stop on collision
+            }
         }
 
         const armatureTransform = this.armatureNode.getComponentOfType(Transform);

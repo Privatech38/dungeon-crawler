@@ -34,6 +34,11 @@ abstract class Hitbox {
         this.center = vector;
     }
 
+    get getCenter() {
+        return this.center;
+    }
+
+    abstract clone(): Hitbox;
 }
 
 

@@ -14,6 +14,13 @@ import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
 import {initalize} from "./game/init/WorldBuilder.js";
 import { PlayerController } from "./game/PlayerController.js";
+import {GameManager} from "./game/GameManager.js";
+import { player } from "./game/enteties.js";
+import {OBBToMesh} from "./engine/loaders/OBBToMesh.js";
+
+let manager = new GameManager(player, 20);
+manager.generateWorld();
+let world = manager.getWorld;
 
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
@@ -27,7 +34,7 @@ await gltfLoader.load('./assets/default/DefaultScene.gltf');
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
 const playerNode = gltfLoader.loadNode("Player");
 const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
-playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas));
+playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
 
 const camera = scene.find(node => node.getComponentOfType(Camera));
 // camera.addComponent(new FirstPersonController(camera, canvas));
@@ -42,7 +49,29 @@ light.addComponent(new Transform({
 }));
 scene.addChild(light);
 
-initalize(scene, playerNode);
+initalize(scene, playerNode, world);
+
+const color = [1, 0, 0];
+
+world.getRooms.forEach((room) => {
+    room.getWalls.forEach(obb => {
+        let newObb = obb.getHitbox.clone();
+        const obbMesh = new OBBToMesh().createMesh({
+            axes: newObb.getAxes,
+            halfExtents: newObb.getHalfExtents,
+            center: newObb.center,
+            color: color,
+        });
+
+        const obbNode = new Node();
+        obbNode.addComponent(new Model({ mesh: obbMesh }));
+        obbNode.addComponent(new Transform({
+            translation: [obb.center.x, obb.center.y, obb.center.z],
+        }));
+
+        scene.addChild(obbNode);
+    })
+})
 
 function update(time, dt) {
     scene.traverse(node => {

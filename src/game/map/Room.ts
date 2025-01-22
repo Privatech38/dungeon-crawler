@@ -13,7 +13,7 @@ class Room {
     private readonly walls: Wall[];
     private readonly pillars: Pillar[];
     private readonly floors: Floor[];
-    private readonly bottomWalls: Floor[];
+    private readonly bottomWalls: BottomWall[];
     private width: number;
     private depth: number;
     private startPoint: Vector3;
@@ -80,6 +80,7 @@ class Room {
      * Generates the room by creating walls, pillars, and floors.
      */
     private generateRoom(): void {
+
         // Generate bottom pillars and walls
         this.generatePillar(
             new Vector3(0, 0, 0).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, 1)
@@ -174,6 +175,7 @@ class Room {
                 bottomWall = new BottomWall(90, center.clone());
                 wall.rotateHitbox();
                 wall.rotate(["Y"], 90, 0, false);
+                bottomWall.rotate(["Y"], 90, 0, false);
                 center.z += 3;
             }
             bottomWall.rotate(["Y"], 180);
@@ -273,7 +275,7 @@ class Room {
      * Gets the bottomWalls of the room.
      * @returns An array of bottomWalls in the room.
      */
-    get getBottomWalls(): Floor[] {
+    get getBottomWalls(): BottomWall[] {
         return this.bottomWalls;
     }
 

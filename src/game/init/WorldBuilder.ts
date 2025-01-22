@@ -9,10 +9,9 @@ import {
 import { GLTFLoader } from '../../engine/loaders/GLTFLoader.js';
 import {World} from "../map/World.js";
 
-export async function initalize(scene: Node, playerNode: Node): Promise<void> {
+
+export async function initalize(scene: Node, playerNode: Node, world: World): Promise<void> {
     // Create the world
-    const world: World = new World();
-    world.generateWorld();
     await buildWorld(scene, world);
     // Move the player
     playerNode.addComponent(new Transform({
@@ -35,7 +34,17 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
         }
     });
 
+    world.getBottomWalls().forEach(bottomWall => {
+        if (!bottomWall.isDoor) {
+            createLowerWall(new Transform({
+                translation: bottomWall.getCenter.toArray,
+                rotation: bottomWall.getQuaternions,
+            }), scene);
+        }
+    })
+
     world.getPillars().forEach(pillar => {
+        console.log(pillar.getCenter.toArray);
         createWallPillar(new Transform({
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,
@@ -72,6 +81,15 @@ export async function createWall(location: Transform, scene: Node): Promise<void
     wall.isStatic = true;
     wall.addComponent(location);
     scene.addChild(wall);
+}
+
+
+/**
+ * Creates a lower wall at the specified location.
+ * @param location the location of the lower wall
+ * @param scene the scene to which the lower wall will be added
+ */
+export async function createLowerWall(location: Transform, scene: Node): Promise<void> {
     const lowerWallLoader = new GLTFLoader();
     await lowerWallLoader.load('assets/models/rooms/walls/LowerWall/LowerWall.gltf');
     const lowerWall: Node = lowerWallLoader.loadNode('LowerWall');
@@ -79,6 +97,7 @@ export async function createWall(location: Transform, scene: Node): Promise<void
     lowerWall.addComponent(location);
     scene.addChild(lowerWall);
 }
+
 
 /**
  * Creates a wall pillar at the specified location.

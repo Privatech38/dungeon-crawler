@@ -10,17 +10,13 @@ const defaultAxis: [Vector3, Vector3, Vector3] = [
 
 const playerHitbox = new OBB(
     defaultAxis,
-    new Vector3(0.25, 1, 0.25),
+    new Vector3(0.1, 0.7, 0.1),
 )
 
-const player = new Player(
+export const player = new Player(
     100,
     5,
     playerHitbox,
     9,
     new Vector3(0, 1, 0),
 )
-
-
-
-export {player}

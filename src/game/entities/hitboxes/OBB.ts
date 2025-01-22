@@ -120,6 +120,18 @@ class OBB extends Hitbox {
         return vertices;
     }
 
+    get getAxes(): Vector3[] {
+        return [
+            this.axes[0].clone(),
+            this.axes[1].clone(),
+            this.axes[2].clone(),
+        ]
+    }
+
+    get getHalfExtents(): Vector3 {
+        return this.halfExtents.clone();
+    }
+
     /**
      * Checks if a point is inside the OBB.
      * @param other - The point to check
@@ -257,6 +269,17 @@ class OBB extends Hitbox {
             scale.scale(0.5),
             center
         )
+    }
+
+    public clone(): Hitbox {
+        return new OBB(
+            [this.axes[0].clone(),
+            this.axes[1].clone(),
+            this.axes[2].clone()],
+            this.halfExtents.clone(),
+            this.center,
+            this.isActive
+        );
     }
 }
 

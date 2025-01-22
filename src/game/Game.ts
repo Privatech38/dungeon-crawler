@@ -11,11 +11,4 @@ class Game {
         this.gameManager.generateWorld();
     }
 
-    update(
-        keys: Set<string>,
-
-    ) {
-        this.gameManager.playerMove(keys);
-        this.gameManager.entityMove();
-    }
 }

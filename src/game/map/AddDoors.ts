@@ -22,6 +22,14 @@ class AddDoors {
                                 if (wall1.getCenter.equals(wall2.getCenter) && !added) {
                                     wall1.isDoor = true;
                                     wall2.isDoor = true;
+
+                                    room1.getBottomWalls.forEach((bottomWall) => {
+                                        if (bottomWall.getCenter.equals(wall1.getCenter)) {bottomWall.isDoor = true}
+                                    })
+                                    room2.getBottomWalls.forEach((bottomWall) => {
+                                        if (bottomWall.getCenter.equals(wall2.getCenter)) {bottomWall.isDoor = true}
+                                    })
+
                                     room1.newNeighbor(room2);
                                     room2.newNeighbor(room1);
                                     added = true;

@@ -111,7 +111,8 @@ class MapGenerator {
             }
         }
         room.setID = this.roomId;
-        room.setStartPoint = new Vector3((row * 3) - Math.floor(this.maxSize/2) * 3, 0, (col * 3) - Math.floor(this.maxSize/2) * 3);
+        let center = new Vector3((row * 3), 0, (col * 3));
+        room.setStartPoint = center;
         room.generateNewRoom();
         this.rooms.push(room);
         this.roomId++;
@@ -125,7 +126,7 @@ class MapGenerator {
      * @returns True if the room was successfully added, otherwise false.
      */
     public addRoom(room: Room): boolean {
-        return this.bfs2D([Math.floor(this.maxSize/2), Math.floor(this.maxSize/2)], room);
+        return this.bfs2D([0, 0], room);
     }
 
     /**

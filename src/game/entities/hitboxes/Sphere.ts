@@ -14,9 +14,10 @@ class Sphere extends Hitbox {
      * Creates a new Sphere.
      * @param center - The center of the sphere
      * @param radius - The radius of the sphere
+     * @param isActive
      */
-    constructor(center: Vector3, radius: number) {
-        super(center);
+    constructor(center: Vector3, radius: number, isActive: boolean = true) {
+        super(center, isActive);
         this.radius = radius;
     }
 
@@ -67,6 +68,10 @@ class Sphere extends Hitbox {
      */
     intersectsOBB(other: OBB): boolean {
         return other.intersectsSphere(this);
+    }
+
+    public clone(): Hitbox {
+        return new Sphere(this.center.clone(), this.radius, this.isActive);
     }
 }
 

@@ -11,11 +11,12 @@ import {Vector3} from "../math/Vector.js";
 import {OBB} from "./entities/hitboxes/OBB.js";
 import {Weapon} from "./entities/items/Weapon.js";
 import {Projectile} from "./attack/types/Projectile.js";
+import {Hitbox} from "./entities/hitboxes/Hitbox";
+import {player} from "./enteties";
 
 class GameManager {
     private entities: Set<Entity>;
     private readonly player: Player;
-    private readonly playerMovement: PlayerMovement;
     private readonly activeEntities: Set<Entity>;
     private activeRooms: Set<Room>;
     private activeProjectiles: Set<Projectile>;
@@ -31,13 +32,21 @@ class GameManager {
         this.deltaTime = 0;
         this.entities = new Set<Entity>;
         this.lastFrameTime = performance.now();
-        this.playerMovement = new PlayerMovement(this.player.getInitialPosition, this.player.getSpeed);
         this.world = new World(worldSurfaceArea);
         this.activeEntities = new Set<Entity>();
-        this.currentRoom = this.world.getRooms[0]; //starting room
+        this.currentRoom = this.getCurrentRoom()
         this.activeRooms = new Set<Room>();
         this.activeRooms.add(this.currentRoom);
         this.activeProjectiles = new Set<Projectile>();
+    }
+
+    private getCurrentRoom(): Room {
+        for (const room of this.world.getRooms) {
+            if (room.isWithinRoom(this.player)) {
+                return room;
+            }
+        }
+        return this.world.getRooms[0];
     }
 
     public removeEntity(entity: Entity){
@@ -46,13 +55,6 @@ class GameManager {
 
     public addEntity(entity: Entity){
         this.entities.add(entity);
-    }
-
-    public playerMove(keys: Set<string>): void {
-        this.updateDeltaTime();
-        this.collisionWithWall(this.player)
-        this.playerMovement.move(keys)
-        this.playerInRoom();
     }
 
     public playerAttack([x, y]: [number, number], equippedSlot: number): void {
@@ -67,7 +69,7 @@ class GameManager {
         this.activeEntities.forEach((entity: Entity) => {
             if (this.checkCollision(entity).length !== 0) {return}
             if (entity instanceof Enemy) {
-                if (this.collisionWithWall(entity)) {
+                if (this.collisionWithWall(entity.getHitbox)) {
                     return;
                 }
                 this.playerInRoom();
@@ -81,22 +83,13 @@ class GameManager {
         this.world.generateWorld();
     }
 
-    private collisionWithWall(entity: Entity): boolean {
-        let movement;
-        if (entity instanceof Enemy) {
-            movement = entity.movement;
-        } else {
-            movement = this.playerMovement;
-        }
-
-        let newPosition = movement.checkMovement(this.deltaTime);
-        let point = new Point(newPosition);
-        this.activeRooms.forEach((room: Room) => {
-            room.getWalls.forEach((wall: Wall) => {
-                const collision = new CollisionManager().checkCollision(point, wall.getHitbox);
+    public collisionWithWall(hitbox: Hitbox): boolean {
+        for (const room of this.world.getRooms) {
+            for (const wall of room.getWalls) {
+                const collision = new CollisionManager().checkCollision(hitbox, wall.getHitbox);
                 if (collision.collisionPoint !== null) {return false}
-            })
-        })
+            }
+        }
         return true;
     }
 
@@ -180,24 +173,10 @@ class GameManager {
         return this.player;
     }
 
+    get getActiveRooms(): Set<Room> {
+        return this.activeRooms;
+    }
+
 }
-const defaultAxis: [Vector3, Vector3, Vector3] = [
-    new Vector3(1, 0, 0),
-    new Vector3(0, 1, 0),
-    new Vector3(0, 0, 1),
-]
-
-const playerHitbox = new OBB(
-    defaultAxis,
-    new Vector3(0.25, 1, 0.25),
-)
-
-const player = new Player(
-    100,
-    5,
-    playerHitbox,
-    9,
-    new Vector3(0, 1, 0),
-)
 
 export {GameManager}

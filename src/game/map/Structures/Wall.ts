@@ -37,7 +37,7 @@ class Wall extends Structure {
                 new Vector3(0, 1, 0),
                 new Vector3(0, 0, 1),
             ],
-            new Vector3(1.5, 1.1, 0.3),
+            new Vector3(1.5, 1.1, 0.2),
             center
         );
         this.orientation = orientation;
