@@ -1,4 +1,4 @@
-import {Debuff} from "./Debuff.js";
+import {Debuff} from "./Debuff";
 
 class DebuffFreeze extends Debuff{
 

@@ -1,6 +1,6 @@
 import { quat, vec2, vec3 } from 'glm';
 
-import { Transform } from 'engine/core/Transform.js';
+import { Transform } from 'dist/engine/core/Transform.js';
 
 export class TouchController {
 

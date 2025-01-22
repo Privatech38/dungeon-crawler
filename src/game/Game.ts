@@ -12,10 +12,10 @@ class Game {
     }
 
     update(
-        playerMovement: { up: boolean; down: boolean; left: boolean; right: boolean },
+        keys: Set<string>,
 
     ) {
-        this.gameManager.playerMove(playerMovement);
+        this.gameManager.playerMove(keys);
         this.gameManager.entityMove();
     }
 }

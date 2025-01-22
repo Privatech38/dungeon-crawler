@@ -36,7 +36,7 @@ class AddDoors {
 
     // check if they are neighbors
     private alreadyNeighbors(room: Room, neighbor: Room): boolean {
-        for (const cur of room.getNeighbors) {
+        for (const cur of room.getNeighbors.keys()) {
             if (cur.getID === neighbor.getID) {return true;}
         }
         return false;

@@ -1,4 +1,4 @@
-import {Direct} from "./Direct.js";
+import {Direct} from "./Direct";
 
 class FireEffect extends Direct {
 

@@ -67,13 +67,13 @@ export function createCamera(): Node {
  */
 export async function createWall(location: Transform, scene: Node): Promise<void> {
     const wallLoader = new GLTFLoader();
-    await wallLoader.load('../../assets/models/rooms/walls/Wall/Wall.gltf');
+    await wallLoader.load('assets/models/rooms/walls/Wall/Wall.gltf');
     const wall: Node = wallLoader.loadNode('Wall');
     wall.isStatic = true;
     wall.addComponent(location);
     scene.addChild(wall);
     const lowerWallLoader = new GLTFLoader();
-    await lowerWallLoader.load('../../assets/models/rooms/walls/LowerWall/LowerWall.gltf');
+    await lowerWallLoader.load('assets/models/rooms/walls/LowerWall/LowerWall.gltf');
     const lowerWall: Node = lowerWallLoader.loadNode('LowerWall');
     lowerWall.isStatic = true;
     lowerWall.addComponent(location);
@@ -88,14 +88,14 @@ export async function createWall(location: Transform, scene: Node): Promise<void
  */
 export async function createWallPillar(location: Transform, scene: Node, torchTransform: Transform = null): Promise<void> {
     const wallPillarLoader = new GLTFLoader();
-    await wallPillarLoader.load('../../assets/models/rooms/walls/WallPillar/WallPillar.gltf');
+    await wallPillarLoader.load('assets/models/rooms/walls/WallPillar/WallPillar.gltf');
     const wallPillar: Node = wallPillarLoader.loadNode('WallPole');
     wallPillar.isStatic = true;
     wallPillar.addComponent(location);
     scene.addChild(wallPillar);
     if (torchTransform) {
         const torchLoader = new GLTFLoader();
-        await torchLoader.load('../../assets/models/rooms/walls/Torch/Torch.gltf');
+        await torchLoader.load('assets/models/rooms/walls/Torch/Torch.gltf');
         const torch: Node = torchLoader.loadNode('Torch');
         torch.isStatic = true;
         torch.addComponent(torchTransform);
@@ -110,7 +110,7 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
  */
 export async function createFloor(location: Transform, scene: Node): Promise<void> {
     const floorLoader = new GLTFLoader();
-    await floorLoader.load('../../assets/models/rooms/floor/Floor.gltf');
+    await floorLoader.load('assets/models/rooms/floor/Floor.gltf');
     const floor: Node = floorLoader.loadNode('Floor');
     floor.isStatic = true;
     floor.addComponent(location);
@@ -125,7 +125,7 @@ export async function createFloor(location: Transform, scene: Node): Promise<voi
  */
 export async function createDoor(location: Transform, scene: Node): Promise<void> {
     const doorLoader = new GLTFLoader();
-    await doorLoader.load('../../assets/models/rooms/walls/WallDoor/WallDoor.gltf');
+    await doorLoader.load('assets/models/rooms/walls/WallDoor/WallDoor.gltf');
     const door: Node = doorLoader.loadNode('DoorWallUpper');
     door.isStatic = true;
     door.addComponent(location);
