@@ -1,4 +1,4 @@
-class Item {
+export class Item {
     private readonly name: string;
     private readonly description: string;
 

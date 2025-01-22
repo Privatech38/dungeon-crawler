@@ -4,6 +4,7 @@ import {Hitbox} from "./hitboxes/Hitbox";
 import {InventorySlot} from "./inventory/InventorySlot";
 import {Vector3} from "../../math/Vector";
 import {PlayerMovement} from "./PlayerMovement";
+import {Item} from "./items/Item";
 
 class Player extends Entity {
     public inventory: Inventory;
