@@ -1,4 +1,8 @@
 .idea
+game/**/*.js
+math/**/*.js
+dataTypes/**/*.js
+searchAlgorithms/**/*.js
 # LaTeX compile outputs
 *.aux
 *.bbl
