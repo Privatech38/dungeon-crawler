@@ -1,5 +1,5 @@
-import {Effect} from "../effects/Effect";
-import {Hitbox} from "../hitboxes/Hitbox";
+import {Effect} from "../effects/Effect.js";
+import {Hitbox} from "../hitboxes/Hitbox.js";
 
 
 abstract class Weapon{

@@ -1,5 +1,5 @@
-import {Vector3} from "../../../math/Vector";
-import {Structure} from "./Structure";
+import {Vector3} from "../../../math/Vector.js";
+import {Structure} from "./Structure.js";
 
 /**
  * Represents a pillar within a structure, which can be a corner or regular pillar with a specific orientation.

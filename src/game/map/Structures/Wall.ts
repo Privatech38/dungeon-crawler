@@ -1,6 +1,6 @@
-import { OBB } from "../../entities/hitboxes/OBB";
-import { Vector3 } from "../../../math/Vector";
-import { Structure } from "./Structure";
+import { OBB } from "../../entities/hitboxes/OBB.js";
+import { Vector3 } from "../../../math/Vector.js";
+import { Structure } from "./Structure.js";
 
 /**
  * Represents a wall structure made up of bricks, with optional configurations for a door.

@@ -1,10 +1,10 @@
-import {Random} from "../../math/Random";
-import {Wall} from "./Structures/Wall";
-import {Vector3} from "../../math/Vector";
-import {Entity} from "../entities/Entity";
-import {Pillar} from "./Structures/Pillar";
-import {Floor} from "./Structures/Floor";
-import {BottomWall} from "./Structures/BottomWall";
+import {Random} from "../../math/Random.js";
+import {Wall} from "./Structures/Wall.js";
+import {Vector3} from "../../math/Vector.js";
+import {Entity} from "../entities/Entity.js";
+import {Pillar} from "./Structures/Pillar.js";
+import {Floor} from "./Structures/Floor.js";
+import {BottomWall} from "./Structures/BottomWall.js";
 
 /**
  * Represents a room in a 3D space with walls, pillars, floors, and other elements.

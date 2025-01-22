@@ -1,5 +1,5 @@
-import {Room} from "./Room";
-import {Vector3} from "../../math/Vector";
+import {Room} from "./Room.js";
+import {Vector3} from "../../math/Vector.js";
 
 /**
  * Class responsible for generating a map with rooms, using a breadth-first search (BFS) algorithm.

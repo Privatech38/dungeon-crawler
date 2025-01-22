@@ -1,9 +1,9 @@
-import {Entity} from "./Entity";
-import {Hitbox} from "./hitboxes/Hitbox";
-import {Vector3} from "../../math/Vector";
-import {Movement} from "./Movement";
-import {Player} from "./Player";
-import {Weapon} from "./items/Weapon";
+import {Entity} from "./Entity.js";
+import {Hitbox} from "./hitboxes/Hitbox.js";
+import {Vector3} from "../../math/Vector.js";
+import {Movement} from "./Movement.js";
+import {Player} from "./Player.js";
+import {Weapon} from "./items/Weapon.js";
 
 class Enemy extends Entity {
     movement: Movement;

@@ -1,10 +1,10 @@
-import {Entity} from "./Entity";
-import {Inventory} from "./inventory/Inventory";
-import {Hitbox} from "./hitboxes/Hitbox";
-import {InventorySlot} from "./inventory/InventorySlot";
-import {Vector3} from "../../math/Vector";
-import {PlayerMovement} from "./PlayerMovement";
-import {Item} from "./items/Item";
+import {Entity} from "./Entity.js";
+import {Inventory} from "./inventory/Inventory.js";
+import {Hitbox} from "./hitboxes/Hitbox.js";
+import {InventorySlot} from "./inventory/InventorySlot.js";
+import {Vector3} from "../../math/Vector.js";
+import {PlayerMovement} from "./PlayerMovement.js";
+import {Item} from "./items/Item.js";
 
 class Player extends Entity {
     public inventory: Inventory;

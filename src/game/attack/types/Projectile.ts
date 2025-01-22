@@ -1,8 +1,8 @@
-import { Attack } from "../Attack";
-import { Vector3 } from "../../../math/Vector";
-import { Hitbox } from "../../entities/hitboxes/Hitbox";
-import { Sphere } from "../../entities/hitboxes/Sphere";
-import {Entity} from "../../entities/Entity";
+import { Attack } from "../Attack.js";
+import { Vector3 } from "../../../math/Vector.js";
+import { Hitbox } from "../../entities/hitboxes/Hitbox.js";
+import { Sphere } from "../../entities/hitboxes/Sphere.js";
+import {Entity} from "../../entities/Entity.js";
 
 /**
  * Represents a projectile attack.

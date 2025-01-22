@@ -1,5 +1,5 @@
-import {GameManager} from "./GameManager";
-import {Player} from "./entities/Player";
+import {GameManager} from "./GameManager.js";
+import {Player} from "./entities/Player.js";
 
 class Game {
     gameManager: GameManager;

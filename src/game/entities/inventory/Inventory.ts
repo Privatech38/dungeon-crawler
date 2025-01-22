@@ -1,4 +1,4 @@
-import {InventorySlot} from "./InventorySlot";
+import {InventorySlot} from "./InventorySlot.js";
 
 class Inventory {
     private inventorySlots: InventorySlot[];

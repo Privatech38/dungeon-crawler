@@ -7,7 +7,7 @@ import {
 } from '../../../dist/engine/core.js';
 // @ts-ignore
 import { GLTFLoader } from '../../../dist/engine/loaders/GLTFLoader.js';
-import {World} from "../map/World";
+import {World} from "../map/World.js";
 
 export async function initalize(scene: Node, playerNode: Node): Promise<void> {
     // Create the world

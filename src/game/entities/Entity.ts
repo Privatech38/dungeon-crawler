@@ -1,10 +1,10 @@
-import {Vector3} from "../../math/Vector";
-import {Hitbox} from "./hitboxes/Hitbox";
-import {Effect} from "./effects/Effect";
-import {Defence} from "./Defence";
-import {Direct} from "./effects/direct/Direct";
-import {DebuffFreeze} from "./effects/debuff/DebuffFreeze";
-import {DebuffDamage} from "./effects/debuff/DebuffDamage";
+import {Vector3} from "../../math/Vector.js";
+import {Hitbox} from "./hitboxes/Hitbox.js";
+import {Effect} from "./effects/Effect.js";
+import {Defence} from "./Defence.js";
+import {Direct} from "./effects/direct/Direct.js";
+import {DebuffFreeze} from "./effects/debuff/DebuffFreeze.js";
+import {DebuffDamage} from "./effects/debuff/DebuffDamage.js";
 
 abstract class Entity {
     protected healthPoints: number;
