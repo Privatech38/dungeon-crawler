@@ -17,36 +17,21 @@ import {player} from "./enteties";
 class GameManager {
     private entities: Set<Entity>;
     private readonly player: Player;
-    private readonly activeEntities: Set<Entity>;
-    private activeRooms: Set<Room>;
-    private activeProjectiles: Set<Projectile>;
 
     private deltaTime: number;
-    private lastFrameTime: number;
     private readonly world: World;
 
-    private currentRoom: Room;
 
     constructor(player: Player, worldSurfaceArea: number) {
         this.player = player;
         this.deltaTime = 0;
         this.entities = new Set<Entity>;
-        this.lastFrameTime = performance.now();
         this.world = new World(worldSurfaceArea);
-        this.activeEntities = new Set<Entity>();
-        this.currentRoom = this.getCurrentRoom()
-        this.activeRooms = new Set<Room>();
-        this.activeRooms.add(this.currentRoom);
-        this.activeProjectiles = new Set<Projectile>();
     }
 
-    private getCurrentRoom(): Room {
-        for (const room of this.world.getRooms) {
-            if (room.isWithinRoom(this.player)) {
-                return room;
-            }
-        }
-        return this.world.getRooms[0];
+    public update(dt: number): void {
+        this.deltaTime = dt;
+        this.entityMove();
     }
 
     public removeEntity(entity: Entity){
@@ -66,14 +51,12 @@ class GameManager {
     }
 
     public entityMove() {
-        this.activeEntities.forEach((entity: Entity) => {
+        this.entities.forEach((entity: Entity) => {
             if (this.checkCollision(entity).length !== 0) {return}
             if (entity instanceof Enemy) {
                 if (this.collisionWithWall(entity.getHitbox)) {
                     return;
                 }
-                this.playerInRoom();
-                this.updateDeltaTime();
                 entity.update(this.player)
             }
         })
@@ -87,45 +70,18 @@ class GameManager {
         for (const room of this.world.getRooms) {
             for (const wall of room.getWalls) {
                 const collision = new CollisionManager().checkCollision(hitbox, wall.getHitbox);
-                if (collision.collisionPoint !== null) {return false}
-            }
-        }
-        return true;
-    }
-
-    private playerInRoom() {
-        if (this.currentRoom.isWithinRoom(this.player)) {
-            this.activeRooms = this.currentRoom.getNeighbors;
-        } else {
-            this.activeRooms.forEach((room: Room) => {
-                if (room.isWithinRoom(this.player)) {
-                    this.currentRoom = room;
-                    this.activeRooms = this.currentRoom.getNeighbors;
-                    this.activeRooms.add(this.currentRoom);
+                if (collision.collisionPoint !== null) {
+                    return true
                 }
-            })
-        }
-        this.activateRooms();
-        this.deactivateRooms();
-        this.updateActiveEntities();
-    }
-
-    private activateRooms() {
-        this.activeRooms.forEach((room: Room) => {
-            room.isActive = true;
-        })
-    }
-
-    private deactivateRooms() {
-        this.world.getRooms.forEach((room: Room) => {
-            if (!this.activeRooms.has(room)) {
-                room.isActive = false;
             }
-        })
+        }
+        return false;
     }
+
+
 
     private checkCollision(entity: Entity): Entity[] {
-        let allActiveEntities = this.activeEntities;
+        let allActiveEntities = this.entities;
         allActiveEntities.add(this.player);
 
         let collidedWith: Array<Entity> = new Array<Entity>();
@@ -140,27 +96,10 @@ class GameManager {
         return collidedWith;
     }
 
-
-    public updateActiveEntities() {
-        this.activeRooms.forEach((room: Room) => {
-            this.entities.forEach((entity: Entity) => {
-                if (room.isWithinRoom(entity)) {
-                    this.activeEntities.add(entity);
-                } else {
-                    this.activeEntities.delete(entity);
-                }
-            })
-        })
-    }
-
     public printWorld() {
         this.world.printWorld()
     }
 
-    private updateDeltaTime(){
-        this.deltaTime = performance.now() - this.lastFrameTime;
-        this.lastFrameTime = performance.now();
-    }
     get getWorld(): World {
         return this.world;
     }
@@ -171,10 +110,6 @@ class GameManager {
 
     get getPlayer(): Player {
         return this.player;
-    }
-
-    get getActiveRooms(): Set<Room> {
-        return this.activeRooms;
     }
 
 }

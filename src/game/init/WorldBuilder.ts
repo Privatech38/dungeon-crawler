@@ -8,15 +8,15 @@ import {
 // @ts-ignore
 import { GLTFLoader } from '../../engine/loaders/GLTFLoader.js';
 import {World} from "../map/World.js";
+// @ts-ignore
+import { vec3 } from 'glm';
 
 
 export async function initalize(scene: Node, playerNode: Node, world: World): Promise<void> {
     // Create the world
     await buildWorld(scene, world);
-    // Move the player
-    playerNode.addComponent(new Transform({
-        translation: world.getRooms[0].getFloors[0].getCenter.toArray,
-    }));
+    const transform = playerNode.getComponentOfType(Transform);
+    vec3.add(transform.translation, transform.translation, [1.5, 0, 1.5]);
 }
 
 async function buildWorld(scene: Node, world: World): Promise<void> {
@@ -44,7 +44,6 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
     })
 
     world.getPillars().forEach(pillar => {
-        console.log(pillar.getCenter.toArray);
         createWallPillar(new Transform({
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,

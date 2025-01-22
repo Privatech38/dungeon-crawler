@@ -1,8 +1,8 @@
 // @ts-ignore
-import { quat, vec3, mat4 } from 'glm';
+import {mat4, quat, vec3} from 'glm';
 
 // @ts-ignore
-import { Transform } from '../engine/core/Transform.js';
+import {Transform} from '../engine/core/Transform.js';
 // @ts-ignore
 import {Node} from "../engine/core/Node.js";
 import {Player} from "./entities/Player.js";
@@ -24,6 +24,7 @@ export class PlayerController {
 
     private player: Player;
     private world: World;
+    private mouseDeg: number;
 
     constructor(node: Node, armatureNode: Node, domElement: Element, gameManager: GameManager, {
         velocity = [0, 0, 0],
@@ -48,18 +49,40 @@ export class PlayerController {
         this.decay = decay;
         this.pointerSensitivity = pointerSensitivity;
 
+        this.mouseDeg = 0;
         this.initHandlers();
     }
 
     initHandlers() {
         this.keydownHandler = this.keydownHandler.bind(this);
         this.keyupHandler = this.keyupHandler.bind(this);
+        this.mouseMove = this.mouseMove.bind(this);
 
         const element: Element = this.domElement;
         const doc: Document = element.ownerDocument;
 
         doc.addEventListener('keydown', this.keydownHandler);
         doc.addEventListener('keyup', this.keyupHandler);
+        doc.addEventListener('mousemove', this.mouseMove);
+    }
+
+    mouseMove(event: MouseEvent) {
+        let centerX = window.innerWidth / 2;
+        let centerY = window.innerHeight / 2;
+
+        // Get mouse position
+        let mouseX = event.clientX;
+        let mouseY = event.clientY;
+
+        // Calculate the difference between the mouse and the center
+        let deltaX = mouseX - centerX;
+        let deltaY = mouseY - centerY;
+
+        // Calculate the angle in radians
+        let angleRadians = Math.atan2(deltaY, deltaX);
+
+        // Convert to degrees and normalize it to the range 0-360
+        this.mouseDeg = ((angleRadians * 180 / Math.PI + 360) % 360) - 90;
     }
 
     checkCollision(newPosition: Vector3) {
@@ -119,14 +142,11 @@ export class PlayerController {
                 newPosition[1],
                 newPosition[2],
             )
-
-            console.log(myPosition);
             // Collision detection
             if (!this.checkCollision(myPosition)) {
                 // If no collision, apply the new position.
                 vec3.copy(transform.translation, newPosition);
                 this.gameManager.getPlayer.updatePosition(myPosition);
-                console.log("player position:" + myPosition);
             } else {
                 // Handle collision response (e.g., stop, slide, or bounce).
                 vec3.scale(this.velocity, this.velocity, 0); // Example: Stop on collision
@@ -137,25 +157,8 @@ export class PlayerController {
         if (armatureTransform) {
             // Update rotation
             let rotation = quat.create();
-            if (this.keys.has('KeyS') && this.keys.has('KeyA')) {
-                quat.rotateY(rotation, rotation, -Math.PI / 4);
-            } else if (this.keys.has('KeyS') && this.keys.has('KeyD')) {
-                quat.rotateY(rotation, rotation, Math.PI / 4);
-            } else if (this.keys.has('KeyW') && this.keys.has('KeyA')) {
-                quat.rotateY(rotation, rotation, -3 * Math.PI / 4);
-            } else if (this.keys.has('KeyW') && this.keys.has('KeyD')) {
-                quat.rotateY(rotation, rotation, 3 * Math.PI / 4);
-            } else if (this.keys.has('KeyS')) {
-                quat.rotateY(rotation, rotation, 0);
-            } else if (this.keys.has('KeyW')) {
-                quat.rotateY(rotation, rotation, Math.PI);
-            } else if (this.keys.has('KeyA')) {
-                quat.rotateY(rotation, rotation, -Math.PI / 2);
-            } else if (this.keys.has('KeyD')) {
-                quat.rotateY(rotation, rotation, Math.PI / 2);
-            } else {
-                rotation = armatureTransform.rotation;
-            }
+            let angleRadians = -this.mouseDeg * Math.PI / 180;
+            quat.rotateY(rotation, rotation, angleRadians);
             armatureTransform.rotation = rotation;
         }
     }
