@@ -1,23 +1,57 @@
 /**
- * Class representing JSON structure for a Light as specified by Khronos Group in glTF 2.0.<br>
+ * Interface representing JSON structure for a Light as specified by Khronos Group in glTF 2.0.<br>
  * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
- *
- * There is also an index field <code>light</code>, but it is not included here as it is consumed
- * when applying the light to a node.
  */
-interface Light {
+interface IKHRLightExtension {
     name?: string;
     readonly type: 'point' | 'directional' | 'spot';
     color?: [number, number, number];
     intensity?: number;
     range?: number;
-    spot?: Spot;
+    spot?: IKHRSpot;
+}
+
+/**
+ * Class representing structure for a Light extension as specified by Khronos Group in glTF 2.0.<br>
+ * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
+ */
+class KHRLightExtension {
+    name?: string;
+    readonly type: 'point' | 'directional' | 'spot';
+    color?: [number, number, number];
+    intensity?: number;
+    range?: number;
+    spot?: IKHRSpot;
+
+    constructor(json: IKHRLightExtension) {
+        this.name = json.name ?? '';
+        this.type = json.type;
+        this.color = json.color ?? [1.0, 1.0, 1.0];
+        this.intensity = json.intensity ?? 1.0;
+        this.range = json.range; // Has no default
+        if (json.spot) {
+            this.spot = new KHRSpot(json.spot);
+        }
+    }
 }
 
 /**
  * Interface representing the spotlight properties.
  */
-interface Spot {
+interface IKHRSpot {
     innerConeAngle?: number;
     outerConeAngle?: number;
+}
+
+/**
+ * Class representing the spotlight properties.
+ */
+class KHRSpot {
+    innerConeAngle?: number;
+    outerConeAngle?: number;
+
+    constructor(json?: IKHRSpot) {
+        this.innerConeAngle = json?.innerConeAngle ?? 0.0;
+        this.outerConeAngle = json?.outerConeAngle ?? Math.PI / 4.0;
+    }
 }
