@@ -437,7 +437,7 @@ export class GLTFLoader {
      * @returns {KHRLightExtension|null} KHRLightExtension if successfully loaded, null otherwise
      */
     loadLight(nameOrIndex) {
-        const gltfSpec = this.findByNameOrIndex(this.gltf.extensions.KHR_lights_punctual, nameOrIndex);
+        const gltfSpec = this.findByNameOrIndex(this.gltf.extensions.KHR_lights_punctual.lights, nameOrIndex);
         if (!gltfSpec) {
             return null;
         }
@@ -471,6 +471,11 @@ export class GLTFLoader {
 
         if (gltfSpec.camera !== undefined) {
             node.addComponent(this.loadCamera(gltfSpec.camera));
+        }
+
+        // Load light if present
+        if (gltfSpec.extensions?.KHR_lights_punctual?.light !== undefined) {
+            node.addComponent(this.loadLight(gltfSpec.extensions.KHR_lights_punctual.light))
         }
 
         if (gltfSpec.mesh !== undefined) {
