@@ -11,6 +11,8 @@ import {
     Transform,
     Vertex,
 } from '../core.js';
+import {Light} from "../../Light";
+import {KHRLightExtension} from "../../../src/gpu/object/Light";
 
 // TODO: GLB support
 // TODO: accessors with no buffer views (zero-initialized)
@@ -427,6 +429,25 @@ export class GLTFLoader {
 
         this.cache.set(gltfSpec, camera);
         return camera;
+    }
+
+    /**
+     * Loads a light from the JSON (.gltf) file
+     * @param nameOrIndex The name or index of the light
+     * @returns {KHRLightExtension|null} KHRLightExtension if successfully loaded, null otherwise
+     */
+    loadLight(nameOrIndex) {
+        const gltfSpec = this.findByNameOrIndex(this.gltf.extensions.KHR_lights_punctual, nameOrIndex);
+        if (!gltfSpec) {
+            return null;
+        }
+        if (this.cache.has(gltfSpec)) {
+            return this.cache.get(gltfSpec);
+        }
+
+        const light = new KHRLightExtension(gltfSpec);
+        this.cache.set(gltfSpec, light);
+        return light;
     }
 
     loadNode(nameOrIndex) {
