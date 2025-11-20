@@ -2,7 +2,7 @@
  * Interface representing JSON structure for a Light as specified by Khronos Group in glTF 2.0.<br>
  * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
  */
-interface IKHRLightExtension {
+export interface IKHRLightExtension {
     name?: string;
     readonly type: 'point' | 'directional' | 'spot';
     color?: [number, number, number];
@@ -15,7 +15,7 @@ interface IKHRLightExtension {
  * Class representing structure for a Light extension as specified by Khronos Group in glTF 2.0.<br>
  * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
  */
-class KHRLightExtension {
+export class KHRLightExtension {
     name?: string;
     readonly type: 'point' | 'directional' | 'spot';
     color?: [number, number, number];
@@ -46,7 +46,7 @@ interface IKHRSpot {
 /**
  * Class representing the spotlight properties.
  */
-class KHRSpot {
+export class KHRSpot {
     innerConeAngle?: number;
     outerConeAngle?: number;
 
