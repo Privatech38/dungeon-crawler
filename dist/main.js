@@ -17,6 +17,8 @@ import { PlayerController } from "./game/PlayerController.js";
 import {GameManager} from "./game/GameManager.js";
 import { player } from "./game/enteties.js";
 import {OBBToMesh} from "./engine/loaders/OBBToMesh.js";
+import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer.js";
+import {LightManager} from "./LightManager.js";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
@@ -25,6 +27,9 @@ let world = manager.getWorld;
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
+
+const shadowRenderer = new ShadowMapRenderer(canvas);
+await shadowRenderer.initialize();
 // const renderer = new UnlitRenderer(canvas);
 // await renderer.initialize();
 
@@ -60,7 +65,13 @@ function update(time, dt) {
     });
 }
 
+const lightManager = new LightManager();
+lightManager.addLightsFromNode(scene);
+
 function render() {
+    lightManager.lights.forEach(light => {
+        shadowRenderer.render(scene, light);
+    });
     renderer.render(scene, camera);
 }
 

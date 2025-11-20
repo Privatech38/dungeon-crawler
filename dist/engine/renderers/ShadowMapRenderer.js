@@ -1,9 +1,9 @@
 import { vec3, mat4 } from 'glm';
 
-import {BaseRenderer} from "./BaseRenderer";
+import {BaseRenderer} from "./BaseRenderer.js";
 import { KHRLightExtension } from "../../gpu/object/KhronosLight.js";
-import {getGlobalViewMatrix, getLocalModelMatrix, getProjectionMatrix} from "../core/SceneUtils";
-import {Model} from "../core/Model";
+import {getGlobalViewMatrix, getLocalModelMatrix, getProjectionMatrix} from "../core/SceneUtils.js";
+import {Model} from "../core/Model.js";
 
 const vertexBufferLayout = {
     arrayStride: 32,
@@ -64,9 +64,15 @@ export class ShadowMapRenderer extends BaseRenderer {
     }
 
     async initialize() {
-        await super.initialize();
 
-        const shader = await fetch('ShadowMap.wgsl').then(response => response.text());
+        const adapter = await navigator.gpu.requestAdapter();
+        const device = await adapter.requestDevice();
+        const format = navigator.gpu.getPreferredCanvasFormat();
+
+        this.device = device;
+        this.format = format;
+
+        const shader = await fetch('engine/renderers/ShadowMap.wgsl').then(response => response.text());
 
         const shaderModule = this.device.createShaderModule({ code: shader });
 
