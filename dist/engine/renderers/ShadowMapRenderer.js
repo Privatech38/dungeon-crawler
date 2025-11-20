@@ -159,13 +159,14 @@ export class ShadowMapRenderer extends BaseRenderer {
     render(scene, light) {
 
         const shadowMap = this.createShadowMap();
+        const shadowMapView = shadowMap.createView();
 
         const encoder = this.device.createCommandEncoder();
         this.renderPass = encoder.beginRenderPass({
             colorAttachments: [],
             depthStencilAttachment: {
-                view: this.depthTexture.createView(),
-                depthClearValue: 1,
+                view: shadowMapView,
+                depthClearValue: 1.0,
                 depthLoadOp: 'clear',
                 depthStoreOp: 'discard',
             },
