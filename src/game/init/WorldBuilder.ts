@@ -20,43 +20,43 @@ export async function initalize(scene: Node, playerNode: Node, world: World): Pr
 }
 
 async function buildWorld(scene: Node, world: World): Promise<void> {
-    world.getWalls().forEach(wall => {
+    for (const wall of world.getWalls()) {
         if (wall.isDoor) {
-            createDoor(new Transform({
+            await createDoor(new Transform({
                 translation: wall.getCenter.toArray,
                 rotation: wall.getQuaternions,
             }), scene);
         } else {
-            createWall(new Transform({
+            await createWall(new Transform({
                 translation: wall.getCenter.toArray,
                 rotation: wall.getQuaternions,
             }), scene);
         }
-    });
+    }
 
-    world.getBottomWalls().forEach(bottomWall => {
+    for (const bottomWall of world.getBottomWalls()) {
         if (!bottomWall.isDoor) {
-            createLowerWall(new Transform({
+            await createLowerWall(new Transform({
                 translation: bottomWall.getCenter.toArray,
                 rotation: bottomWall.getQuaternions,
             }), scene);
         }
-    })
+    }
 
-    world.getPillars().forEach(pillar => {
+    for (const pillar of world.getPillars()) {
         let transform = new Transform({
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,
         });
-        createWallPillar(transform, scene, pillar.getIsCorner ? undefined : transform);
-    });
+        await createWallPillar(transform, scene, pillar.getIsCorner ? undefined : transform);
+    }
 
-    world.getFloors().forEach(floor => {
-        createFloor(new Transform({
+    for (const floor of world.getFloors()) {
+        await createFloor(new Transform({
             translation: floor.getCenter.toArray,
             rotation: floor.getQuaternions,
         }), scene);
-    });
+    }
 }
 
 /**
