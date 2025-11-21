@@ -2,7 +2,12 @@ import { vec3, mat4 } from 'glm';
 
 import {BaseRenderer} from "./BaseRenderer.js";
 import { KHRLightExtension } from "../../gpu/object/KhronosLight.js";
-import {getGlobalViewMatrix, getLocalModelMatrix, getProjectionMatrix} from "../core/SceneUtils.js";
+import {
+    getGlobalModelMatrix,
+    getGlobalViewMatrix,
+    getLocalModelMatrix,
+    getProjectionMatrix
+} from "../core/SceneUtils.js";
 import {Model} from "../core/Model.js";
 
 const vertexBufferLayout = {
@@ -122,7 +127,9 @@ export class ShadowMapRenderer extends BaseRenderer {
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
-        const textureView = texture.createView();
+        const textureView = texture.createView({
+            label: "Shadow map view"
+        });
 
         const textureObject = { texture, textureView };
         this.shadowMaps.set(light, textureObject);
@@ -179,9 +186,9 @@ export class ShadowMapRenderer extends BaseRenderer {
     }
 
     renderSceneLights(scene) {
-        scene.filter(node => node.getComponentOfType(KHRLightExtension)).forEach(node => {
+        scene.filter(node => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach(node => {
             this.render(scene, node);
-        })
+        });
     }
 
     render(scene, light) {
@@ -203,6 +210,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         this.renderPass.setPipeline(this.pipeline);
 
         // Setup view and projection matrix
+        // TODO Cache this since the view matrices never change for lights
         const khronosLight = light.getComponentOfType(KHRLightExtension);
         const viewMatrix = getGlobalViewMatrix(light);
         const projectionMatrix = getProjectionMatrix(light);
