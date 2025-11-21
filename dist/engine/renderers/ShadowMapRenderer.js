@@ -57,10 +57,12 @@ const modelBindGroupLayout = {
 const SHADOW_MAP_SIZE = 512
 
 export class ShadowMapRenderer extends BaseRenderer {
+    shadowMaps;
 
     constructor(canvas) {
         super(canvas);
         this.perFragment = false;
+        this.shadowMaps = new Map();
     }
 
     async initialize() {
@@ -103,16 +105,28 @@ export class ShadowMapRenderer extends BaseRenderer {
     }
 
     /**
-     * Creates a new shadow map texture to be used to draw onto
-     * @returns {WebGLTexture} the shadow map/depth texture with size defined as {@linkcode SHADOW_MAP_SIZE}
+     * Create a new shadow map with size of {@linkcode SHADOW_MAP_SIZE} or return an existing shadow map associated with
+     * this light node
+     * @param light A node with {@linkcode KHRLightExtension} component
+     * @returns {{ texture: WebGLTexture, textureView: GPUTextureView }} An object representing the texture and it's view
      */
-    createShadowMap() {
-        return this.device.createTexture({
+    prepareShadowMap(light) {
+        if (this.shadowMaps.has(light)) {
+            return this.shadowMaps.get(light);
+        }
+
+        const texture = this.device.createTexture({
             label: "ShadowMap",
             size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1],
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
-        })
+        });
+
+        const textureView = texture.createView();
+
+        const textureObject = { texture, textureView };
+        this.shadowMaps.set(light, textureObject);
+        return textureObject;
     }
 
     /**
@@ -171,8 +185,8 @@ export class ShadowMapRenderer extends BaseRenderer {
     }
 
     render(scene, light) {
-        const shadowMap = this.createShadowMap();
-        const shadowMapView = shadowMap.createView();
+        const shadowMap = this.prepareShadowMap(light);
+        const shadowMapView = shadowMap.textureView;
 
         const encoder = this.device.createCommandEncoder();
         this.renderPass = encoder.beginRenderPass({
