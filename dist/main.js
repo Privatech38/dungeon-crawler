@@ -47,14 +47,13 @@ const camera = scene.find(node => node.getComponentOfType(Camera));
 
 const light = new Node();
 light.addComponent(new Light({
-    color: [255, 184, 92],
-    direction: [0, 1, 0],
+    color: [220, 200, 150],
+    direction: [0.2, 1, 0.2],
 }));
 light.addComponent(new Transform({
     translation: [0, 10, 0],
 }));
 scene.addChild(light);
-const lightManager = new LightManager();
 
 await initalize(scene, playerNode, world);
 
@@ -68,7 +67,7 @@ function update(time, dt) {
 }
 
 function render() {
-    shadowRenderer.renderSceneLights(scene);
+    // shadowRenderer.renderSceneLights(scene, camera);
     renderer.render(scene, camera);
 }
 
