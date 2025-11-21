@@ -44,10 +44,11 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
     })
 
     world.getPillars().forEach(pillar => {
-        createWallPillar(new Transform({
+        let transform = new Transform({
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,
-        }), scene);
+        });
+        createWallPillar(transform, scene, pillar.getIsCorner ? undefined : transform);
     });
 
     world.getFloors().forEach(floor => {
@@ -113,7 +114,7 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
     scene.addChild(wallPillar);
     if (torchTransform) {
         const torchLoader = new GLTFLoader();
-        await torchLoader.load('assets/models/rooms/walls/Torch/Torch.gltf');
+        await torchLoader.load('assets/models/rooms/walls/Torch/Torch2.gltf');
         const torch: Node = torchLoader.loadNode('Torch');
         torch.isStatic = true;
         torch.addComponent(torchTransform);

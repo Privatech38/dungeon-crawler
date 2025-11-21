@@ -12,10 +12,7 @@ export class LightManager {
     }
 
     addLightsFromNode(node) {
-        if (node.getComponentOfType(KHRLightExtension)) {
-            this.addLight(node);
-        }
-        for (let child of node.children) {
+        for (const child of node.children) {
             this.addLightsFromNode(child);
         }
     }

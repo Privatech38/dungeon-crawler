@@ -19,6 +19,7 @@ import { player } from "./game/enteties.js";
 import {OBBToMesh} from "./engine/loaders/OBBToMesh.js";
 import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer.js";
 import {LightManager} from "./LightManager.js";
+import {KHRLightExtension} from "./gpu/object/KhronosLight.js";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
@@ -53,8 +54,9 @@ light.addComponent(new Transform({
     translation: [0, 10, 0],
 }));
 scene.addChild(light);
+const lightManager = new LightManager();
 
-initalize(scene, playerNode, world);
+await initalize(scene, playerNode, world);
 
 function update(time, dt) {
     manager.update();
@@ -65,13 +67,8 @@ function update(time, dt) {
     });
 }
 
-const lightManager = new LightManager();
-lightManager.addLightsFromNode(scene);
-
 function render() {
-    lightManager.lights.forEach(light => {
-        shadowRenderer.render(scene, light);
-    });
+    shadowRenderer.renderSceneLights(scene);
     renderer.render(scene, camera);
 }
 

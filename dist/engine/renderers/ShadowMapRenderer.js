@@ -87,6 +87,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         });
 
         this.pipeline = await this.device.createRenderPipelineAsync({
+            label: "Shadow map pipeline",
             vertex: {
                 module: shaderModule,
                 buffers: [ vertexBufferLayout ],
@@ -107,6 +108,7 @@ export class ShadowMapRenderer extends BaseRenderer {
      */
     createShadowMap() {
         return this.device.createTexture({
+            label: "ShadowMap",
             size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1],
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
@@ -162,13 +164,19 @@ export class ShadowMapRenderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    render(scene, light) {
+    renderSceneLights(scene) {
+        scene.filter(node => node.getComponentOfType(KHRLightExtension)).forEach(node => {
+            this.render(scene, node);
+        })
+    }
 
+    render(scene, light) {
         const shadowMap = this.createShadowMap();
         const shadowMapView = shadowMap.createView();
 
         const encoder = this.device.createCommandEncoder();
         this.renderPass = encoder.beginRenderPass({
+            label: "Shadow Map Render Pass",
             colorAttachments: [],
             depthStencilAttachment: {
                 view: shadowMapView,
