@@ -47,6 +47,7 @@ const camera = scene.find(node => node.getComponentOfType(Camera));
 
 const light = new Node();
 light.addComponent(new Light({
+    // Should be 10, 10, 10 in final version as ambient color, since main lighting should be from torches
     color: [220, 200, 150],
     direction: [0.2, 1, 0.2],
 }));
