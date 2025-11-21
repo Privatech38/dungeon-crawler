@@ -61,7 +61,35 @@ const modelBindGroupLayout = {
  * resolution of shadows
  * @type {number}
  */
-const SHADOW_MAP_SIZE = 512
+const SHADOW_MAP_SIZE = 256
+
+class CubeFace {
+    targetDirection;
+    upVector;
+
+    constructor(targetDirection, upVector) {
+        this.targetDirection = targetDirection;
+        this.upVector = upVector;
+    }
+
+    toViewMatrix(positionMatrix) {
+        const position = vec3.fromValues(positionMatrix[12], positionMatrix[13], positionMatrix[14]);
+        let viewMatrix = mat4.create();
+        const direction = vec3.create();
+        vec3.add(direction, position, this.targetDirection)
+        mat4.lookAt(viewMatrix, position, direction, this.upVector);
+        return viewMatrix;
+    }
+}
+
+const CUBE_VECTORS = [
+    new CubeFace([1,0,0], [0,-1,0]),  // +X
+    new CubeFace([-1,0,0], [0,-1,0]), // -X
+    new CubeFace([0,1,0], [0,0,1]),   // +Y
+    new CubeFace([0,-1,0], [0,0,-1]), // -Y
+    new CubeFace([0,0,1], [0,-1,0]),  // +Z
+    new CubeFace([0,0,-1], [0,-1,0])  // -Z
+]
 
 export class ShadowMapRenderer extends BaseRenderer {
     shadowMaps;
@@ -115,25 +143,37 @@ export class ShadowMapRenderer extends BaseRenderer {
      * Create a new shadow map with size of {@linkcode SHADOW_MAP_SIZE} or return an existing shadow map associated with
      * this light node
      * @param light A node with {@linkcode KHRLightExtension} component
-     * @returns {{ texture: WebGLTexture, textureView: GPUTextureView }} An object representing the texture and it's view
+     * @returns {{ texture: WebGLTexture, textureViews: Array<GPUTextureView> }} An object representing the textures and their views
      */
     prepareShadowMap(light) {
         if (this.shadowMaps.has(light)) {
             return this.shadowMaps.get(light);
         }
 
+        const khrLightExtension = light.getComponentOfType(KHRLightExtension);
+
         const texture = this.device.createTexture({
             label: "ShadowMap",
-            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1],
+            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, khrLightExtension.type === 'point' ? 6 : 1],
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
-        const textureView = texture.createView({
-            label: "Shadow map view"
-        });
+        let textureViews;
+        if (khrLightExtension.type === 'point') {
+            textureViews = [0,1,2,3,4,5].map(index => texture.createView({
+                label: "Shadow map (cube) view",
+                dimension: "2d",
+                arrayLayerCount: 1,
+                baseArrayLayer: index
+            }));
+        } else {
+            textureViews = [texture.createView({
+                label: "Shadow map view"
+            })];
+        }
 
-        const textureObject = { texture, textureView };
+        const textureObject = { texture, textureViews };
         this.shadowMaps.set(light, textureObject);
         return textureObject;
     }
@@ -188,43 +228,51 @@ export class ShadowMapRenderer extends BaseRenderer {
     }
 
     renderSceneLights(scene) {
-        scene.filter(node => node.getComponentOfType(KHRLightExtension)).forEach(node => {
+        scene.filter(node => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach(node => {
             this.render(scene, node);
         });
     }
 
     render(scene, light) {
         const shadowMap = this.prepareShadowMap(light);
-        const shadowMapView = shadowMap.textureView;
-
-        const encoder = this.device.createCommandEncoder();
-        this.renderPass = encoder.beginRenderPass({
-            label: "Shadow Map Render Pass",
-            colorAttachments: [],
-            depthStencilAttachment: {
-                view: shadowMapView,
-                depthClearValue: 1.0,
-                depthLoadOp: 'clear',
-                depthStoreOp: 'store',
-            },
-        });
-
-        this.renderPass.setPipeline(this.pipeline);
+        const shadowMapViews = shadowMap.textureViews;
 
         // Setup view and projection matrix
         // TODO Cache this since the view matrices never change for lights
         const khronosLight = light.getComponentOfType(KHRLightExtension);
         const viewMatrix = getGlobalViewMatrix(light);
+        const globalModelMatrix = getGlobalModelMatrix(light);
         const projectionMatrix = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, 1000);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(khronosLight);
-        this.device.queue.writeBuffer(lightUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(lightUniformBuffer, 64, projectionMatrix);
-        this.renderPass.setBindGroup(0, lightBindGroup);
 
-        this.renderNode(scene);
 
-        this.renderPass.end();
-        this.device.queue.submit([encoder.finish()]);
+        for (let i = 0; i < shadowMapViews.length; i++) {
+            const encoder = this.device.createCommandEncoder();
+            const shadowMapView = shadowMapViews[i];
+            this.renderPass = encoder.beginRenderPass({
+                label: "Shadow Map Render Pass",
+                colorAttachments: [],
+                depthStencilAttachment: {
+                    view: shadowMapView,
+                    depthClearValue: 1.0,
+                    depthLoadOp: 'clear',
+                    depthStoreOp: 'store',
+                }
+            });
+
+            let toViewMatrix = CUBE_VECTORS[i].toViewMatrix(globalModelMatrix);
+            console.log(`View matrix for ${i} is ${toViewMatrix}`);
+            this.device.queue.writeBuffer(lightUniformBuffer, 0, shadowMapViews.length > 1 ? toViewMatrix : viewMatrix);
+            this.renderPass.setBindGroup(0, lightBindGroup);
+
+            this.renderPass.setPipeline(this.pipeline);
+
+            this.renderNode(scene);
+
+            this.renderPass.end();
+            this.device.queue.submit([encoder.finish()]);
+        }
 
     }
 
