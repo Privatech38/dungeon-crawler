@@ -35,6 +35,7 @@ const vertexBufferLayout = {
 };
 
 const lightViewProjectionBindGroupLayout = {
+    label: "Light view and projection bind group layout",
     entries: [
         {
             binding: 0,
@@ -45,6 +46,7 @@ const lightViewProjectionBindGroupLayout = {
 }
 
 const modelBindGroupLayout = {
+    label: "Model bind group layout",
     entries: [
         {
             binding: 0,
@@ -186,7 +188,7 @@ export class ShadowMapRenderer extends BaseRenderer {
     }
 
     renderSceneLights(scene) {
-        scene.filter(node => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach(node => {
+        scene.filter(node => node.getComponentOfType(KHRLightExtension)).forEach(node => {
             this.render(scene, node);
         });
     }
@@ -203,7 +205,7 @@ export class ShadowMapRenderer extends BaseRenderer {
                 view: shadowMapView,
                 depthClearValue: 1.0,
                 depthLoadOp: 'clear',
-                depthStoreOp: 'discard',
+                depthStoreOp: 'store',
             },
         });
 
@@ -213,7 +215,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         // TODO Cache this since the view matrices never change for lights
         const khronosLight = light.getComponentOfType(KHRLightExtension);
         const viewMatrix = getGlobalViewMatrix(light);
-        const projectionMatrix = getProjectionMatrix(light);
+        const projectionMatrix = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, 1000);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(khronosLight);
         this.device.queue.writeBuffer(lightUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(lightUniformBuffer, 64, projectionMatrix);
