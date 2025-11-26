@@ -7,6 +7,5 @@ export class Structure extends ComponentHost {
   constructor(type: string) {
     super();
     this.type = type;
-    this.addComponent(new Transform());
   }
 }
