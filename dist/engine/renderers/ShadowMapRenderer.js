@@ -91,6 +91,9 @@ const CUBE_VECTORS = [
     new CubeFace([0,0,-1], [0,-1,0])  // -Z
 ]
 
+const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, 1000);
+const ORTOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
+
 export class ShadowMapRenderer extends BaseRenderer {
     shadowMaps;
 
@@ -227,24 +230,32 @@ export class ShadowMapRenderer extends BaseRenderer {
         return gpuObjects;
     }
 
+    /**
+     * Renders the scene (node), by creating shadow/depth maps for every node with KHRLightExtension component.
+     * If a light node is already cached it will not render it's shadow/depth map(s)
+     * @param scene A scene
+     */
     renderSceneLights(scene) {
         scene.filter(node => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach(node => {
             this.render(scene, node);
         });
     }
 
+    /**
+     * Render shadow/depth map for this light node
+     * @param scene The scene to render
+     * @param light The light node
+     */
     render(scene, light) {
         const shadowMap = this.prepareShadowMap(light);
         const shadowMapViews = shadowMap.textureViews;
 
         // Setup view and projection matrix
-        // TODO Cache this since the view matrices never change for lights
         const khronosLight = light.getComponentOfType(KHRLightExtension);
         const viewMatrix = getGlobalViewMatrix(light);
         const globalModelMatrix = getGlobalModelMatrix(light);
-        const projectionMatrix = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, 1000);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(khronosLight);
-        this.device.queue.writeBuffer(lightUniformBuffer, 64, projectionMatrix);
+        this.device.queue.writeBuffer(lightUniformBuffer, 64, khronosLight.type === 'directional' ? ORTOGRAPHIC_MATRIX : PERSPECTIVE_MATRIX);
 
 
         for (let i = 0; i < shadowMapViews.length; i++) {
@@ -262,7 +273,6 @@ export class ShadowMapRenderer extends BaseRenderer {
             });
 
             let toViewMatrix = CUBE_VECTORS[i].toViewMatrix(globalModelMatrix);
-            console.log(`View matrix for ${i} is ${toViewMatrix}`);
             this.device.queue.writeBuffer(lightUniformBuffer, 0, shadowMapViews.length > 1 ? toViewMatrix : viewMatrix);
             this.renderPass.setBindGroup(0, lightBindGroup);
 
