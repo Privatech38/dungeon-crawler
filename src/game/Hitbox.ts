@@ -13,7 +13,7 @@ export class Hitbox extends Component {
   getWorldPosition(): vec3 {
     const transform = this.getComponent(Transform);
     if (!transform) throw new Error("Hitbox requires a Transform component");
-    return transform.position;
+    return transform.translation;
   }
 
   getWorldSize(): vec3 {

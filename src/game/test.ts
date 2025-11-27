@@ -32,7 +32,7 @@ wall.addComponent(new Hitbox([5, 0.2, 2.2]));
 wall2.addComponent(new Hitbox([5, 0.2, 2.2]));
 
 // set wall position and rotation
-wall.addComponent(new Transform([3, 3, 3], rotation90));
+wall.addComponent(new Transform({translation: [3, 3, 3], rotation: rotation90}));
 
 console.log(room1.structures)
 
@@ -51,13 +51,13 @@ world.addEntity(player);
 world.addSystem(new MovementSystem());
 
 // Simulate
-console.log("Before:", player.getComponent(Transform)?.position, player.getComponent(Hitbox)?.getWorldPosition());
+console.log("Before:", player.getComponent(Transform)?.translation, player.getComponent(Hitbox)?.getWorldPosition());
 world.update(1.0);
 
-console.log("After 1s:", player.getComponent(Transform)?.position, player.getComponent(Hitbox)?.getWorldPosition());
+console.log("After 1s:", player.getComponent(Transform)?.translation, player.getComponent(Hitbox)?.getWorldPosition());
 
 // change players movment
 player.getComponent(VelocityComponent)?.set(1, 3, 0);
 
 world.update(1.0);
-console.log("After 2s:", player.getComponent(Transform)?.position, player.getComponent(Hitbox)?.getWorldPosition());
+console.log("After 2s:", player.getComponent(Transform)?.translation, player.getComponent(Hitbox)?.getWorldPosition());

@@ -15,7 +15,7 @@ export class MovementSystem {
       // newPosition = position + velocity * dt
       const delta = vec3.create();
       vec3.scale(delta, velocity.vec, dt);
-      vec3.add(transform.position, transform.position, delta);
+      vec3.add(transform.translation, transform.translation, delta);
     }
   }
 }
