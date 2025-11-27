@@ -61,7 +61,7 @@ const modelBindGroupLayout = {
  * resolution of shadows
  * @type {number}
  */
-const SHADOW_MAP_SIZE = 256
+const SHADOW_MAP_SIZE = 512
 
 class CubeFace {
     targetDirection;
