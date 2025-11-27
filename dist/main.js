@@ -68,8 +68,8 @@ function update(time, dt) {
 }
 
 function render() {
-    // shadowRenderer.renderSceneLights(scene, camera);
     renderer.render(scene, camera);
+    shadowRenderer.renderSceneLights(scene);
 }
 
 function resize({ displaySize: { width, height }}) {
