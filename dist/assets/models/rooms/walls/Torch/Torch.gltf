@@ -1,25 +1,69 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.3.47",
+		"generator":"Khronos glTF Blender I/O v5.0.21",
 		"version":"2.0"
+	},
+	"extensionsUsed":[
+		"KHR_lights_punctual"
+	],
+	"extensionsRequired":[
+		"KHR_lights_punctual"
+	],
+	"extensions":{
+		"KHR_lights_punctual":{
+			"lights":[
+				{
+					"color":[
+						1,
+						0.43965762853622437,
+						0.06662608683109283
+					],
+					"intensity":100.0,
+					"type":"point",
+					"name":"Point"
+				}
+			]
+		}
 	},
 	"scene":0,
 	"scenes":[
 		{
 			"name":"Scene",
 			"nodes":[
-				0
+				1
 			]
 		}
 	],
 	"nodes":[
 		{
+			"extensions":{
+				"KHR_lights_punctual":{
+					"light":0
+				}
+			},
+			"name":"Point",
+			"rotation":[
+				-0.7071068286895752,
+				0,
+				0,
+				0.7071068286895752
+			],
+			"translation":[
+				-0.00534471869468689,
+				0.2687603235244751,
+				0.2399812638759613
+			]
+		},
+		{
+			"children":[
+				0
+			],
 			"mesh":0,
 			"name":"Torch",
 			"translation":[
 				0,
 				1.600000023841858,
-				0.2000100016593933
+				0.2082262933254242
 			]
 		}
 	],
@@ -61,15 +105,15 @@
 	"images":[
 		{
 			"mimeType":"image/png",
-			"name":"main-texture",
-			"uri":"../../../../textures/main-texture.png"
+			"name":"torch-albedo",
+			"uri":"torch-albedo.png"
 		}
 	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":241,
+			"count":243,
 			"max":[
 				0.05345809459686279,
 				0.22620528936386108,
@@ -85,13 +129,13 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":241,
+			"count":243,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":241,
+			"count":243,
 			"type":"VEC2"
 		},
 		{
@@ -104,26 +148,26 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":2892,
+			"byteLength":2916,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":2892,
-			"byteOffset":2892,
+			"byteLength":2916,
+			"byteOffset":2916,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":1928,
-			"byteOffset":5784,
+			"byteLength":1944,
+			"byteOffset":5832,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":684,
-			"byteOffset":7712,
+			"byteOffset":7776,
 			"target":34963
 		}
 	],
@@ -135,7 +179,7 @@
 	],
 	"buffers":[
 		{
-			"byteLength":8396,
+			"byteLength":8460,
 			"uri":"Torch.bin"
 		}
 	]

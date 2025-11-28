@@ -20,42 +20,48 @@ export async function initalize(scene: Node, playerNode: Node, world: World): Pr
 }
 
 async function buildWorld(scene: Node, world: World): Promise<void> {
-    world.getWalls().forEach(wall => {
+    for (const wall of world.getWalls()) {
         if (wall.isDoor) {
-            createDoor(new Transform({
+            await createDoor(new Transform({
                 translation: wall.getCenter.toArray,
                 rotation: wall.getQuaternions,
             }), scene);
         } else {
-            createWall(new Transform({
+            await createWall(new Transform({
                 translation: wall.getCenter.toArray,
                 rotation: wall.getQuaternions,
             }), scene);
         }
-    });
+    }
 
-    world.getBottomWalls().forEach(bottomWall => {
+    for (const bottomWall of world.getBottomWalls()) {
         if (!bottomWall.isDoor) {
-            createLowerWall(new Transform({
+            await createLowerWall(new Transform({
                 translation: bottomWall.getCenter.toArray,
                 rotation: bottomWall.getQuaternions,
             }), scene);
         }
-    })
+    }
 
-    world.getPillars().forEach(pillar => {
-        createWallPillar(new Transform({
+    for (const pillar of world.getPillars()) {
+        let transform = new Transform({
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,
-        }), scene);
-    });
+        });
+        let translation = pillar.getCenter.toArray;
+        translation[1] = -0.4;
+        let torchTransform = new Transform({
+            translation: translation
+        })
+        await createWallPillar(transform, scene, pillar.getIsCorner ? undefined : torchTransform);
+    }
 
-    world.getFloors().forEach(floor => {
-        createFloor(new Transform({
+    for (const floor of world.getFloors()) {
+        await createFloor(new Transform({
             translation: floor.getCenter.toArray,
             rotation: floor.getQuaternions,
         }), scene);
-    });
+    }
 }
 
 /**
@@ -116,7 +122,6 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
         await torchLoader.load('assets/models/rooms/walls/Torch/Torch.gltf');
         const torch: Node = torchLoader.loadNode('Torch');
         torch.isStatic = true;
-        torch.addComponent(torchTransform);
         wallPillar.addChild(torch);
     }
 }

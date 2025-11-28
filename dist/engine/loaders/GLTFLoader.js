@@ -11,6 +11,7 @@ import {
     Transform,
     Vertex,
 } from '../core.js';
+import {KHRLightExtension} from "../../gpu/object/KhronosLight.js";
 
 // TODO: GLB support
 // TODO: accessors with no buffer views (zero-initialized)
@@ -429,6 +430,25 @@ export class GLTFLoader {
         return camera;
     }
 
+    /**
+     * Loads a light from the JSON (.gltf) file
+     * @param nameOrIndex The name or index of the light
+     * @returns {KHRLightExtension|null} KHRLightExtension if successfully loaded, null otherwise
+     */
+    loadLight(nameOrIndex) {
+        const gltfSpec = this.findByNameOrIndex(this.gltf.extensions.KHR_lights_punctual.lights, nameOrIndex);
+        if (!gltfSpec) {
+            return null;
+        }
+        if (this.cache.has(gltfSpec)) {
+            return this.cache.get(gltfSpec);
+        }
+
+        const light = new KHRLightExtension(gltfSpec);
+        this.cache.set(gltfSpec, light);
+        return light;
+    }
+
     loadNode(nameOrIndex) {
         const gltfSpec = this.findByNameOrIndex(this.gltf.nodes, nameOrIndex);
         if (!gltfSpec) {
@@ -450,6 +470,11 @@ export class GLTFLoader {
 
         if (gltfSpec.camera !== undefined) {
             node.addComponent(this.loadCamera(gltfSpec.camera));
+        }
+
+        // Load light if present
+        if (gltfSpec.extensions?.KHR_lights_punctual?.light !== undefined) {
+            node.addComponent(this.loadLight(gltfSpec.extensions.KHR_lights_punctual.light))
         }
 
         if (gltfSpec.mesh !== undefined) {

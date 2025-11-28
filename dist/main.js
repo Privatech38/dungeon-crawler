@@ -17,6 +17,9 @@ import { PlayerController } from "./game/PlayerController.js";
 import {GameManager} from "./game/GameManager.js";
 import { player } from "./game/enteties.js";
 import {OBBToMesh} from "./engine/loaders/OBBToMesh.js";
+import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer.js";
+import {LightManager} from "./LightManager.js";
+import {KHRLightExtension} from "./gpu/object/KhronosLight.js";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
@@ -25,6 +28,9 @@ let world = manager.getWorld;
 const canvas = document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
+
+const shadowRenderer = new ShadowMapRenderer(canvas);
+await shadowRenderer.initialize();
 // const renderer = new UnlitRenderer(canvas);
 // await renderer.initialize();
 
@@ -41,15 +47,16 @@ const camera = scene.find(node => node.getComponentOfType(Camera));
 
 const light = new Node();
 light.addComponent(new Light({
-    color: [255, 184, 92],
-    direction: [0, 1, 0],
+    // Should be 10, 10, 10 in final version as ambient color, since main lighting should be from torches
+    color: [220, 200, 150],
+    direction: [0.2, 1, 0.2],
 }));
 light.addComponent(new Transform({
     translation: [0, 10, 0],
 }));
 scene.addChild(light);
 
-initalize(scene, playerNode, world);
+await initalize(scene, playerNode, world);
 
 function update(time, dt) {
     manager.update();
@@ -62,6 +69,7 @@ function update(time, dt) {
 
 function render() {
     renderer.render(scene, camera);
+    shadowRenderer.renderSceneLights(scene);
 }
 
 function resize({ displaySize: { width, height }}) {

@@ -40,6 +40,16 @@ struct MaterialUniforms {
     ambientColor: vec3f
 }
 
+// Don't delete, important for light
+struct Light {
+    color : vec3<f32>,
+    light_type : u32,
+    intensity : f32,
+    range : f32,
+    innerConeAngle : f32,
+    outerConeAngle : f32
+}
+
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
 @group(1) @binding(0) var<uniform> light: LightUniforms;
 @group(2) @binding(0) var<uniform> model: ModelUniforms;
