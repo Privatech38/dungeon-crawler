@@ -122,7 +122,6 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
         await torchLoader.load('assets/models/rooms/walls/Torch/Torch.gltf');
         const torch: Node = torchLoader.loadNode('Torch');
         torch.isStatic = true;
-        torch.addComponent(torchTransform);
         wallPillar.addChild(torch);
     }
 }
