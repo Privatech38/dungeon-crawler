@@ -48,7 +48,12 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,
         });
-        await createWallPillar(transform, scene, pillar.getIsCorner ? undefined : transform);
+        let translation = pillar.getCenter.toArray;
+        translation[1] = -0.4;
+        let torchTransform = new Transform({
+            translation: translation
+        })
+        await createWallPillar(transform, scene, pillar.getIsCorner ? undefined : torchTransform);
     }
 
     for (const floor of world.getFloors()) {
