@@ -1,7 +1,7 @@
 import { vec3, mat4 } from 'glm';
 
-import {BaseRenderer} from "./BaseRenderer.js";
-import { KHRLightExtension } from "../../../dist/gpu/object/KhronosLight.js";
+import { BaseRenderer } from "./BaseRenderer.js";
+import { KHRLightExtension } from "../../gpu/object/KhronosLight";
 import {
     getGlobalModelMatrix,
     getGlobalViewMatrix,
