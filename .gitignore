@@ -1,5 +1,4 @@
 .idea/
-src/**/*.js
 # LaTeX compile outputs
 *.aux
 *.bbl
