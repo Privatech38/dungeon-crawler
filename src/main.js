@@ -1,14 +1,14 @@
-import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
-import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
+import { ResizeSystem } from 'src/engine/systems/ResizeSystem.js';
+import { UpdateSystem } from 'src/engine/systems/UpdateSystem.js';
 
-import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'src/engine/loaders/GLTFLoader.js';
 
 import {
     Camera,
     Model,
     Node,
     Transform,
-} from 'engine/core.js';
+} from 'src/engine/core.js';
 
 import { Renderer } from './Renderer.js';
 import { Light } from './Light.js';
