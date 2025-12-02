@@ -49,3 +49,5 @@ src/**/*.js
 *.synctex(busy)
 *.synctex.gz(busy)
 *.xdv
+
+node_modules
