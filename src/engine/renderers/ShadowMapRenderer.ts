@@ -1,32 +1,41 @@
+// @ts-ignore
 import { vec3, mat4 } from 'glm';
-
+// @ts-ignore
 import { BaseRenderer } from "./BaseRenderer.js";
 import { KHRLightExtension } from "../../gpu/object/KhronosLight";
 import {
     getGlobalModelMatrix,
     getGlobalViewMatrix,
-    getLocalModelMatrix,
-    getProjectionMatrix
+    getLocalModelMatrix
+    // @ts-ignore
 } from "../core/SceneUtils.js";
+// @ts-ignore
 import {Model} from "../core/Model.js";
 
-const vertexBufferLayout = {
+// @ts-ignore
+import shadowShader from './ShadowMap.wgsl';
+// @ts-ignore
+import {Node} from "engine/core/Node.js";
+// @ts-ignore
+import {Primitive} from "engine/core/Primitive.js";
+
+const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
     attributes: [
         {
-            name: 'position',
+            // position
             shaderLocation: 0,
             offset: 0,
             format: 'float32x3',
         },
         {
-            name: 'texcoords',
+            // texture coordinates
             shaderLocation: 1,
             offset: 12,
             format: 'float32x2',
         },
         {
-            name: 'normal',
+            // normal
             shaderLocation: 2,
             offset: 20,
             format: 'float32x3',
@@ -34,7 +43,7 @@ const vertexBufferLayout = {
     ],
 };
 
-const lightViewProjectionBindGroupLayout = {
+const lightViewProjectionBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     label: "Light view and projection bind group layout",
     entries: [
         {
@@ -45,7 +54,7 @@ const lightViewProjectionBindGroupLayout = {
     ]
 }
 
-const modelBindGroupLayout = {
+const modelBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     label: "Model bind group layout",
     entries: [
         {
@@ -61,18 +70,18 @@ const modelBindGroupLayout = {
  * resolution of shadows
  * @type {number}
  */
-const SHADOW_MAP_SIZE = 512
+const SHADOW_MAP_SIZE: number = 512
 
 class CubeFace {
     targetDirection;
     upVector;
 
-    constructor(targetDirection, upVector) {
+    constructor(targetDirection: Array<number>, upVector: Array<number>) {
         this.targetDirection = targetDirection;
         this.upVector = upVector;
     }
 
-    toViewMatrix(positionMatrix) {
+    toViewMatrix(positionMatrix: Array<number>) {
         const position = vec3.fromValues(positionMatrix[12], positionMatrix[13], positionMatrix[14]);
         let viewMatrix = mat4.create();
         const direction = vec3.create();
@@ -92,12 +101,27 @@ const CUBE_VECTORS = [
 ]
 
 const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, 1000);
-const ORTOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
+const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
 
 export class ShadowMapRenderer extends BaseRenderer {
+    // @ts-ignore
+    gpuObjects: Map<Node, any>;
+    // @ts-ignore
+    device: GPUDevice;
+    format!: GPUTextureFormat;
+    perFragment: boolean;
+    // @ts-ignore
+    renderPass: GPURenderPassEncoder;
     shadowMaps;
 
-    constructor(canvas) {
+    // @ts-ignore
+    lightViewProjectionBindGroupLayout: GPUBindGroupLayout;
+    // @ts-ignore
+    modelBindGroupLayout: GPUBindGroupLayout;
+    // @ts-ignore
+    pipeline: GPURenderPipeline;
+
+    constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.perFragment = false;
         this.shadowMaps = new Map();
@@ -106,13 +130,16 @@ export class ShadowMapRenderer extends BaseRenderer {
     async initialize() {
 
         const adapter = await navigator.gpu.requestAdapter();
-        const device = await adapter.requestDevice();
+        const device = await adapter?.requestDevice();
+        if (!device) {
+            return;
+        }
         const format = navigator.gpu.getPreferredCanvasFormat();
 
         this.device = device;
         this.format = format;
 
-        const shader = await fetch('engine/renderers/ShadowMap.wgsl').then(response => response.text());
+        const shader = await fetch(shadowShader).then(response => response.text());
 
         const shaderModule = this.device.createShaderModule({ code: shader });
 
@@ -148,7 +175,7 @@ export class ShadowMapRenderer extends BaseRenderer {
      * @param light A node with {@linkcode KHRLightExtension} component
      * @returns {{ texture: WebGLTexture, textureViews: Array<GPUTextureView> }} An object representing the textures and their views
      */
-    prepareShadowMap(light) {
+    prepareShadowMap(light: Node): { texture: WebGLTexture; textureViews: Array<GPUTextureView>; } {
         if (this.shadowMaps.has(light)) {
             return this.shadowMaps.get(light);
         }
@@ -186,7 +213,7 @@ export class ShadowMapRenderer extends BaseRenderer {
      * @param light A node that has a KhronosLight component
      * @returns {{lightUniformBuffer: WebGLBuffer, lightBindGroup: GPUBindGroup}}
      */
-    prepareLight(light) {
+    prepareLight(light: Node): { lightUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; } {
         if (this.gpuObjects.has(light)) {
             return this.gpuObjects.get(light);
         }
@@ -208,7 +235,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    prepareNode(node) {
+    prepareNode(node: Node) {
         if (this.gpuObjects.has(node)) {
             return this.gpuObjects.get(node);
         }
@@ -235,8 +262,8 @@ export class ShadowMapRenderer extends BaseRenderer {
      * If a light node is already cached it will not render it's shadow/depth map(s)
      * @param scene A scene
      */
-    renderSceneLights(scene) {
-        scene.filter(node => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach(node => {
+    renderSceneLights(scene: Node) {
+        scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach((node: Node) => {
             this.render(scene, node);
         });
     }
@@ -246,7 +273,7 @@ export class ShadowMapRenderer extends BaseRenderer {
      * @param scene The scene to render
      * @param light The light node
      */
-    render(scene, light) {
+    render(scene: Node, light: Node) {
         const shadowMap = this.prepareShadowMap(light);
         const shadowMapViews = shadowMap.textureViews;
 
@@ -255,7 +282,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         const viewMatrix = getGlobalViewMatrix(light);
         const globalModelMatrix = getGlobalModelMatrix(light);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(khronosLight);
-        this.device.queue.writeBuffer(lightUniformBuffer, 64, khronosLight.type === 'directional' ? ORTOGRAPHIC_MATRIX : PERSPECTIVE_MATRIX);
+        this.device.queue.writeBuffer(lightUniformBuffer, 64, khronosLight.type === 'directional' ? ORTHOGRAPHIC_MATRIX : PERSPECTIVE_MATRIX);
 
 
         for (let i = 0; i < shadowMapViews.length; i++) {
@@ -286,7 +313,7 @@ export class ShadowMapRenderer extends BaseRenderer {
 
     }
 
-    renderNode(node, modelMatrix = mat4.create()) {
+    renderNode(node: Node, modelMatrix = mat4.create()) {
         const localMatrix = getLocalModelMatrix(node);
         modelMatrix = mat4.multiply(mat4.create(), modelMatrix, localMatrix);
         const normalMatrix = mat4.normalFromMat4(mat4.create(), modelMatrix);
@@ -305,14 +332,14 @@ export class ShadowMapRenderer extends BaseRenderer {
         }
     }
 
-    renderModel(model) {
+    renderModel(model: Model) {
         for (const primitive of model.primitives) {
             this.renderPrimitive(primitive);
         }
     }
 
-    renderPrimitive(primitive) {
-
+    renderPrimitive(primitive: Primitive) {
+        // @ts-ignore
         const { vertexBuffer, indexBuffer } = this.prepareMesh(primitive.mesh, vertexBufferLayout);
         this.renderPass.setVertexBuffer(0, vertexBuffer);
         this.renderPass.setIndexBuffer(indexBuffer, 'uint32');
