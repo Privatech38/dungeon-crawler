@@ -11,6 +11,9 @@ import {
 
 import { Light } from './Light.js';
 
+import lamberPerFragment from './lambertPerFragment.wgsl';
+import lamberPerVertex from './lambertPerVertex.wgsl';
+
 const vertexBufferLayout = {
     arrayStride: 32,
     attributes: [
@@ -95,8 +98,8 @@ export class Renderer extends BaseRenderer {
     async initialize() {
         await super.initialize();
 
-        const codePerFragment = await fetch('lambertPerFragment.wgsl').then(response => response.text());
-        const codePerVertex = await fetch('lambertPerVertex.wgsl').then(response => response.text());
+        const codePerFragment = await fetch(lamberPerFragment).then(response => response.text());
+        const codePerVertex = await fetch(lamberPerVertex).then(response => response.text());
 
         const modulePerFragment = this.device.createShaderModule({ code: codePerFragment });
         const modulePerVertex = this.device.createShaderModule({ code: codePerVertex });

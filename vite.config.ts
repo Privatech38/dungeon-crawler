@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import path from "path";
 
 export default defineConfig({
+    build: {
+        minify: false,
+    },
     resolve: {
         alias: {
             "glm": path.resolve(__dirname, "src/lib/glm.js"),
@@ -9,4 +12,5 @@ export default defineConfig({
             "dat": path.resolve(__dirname, "src/lib/dat.js")
         },
     },
+    assetsInclude: ['**/*.wgsl', '**/*.gltf', '**/*.bin'],
 });
