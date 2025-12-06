@@ -13,14 +13,14 @@ import {
     // @ts-ignore
 } from "./engine/core.js";
 // @ts-ignore
-import { Renderer } from 'Renderer.js';
+import { Renderer } from './Renderer.js';
 // @ts-ignore
-import { Light } from 'Light.js';
+import { Light } from './Light.js';
 import {initalize} from "./game/init/WorldBuilder.js";
 import { PlayerController } from "./game/PlayerController.js";
 import {GameManager} from "./game/GameManager.js";
 import { player } from "./game/enteties.js";
-import {ShadowMapRenderer} from "engine/renderers/ShadowMapRenderer";
+import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
 // @ts-ignore
 import {LightManager} from "./LightManager.js";
 

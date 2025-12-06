@@ -1,7 +1,7 @@
 // @ts-ignore
 import { vec3, mat4 } from 'glm';
 // @ts-ignore
-import { BaseRenderer } from "./BaseRenderer.js";
+import { BaseRenderer } from "./BaseRenderer";
 import { KHRLightExtension } from "../../gpu/object/KhronosLight";
 import {
     getGlobalModelMatrix,
@@ -23,19 +23,22 @@ const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
     attributes: [
         {
-            // position
+            // @ts-ignore
+            name: 'position',
             shaderLocation: 0,
             offset: 0,
             format: 'float32x3',
         },
         {
-            // texture coordinates
+            // @ts-ignore
+            name: 'texcoords',
             shaderLocation: 1,
             offset: 12,
             format: 'float32x2',
         },
         {
-            // normal
+            // @ts-ignore
+            name: 'normal',
             shaderLocation: 2,
             offset: 20,
             format: 'float32x3',
@@ -104,8 +107,6 @@ const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.0
 const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
 
 export class ShadowMapRenderer extends BaseRenderer {
-    // @ts-ignore
-    gpuObjects: Map<Node, any>;
     // @ts-ignore
     device: GPUDevice;
     format!: GPUTextureFormat;
