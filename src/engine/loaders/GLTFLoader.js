@@ -11,7 +11,7 @@ import {
     Transform,
     Vertex,
 } from '../core.js';
-import {KHRLightExtension} from "../../gpu/object/KhronosLight.js";
+import { KHRLightExtension } from "../../gpu/object/KhronosLight";
 
 // TODO: GLB support
 // TODO: accessors with no buffer views (zero-initialized)
