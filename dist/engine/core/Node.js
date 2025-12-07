@@ -69,12 +69,8 @@ export class Node {
     clone() {
         let clone = new Node();
 
-        for ( const child of this.children ) {
-            clone.addChild( child );
-        }
-        for ( const component of this.components ) {
-            clone.addComponent( component );
-        }
+        clone.children   = this.children;
+        clone.components = this.components;
 
         return clone;
     }
