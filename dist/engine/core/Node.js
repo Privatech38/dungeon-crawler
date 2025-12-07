@@ -66,4 +66,17 @@ export class Node {
         return this.components.filter(component => component instanceof type);
     }
 
+    clone() {
+        let clone = new Node();
+
+        for ( const child of this.children ) {
+            clone.addChild( child );
+        }
+        for ( const component of this.components ) {
+            clone.addComponent( component );
+        }
+
+        return clone;
+    }
+
 }
