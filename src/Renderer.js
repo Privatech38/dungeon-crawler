@@ -1,17 +1,18 @@
 import { vec3, mat4 } from 'glm';
 
-import * as WebGPU from 'engine/WebGPU.js';
-
-import { Camera, Model } from 'engine/core.js';
-import { BaseRenderer } from 'engine/renderers/BaseRenderer.js';
+import { Camera, Model } from './engine/core.js';
+import { BaseRenderer } from './engine/renderers/BaseRenderer.js';
 
 import {
     getLocalModelMatrix,
     getGlobalViewMatrix,
     getProjectionMatrix,
-} from 'engine/core/SceneUtils.js';
+} from './engine/core/SceneUtils.js';
 
 import { Light } from './Light.js';
+
+import lamberPerFragment from './lambertPerFragment.wgsl';
+import lamberPerVertex from './lambertPerVertex.wgsl';
 
 const vertexBufferLayout = {
     arrayStride: 32,
@@ -97,8 +98,8 @@ export class Renderer extends BaseRenderer {
     async initialize() {
         await super.initialize();
 
-        const codePerFragment = await fetch('lambertPerFragment.wgsl').then(response => response.text());
-        const codePerVertex = await fetch('lambertPerVertex.wgsl').then(response => response.text());
+        const codePerFragment = await fetch(lamberPerFragment).then(response => response.text());
+        const codePerVertex = await fetch(lamberPerVertex).then(response => response.text());
 
         const modulePerFragment = this.device.createShaderModule({ code: codePerFragment });
         const modulePerVertex = this.device.createShaderModule({ code: codePerVertex });

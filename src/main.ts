@@ -1,31 +1,34 @@
-import { ResizeSystem } from 'engine/systems/ResizeSystem.js';
-import { UpdateSystem } from 'engine/systems/UpdateSystem.js';
-
-import { GLTFLoader } from 'engine/loaders/GLTFLoader.js';
+// @ts-ignore
+import { ResizeSystem } from './engine/systems/ResizeSystem.js';
+// @ts-ignore
+import { UpdateSystem } from './engine/systems/UpdateSystem.js';
+// @ts-ignore
+import { GLTFLoader } from './engine/loaders/GLTFLoader.js';
 
 import {
     Camera,
     Model,
     Node,
     Transform,
-} from 'engine/core.js';
-
+    // @ts-ignore
+} from "./engine/core.js";
+// @ts-ignore
 import { Renderer } from './Renderer.js';
+// @ts-ignore
 import { Light } from './Light.js';
 import {initalize} from "./game/init/WorldBuilder.js";
 import { PlayerController } from "./game/PlayerController.js";
 import {GameManager} from "./game/GameManager.js";
 import { player } from "./game/enteties.js";
-import {OBBToMesh} from "./engine/loaders/OBBToMesh.js";
-import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer.js";
+import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
+// @ts-ignore
 import {LightManager} from "./LightManager.js";
-import {KHRLightExtension} from "./gpu/object/KhronosLight.js";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
 let world = manager.getWorld;
 
-const canvas = document.querySelector('canvas');
+const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
 
@@ -42,7 +45,7 @@ const playerNode = gltfLoader.loadNode("Player");
 const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
 playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
 
-const camera = scene.find(node => node.getComponentOfType(Camera));
+const camera = scene.find((node: Node) => node.getComponentOfType(Camera));
 // camera.addComponent(new FirstPersonController(camera, canvas));
 
 const light = new Node();
@@ -58,9 +61,9 @@ scene.addChild(light);
 
 await initalize(scene, playerNode, world);
 
-function update(time, dt) {
-    manager.update();
-    scene.traverse(node => {
+function update(time: number, dt: number) {
+    manager.update(dt);
+    scene.traverse((node: Node) => {
         for (const component of node.components) {
             component.update?.(time, dt);
         }
@@ -72,7 +75,7 @@ function render() {
     shadowRenderer.renderSceneLights(scene);
 }
 
-function resize({ displaySize: { width, height }}) {
+function resize({ displaySize: { width, height }}: { displaySize: { width: number; height: number } }) {
     camera.getComponentOfType(Camera).aspect = width / height;
 }
 

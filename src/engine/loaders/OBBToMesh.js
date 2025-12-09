@@ -1,5 +1,5 @@
 import { Mesh, Vertex } from '../core.js';
-import { Vector3 } from '../../math/Vector.js';
+import { Vector3 } from '../../../dist/math/Vector.js';
 
 export class OBBToMesh {
     /**
