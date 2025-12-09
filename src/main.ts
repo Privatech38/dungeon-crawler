@@ -21,6 +21,7 @@ import { PlayerController } from "./game/PlayerController";
 import { GameManager } from "./game/GameManager";
 import { player } from "./game/enteties";
 import { ShadowMapRenderer } from "engine/renderers/ShadowMapRenderer";
+import {KHRLightExtension} from "./gpu/object/KhronosLight";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
@@ -67,6 +68,11 @@ function update(time: number, dt: number) {
         }
     });
 }
+
+// Set cached light nodes
+const lights = scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension));
+// TODO Add method that creates empty lights if not enough lights are present (4)
+renderer.allLights = lights;
 
 function render() {
     renderer.render(scene, camera);

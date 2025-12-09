@@ -10,6 +10,8 @@ import {
     getLocalModelMatrix,
     getGlobalViewMatrix,
     getProjectionMatrix,
+    getGlobalModelMatrix,
+    getTranslation
     // @ts-ignore
 } from './engine/core/SceneUtils.js';
 
@@ -113,9 +115,13 @@ export class Renderer extends BaseRenderer {
     // @ts-ignore
     private depthTexture: GPUTexture;
 
+    allLights;
+    lightNeighbours;
+
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.perFragment = true;
+        this.lightNeighbours = new WeakMap();
     }
 
     async initialize() {
@@ -348,6 +354,15 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(modelUniformBuffer, 0, modelMatrix);
         this.device.queue.writeBuffer(modelUniformBuffer, 64, normalMatrix);
         this.renderPass.setBindGroup(2, modelBindGroup);
+
+        // Use the closes 4 lights and cache them if not already
+        const nodeTranslation = getTranslation(getGlobalModelMatrix(node));
+
+        const lights = this.allLights.sort((a, b) => vec3.distanceSquared(getTranslation(getGlobalModelMatrix(a)), nodeTranslation)
+            - vec3.distanceSquared(getTranslation(getGlobalModelMatrix(b)), nodeTranslation)
+        ).slice(0, 4);
+
+
 
         for (const model of node.getComponentsOfType(Model)) {
             this.renderModel(model);
