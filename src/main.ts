@@ -16,13 +16,11 @@ import {
 import { Renderer } from './Renderer';
 // @ts-ignore
 import { Light } from './Light.js';
-import {initalize} from "./game/init/WorldBuilder.js";
-import { PlayerController } from "./game/PlayerController.js";
-import {GameManager} from "./game/GameManager.js";
-import { player } from "./game/enteties.js";
-import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
-// @ts-ignore
-import {LightManager} from "./LightManager.js";
+import { initalize } from "./game/init/WorldBuilder";
+import { PlayerController } from "./game/PlayerController";
+import { GameManager } from "./game/GameManager";
+import { player } from "./game/enteties";
+import { ShadowMapRenderer } from "engine/renderers/ShadowMapRenderer";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
