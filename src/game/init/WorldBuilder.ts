@@ -11,6 +11,8 @@ import {World} from "../map/World.js";
 // @ts-ignore
 import { vec3 } from 'glm';
 
+const cache = new Map<string, any>();
+
 
 export async function initalize(scene: Node, playerNode: Node, world: World): Promise<void> {
     // Create the world
@@ -80,9 +82,16 @@ export function createCamera(): Node {
  * @param scene the scene to which the wall will be added
  */
 export async function createWall(location: Transform, scene: Node): Promise<void> {
-    const wallLoader = new GLTFLoader();
-    await wallLoader.load('assets/models/rooms/walls/Wall/Wall.gltf');
-    const wall: Node = wallLoader.loadNode('Wall');
+    const path: string = 'assets/models/rooms/walls/Wall/Wall.gltf'; 
+    let wall: Node;
+    if (!cache.has(path)) {
+        const wallLoader = new GLTFLoader();
+        await wallLoader.load(path);
+        wall = wallLoader.loadNode('Wall');
+    }
+    else {
+        wall = cache.get(path).clone();
+    }
     wall.isStatic = true;
     wall.addComponent(location);
     scene.addChild(wall);
