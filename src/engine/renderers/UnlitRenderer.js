@@ -11,7 +11,7 @@ import {
     getModels,
 } from '../core/SceneUtils.js';
 
-import { BaseRenderer } from './BaseRenderer.js';
+import { BaseRenderer } from './BaseRenderer.ts';
 
 const vertexBufferLayout = {
     arrayStride: 20,

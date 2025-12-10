@@ -1,23 +1,31 @@
+// @ts-ignore
 import { vec3, mat4 } from 'glm';
 
-import { Camera, Model } from './engine/core.js';
-import { BaseRenderer } from './engine/renderers/BaseRenderer.js';
+// @ts-ignore
+import {Camera, Model, Texture, Material, Primitive} from './engine/core.js';
+import { Node } from "engine/core/Node";
+import { BaseRenderer } from './engine/renderers/BaseRenderer';
 
 import {
     getLocalModelMatrix,
     getGlobalViewMatrix,
     getProjectionMatrix,
+    // @ts-ignore
 } from './engine/core/SceneUtils.js';
 
+// @ts-ignore
 import { Light } from './Light.js';
 
+// @ts-ignore
 import lamberPerFragment from './lambertPerFragment.wgsl';
+// @ts-ignore
 import lamberPerVertex from './lambertPerVertex.wgsl';
 
-const vertexBufferLayout = {
+const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
     attributes: [
         {
+            // @ts-ignore
             name: 'position',
             shaderLocation: 0,
             offset: 0,
@@ -38,7 +46,7 @@ const vertexBufferLayout = {
     ],
 };
 
-const cameraBindGroupLayout = {
+const cameraBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     entries: [
         {
             binding: 0,
@@ -48,7 +56,7 @@ const cameraBindGroupLayout = {
     ],
 };
 
-const lightBindGroupLayout = {
+const lightBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     entries: [
         {
             binding: 0,
@@ -58,7 +66,7 @@ const lightBindGroupLayout = {
     ],
 };
 
-const modelBindGroupLayout = {
+const modelBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     entries: [
         {
             binding: 0,
@@ -68,7 +76,7 @@ const modelBindGroupLayout = {
     ],
 };
 
-const materialBindGroupLayout = {
+const materialBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     entries: [
         {
             binding: 0,
@@ -89,8 +97,23 @@ const materialBindGroupLayout = {
 };
 
 export class Renderer extends BaseRenderer {
+    private perFragment: boolean;
+    // @ts-ignore
+    private cameraBindGroupLayout: GPUBindGroupLayout;
+    // @ts-ignore
+    private lightBindGroupLayout: GPUBindGroupLayout;
+    // @ts-ignore
+    private modelBindGroupLayout: GPUBindGroupLayout;
+    // @ts-ignore
+    private materialBindGroupLayout: GPUBindGroupLayout;
+    // @ts-ignore
+    private pipelinePerFragment: GPURenderPipeline;
+    // @ts-ignore
+    private pipelinePerVertex: GPURenderPipeline;
+    // @ts-ignore
+    private depthTexture: GPUTexture;
 
-    constructor(canvas) {
+    constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.perFragment = true;
     }
@@ -164,7 +187,7 @@ export class Renderer extends BaseRenderer {
         });
     }
 
-    prepareNode(node) {
+    prepareNode(node: Node) {
         if (this.gpuObjects.has(node)) {
             return this.gpuObjects.get(node);
         }
@@ -186,7 +209,7 @@ export class Renderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    prepareCamera(camera) {
+    prepareCamera(camera: Camera) {
         if (this.gpuObjects.has(camera)) {
             return this.gpuObjects.get(camera);
         }
@@ -208,7 +231,7 @@ export class Renderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    prepareLight(light) {
+    prepareLight(light: Light) {
         if (this.gpuObjects.has(light)) {
             return this.gpuObjects.get(light);
         }
@@ -230,7 +253,7 @@ export class Renderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    prepareTexture(texture) {
+    prepareTexture(texture: Texture) {
         if (this.gpuObjects.has(texture)) {
             return this.gpuObjects.get(texture);
         }
@@ -243,7 +266,7 @@ export class Renderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    prepareMaterial(material) {
+    prepareMaterial(material: Material) {
         if (this.gpuObjects.has(material)) {
             return this.gpuObjects.get(material);
         }
@@ -269,7 +292,7 @@ export class Renderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    render(scene, camera) {
+    render(scene: Node, camera: Node) {
         if (this.depthTexture.width !== this.canvas.width || this.depthTexture.height !== this.canvas.height) {
             this.recreateDepthTexture();
         }
@@ -301,8 +324,8 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
-        const light = scene.find(node => node.getComponentOfType(Light));
-        const lightComponent = light.getComponentOfType(Light);
+        const light = scene.find((node: Node) => node.getComponentOfType(Light));
+        const lightComponent = light?.getComponentOfType(Light);
         const lightColor = vec3.scale(vec3.create(), lightComponent.color, 1 / 255);
         const lightDirection = vec3.normalize(vec3.create(), lightComponent.direction);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
@@ -316,7 +339,7 @@ export class Renderer extends BaseRenderer {
         this.device.queue.submit([encoder.finish()]);
     }
 
-    renderNode(node, modelMatrix = mat4.create()) {
+    renderNode(node: Node, modelMatrix = mat4.create()) {
         const localMatrix = getLocalModelMatrix(node);
         modelMatrix = mat4.multiply(mat4.create(), modelMatrix, localMatrix);
         const normalMatrix = mat4.normalFromMat4(mat4.create(), modelMatrix);
@@ -335,13 +358,13 @@ export class Renderer extends BaseRenderer {
         }
     }
 
-    renderModel(model) {
+    renderModel(model: Model) {
         for (const primitive of model.primitives) {
             this.renderPrimitive(primitive);
         }
     }
 
-    renderPrimitive(primitive) {
+    renderPrimitive(primitive: Primitive) {
         const { materialUniformBuffer, materialBindGroup } = this.prepareMaterial(primitive.material);
         const ambientLightColor = vec3.scale(vec3.create(), primitive.material.ambientColor, 1 / 255);
 
