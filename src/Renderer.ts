@@ -2,7 +2,8 @@
 import { vec3, mat4 } from 'glm';
 
 // @ts-ignore
-import {Camera, Model, Node, Texture, Material} from './engine/core.js';
+import {Camera, Model, Texture, Material, Primitive} from './engine/core.js';
+import {Node} from "engine/core/Node";
 import { BaseRenderer } from 'engine/renderers/BaseRenderer';
 
 import {
@@ -291,7 +292,7 @@ export class Renderer extends BaseRenderer {
         return gpuObjects;
     }
 
-    render(scene, camera) {
+    render(scene: Node, camera: Node) {
         if (this.depthTexture.width !== this.canvas.width || this.depthTexture.height !== this.canvas.height) {
             this.recreateDepthTexture();
         }
@@ -323,8 +324,8 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
-        const light = scene.find(node => node.getComponentOfType(Light));
-        const lightComponent = light.getComponentOfType(Light);
+        const light = scene.find((node: Node) => node.getComponentOfType(Light));
+        const lightComponent = light?.getComponentOfType(Light);
         const lightColor = vec3.scale(vec3.create(), lightComponent.color, 1 / 255);
         const lightDirection = vec3.normalize(vec3.create(), lightComponent.direction);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
@@ -338,7 +339,7 @@ export class Renderer extends BaseRenderer {
         this.device.queue.submit([encoder.finish()]);
     }
 
-    renderNode(node, modelMatrix = mat4.create()) {
+    renderNode(node: Node, modelMatrix = mat4.create()) {
         const localMatrix = getLocalModelMatrix(node);
         modelMatrix = mat4.multiply(mat4.create(), modelMatrix, localMatrix);
         const normalMatrix = mat4.normalFromMat4(mat4.create(), modelMatrix);
@@ -357,13 +358,13 @@ export class Renderer extends BaseRenderer {
         }
     }
 
-    renderModel(model) {
+    renderModel(model: Model) {
         for (const primitive of model.primitives) {
             this.renderPrimitive(primitive);
         }
     }
 
-    renderPrimitive(primitive) {
+    renderPrimitive(primitive: Primitive) {
         const { materialUniformBuffer, materialBindGroup } = this.prepareMaterial(primitive.material);
         const ambientLightColor = vec3.scale(vec3.create(), primitive.material.ambientColor, 1 / 255);
 

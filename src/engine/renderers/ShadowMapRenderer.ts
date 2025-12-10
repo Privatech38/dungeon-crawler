@@ -14,7 +14,7 @@ import {Model} from "../core/Model.js";
 // @ts-ignore
 import shadowShader from './ShadowMap.wgsl';
 // @ts-ignore
-import {Node} from "engine/core/Node.js";
+import {Node} from "engine/core/Node";
 // @ts-ignore
 import {Primitive} from "engine/core/Primitive.js";
 

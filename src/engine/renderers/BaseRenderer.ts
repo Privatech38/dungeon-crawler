@@ -15,7 +15,8 @@ export class BaseRenderer {
     format!: GPUTextureFormat;
     // @ts-ignore
     renderPass: GPURenderPassEncoder;
-    private context: GPUCanvasContext | null | undefined;
+    // @ts-ignore
+    protected context: GPUCanvasContext;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -30,9 +31,12 @@ export class BaseRenderer {
             return;
         }
         const context = this.canvas.getContext('webgpu');
+        if (!context) {
+            console.error('GPU context not found');
+            return;
+        }
         const format = navigator.gpu.getPreferredCanvasFormat();
         context?.configure({ device, format });
-
         this.device = device;
         this.context = context;
         this.format = format;

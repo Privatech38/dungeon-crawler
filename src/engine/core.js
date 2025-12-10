@@ -3,7 +3,7 @@ export * from './core/Camera.js';
 export * from './core/Material.js';
 export * from './core/Mesh.js';
 export * from './core/Model.js';
-export * from './core/Node.js';
+export * from './core/Node.ts';
 export * from './core/Primitive.js';
 export * from './core/Sampler.js';
 export * from './core/Texture.js';

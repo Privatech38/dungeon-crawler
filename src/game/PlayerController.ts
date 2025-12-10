@@ -4,7 +4,7 @@ import {mat4, quat, vec3} from 'glm';
 // @ts-ignore
 import {Transform} from '../engine/core/Transform.js';
 // @ts-ignore
-import {Node} from "../engine/core/Node.js";
+import {Node} from "engine/core/Node";
 import {Player} from "./entities/Player.js";
 import {Vector3} from "../math/Vector.js";
 import {World} from "./map/World.js";
