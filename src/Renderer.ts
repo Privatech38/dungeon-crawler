@@ -117,7 +117,9 @@ export class Renderer extends BaseRenderer {
     private depthTexture: GPUTexture;
 
     allLights: Node[] = [];
-    lightNeighbours;
+    lightNeighbours: WeakMap<Node, Node>;
+    // @ts-ignore
+    lightsBuffer: { lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup };
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -221,9 +223,9 @@ export class Renderer extends BaseRenderer {
      * @param node The node
      * @returns {{lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup}}
      */
-    prepareLights(node: Node) {
-        if (this.gpuObjects.has(node)) {
-            return this.gpuObjects.get(node);
+    prepareLights() {
+        if (this.lightsBuffer) {
+            return this.lightsBuffer;
         }
 
         const lightsUniformBuffer = this.device.createBuffer({
@@ -238,9 +240,9 @@ export class Renderer extends BaseRenderer {
             ],
         });
 
-        const gpuObjects = { lightsUniformBuffer, lightBindGroup };
-        this.gpuObjects.set(node, gpuObjects);
-        return gpuObjects;
+        const gpuObject = { lightsUniformBuffer, lightBindGroup };
+        this.lightsBuffer = gpuObject;
+        return gpuObject;
     }
 
 
@@ -384,6 +386,10 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(modelUniformBuffer, 64, normalMatrix);
         this.renderPass.setBindGroup(2, modelBindGroup);
 
+        // if (node.getComponentOfType(Model)) {
+        //     this.calculateLighting(node);
+        // }
+
         for (const model of node.getComponentsOfType(Model)) {
             this.renderModel(model);
         }
@@ -393,9 +399,14 @@ export class Renderer extends BaseRenderer {
         }
     }
 
-    writeLights(node: Node) {
+    /**
+     * Finds the closest 4 lights and writes their values to a buffer
+     * @param node The node whose's
+     */
+    calculateLighting(node: Node) {
+        const { lightsUniformBuffer, lightBindGroup } = this.prepareLights();
         // Use the closes 4 lights and cache them if not already
-        const nodeTranslation = getTranslation(getGlobalModelMatrix(node));
+        const nodeTranslation: number[] = getTranslation(getGlobalModelMatrix(node));
 
         const lights = this.allLights.sort((a, b) => vec3.distanceSquared(getTranslation(getGlobalModelMatrix(a)), nodeTranslation)
             - vec3.distanceSquared(getTranslation(getGlobalModelMatrix(b)), nodeTranslation)
@@ -415,12 +426,22 @@ export class Renderer extends BaseRenderer {
             viewProjectionMatrix: new Float32Array(LightUniformValues, 96, 16),
         };
         for (let i = 0; i < lights.length; i++) {
-            const extension = lights[i].getComponentOfType(KHRLightExtension);
-            LightUniformViews.extension.color.set(extension.color);
-            LightUniformViews.extension.light_type[0] = extension;
-            LightUniformViews.extension.color.set(extension.color);
-            LightUniformViews.extension.color.set(extension.color);
+            const lightNode = lights[i];
+            const khrExtension: KHRLightExtension = lightNode.getComponentOfType(KHRLightExtension);
+
+            LightUniformViews.extension.color.set(khrExtension.color);
+            LightUniformViews.extension.light_type[0] = khrExtension.type;
+            LightUniformViews.extension.intensity[0] = khrExtension.intensity;
+            LightUniformViews.extension.range[0] = khrExtension.type;
+            LightUniformViews.extension.innerConeAngle[0] = khrExtension.spot.innerConeAngle;
+            LightUniformViews.extension.outerConeAngle[0] = khrExtension.spot.outerConeAngle;
+
+            LightUniformViews.globalModelMatrix.set(getGlobalModelMatrix(lightNode));
+            LightUniformViews.viewProjectionMatrix.set(getGlobalViewMatrix(lightNode));
+
+            this.device.queue.writeBuffer(lightsUniformBuffer, i * 160, LightUniformValues);
         }
+        this.renderPass.setBindGroup(1, lightBindGroup);
     }
 
     renderModel(model: Model) {

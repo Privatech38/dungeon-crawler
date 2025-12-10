@@ -1,7 +1,7 @@
 // @ts-ignore
 import { vec3, mat4 } from 'glm';
 import { BaseRenderer } from "./BaseRenderer";
-import { KHRLightExtension } from "../../gpu/object/KhronosLight";
+import {KHRLightExtension, LightType} from "../../gpu/object/KhronosLight";
 import {
     getGlobalModelMatrix,
     getGlobalViewMatrix,
@@ -172,17 +172,17 @@ export class ShadowMapRenderer extends BaseRenderer {
             return this.shadowMaps.get(light);
         }
 
-        const khrLightExtension = light.getComponentOfType(KHRLightExtension);
+        const khrLightExtension: KHRLightExtension = light.getComponentOfType(KHRLightExtension);
 
         const texture = this.device.createTexture({
             label: "ShadowMap",
-            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, khrLightExtension.type === 'point' ? 6 : 1],
+            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, khrLightExtension.type === LightType.point ? 6 : 1],
             format: 'depth24plus',
             usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
 
         let textureViews;
-        if (khrLightExtension.type === 'point') {
+        if (khrLightExtension.type === LightType.point) {
             textureViews = [0,1,2,3,4,5].map(index => texture.createView({
                 label: "Shadow map (cube) view",
                 dimension: "2d",
