@@ -22,6 +22,7 @@ import { Light } from './Light.js';
 import lamberPerFragment from './lambertPerFragment.wgsl';
 // @ts-ignore
 import lamberPerVertex from './lambertPerVertex.wgsl';
+import {KHRLightExtension} from "./gpu/object/KhronosLight";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -115,7 +116,7 @@ export class Renderer extends BaseRenderer {
     // @ts-ignore
     private depthTexture: GPUTexture;
 
-    allLights;
+    allLights: Node[] = [];
     lightNeighbours;
 
     constructor(canvas: HTMLCanvasElement) {
@@ -214,6 +215,34 @@ export class Renderer extends BaseRenderer {
         this.gpuObjects.set(node, gpuObjects);
         return gpuObjects;
     }
+
+    /**
+     * Returns a buffer and it's bind group for 4 closest lights
+     * @param node The node
+     * @returns {{lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup}}
+     */
+    prepareLights(node: Node) {
+        if (this.gpuObjects.has(node)) {
+            return this.gpuObjects.get(node);
+        }
+
+        const lightsUniformBuffer = this.device.createBuffer({
+            size: 4*160,
+            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+        });
+
+        const lightBindGroup = this.device.createBindGroup({
+            layout: this.lightBindGroupLayout,
+            entries: [
+                { binding: 0, resource: { buffer: lightsUniformBuffer } },
+            ],
+        });
+
+        const gpuObjects = { lightsUniformBuffer, lightBindGroup };
+        this.gpuObjects.set(node, gpuObjects);
+        return gpuObjects;
+    }
+
 
     prepareCamera(camera: Camera) {
         if (this.gpuObjects.has(camera)) {
@@ -355,6 +384,16 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(modelUniformBuffer, 64, normalMatrix);
         this.renderPass.setBindGroup(2, modelBindGroup);
 
+        for (const model of node.getComponentsOfType(Model)) {
+            this.renderModel(model);
+        }
+
+        for (const child of node.children) {
+            this.renderNode(child, modelMatrix);
+        }
+    }
+
+    writeLights(node: Node) {
         // Use the closes 4 lights and cache them if not already
         const nodeTranslation = getTranslation(getGlobalModelMatrix(node));
 
@@ -362,14 +401,25 @@ export class Renderer extends BaseRenderer {
             - vec3.distanceSquared(getTranslation(getGlobalModelMatrix(b)), nodeTranslation)
         ).slice(0, 4);
 
-
-
-        for (const model of node.getComponentsOfType(Model)) {
-            this.renderModel(model);
-        }
-
-        for (const child of node.children) {
-            this.renderNode(child, modelMatrix);
+        const LightUniformValues = new ArrayBuffer(160);
+        const LightUniformViews = {
+            extension: {
+                color: new Float32Array(LightUniformValues, 0, 3),
+                light_type: new Uint32Array(LightUniformValues, 12, 1),
+                intensity: new Float32Array(LightUniformValues, 16, 1),
+                range: new Float32Array(LightUniformValues, 20, 1),
+                innerConeAngle: new Float32Array(LightUniformValues, 24, 1),
+                outerConeAngle: new Float32Array(LightUniformValues, 28, 1),
+            },
+            globalModelMatrix: new Float32Array(LightUniformValues, 32, 16),
+            viewProjectionMatrix: new Float32Array(LightUniformValues, 96, 16),
+        };
+        for (let i = 0; i < lights.length; i++) {
+            const extension = lights[i].getComponentOfType(KHRLightExtension);
+            LightUniformViews.extension.color.set(extension.color);
+            LightUniformViews.extension.light_type[0] = extension;
+            LightUniformViews.extension.color.set(extension.color);
+            LightUniformViews.extension.color.set(extension.color);
         }
     }
 

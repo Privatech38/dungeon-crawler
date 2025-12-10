@@ -50,14 +50,21 @@ struct Light {
     outerConeAngle : f32
 }
 
+struct LightUniform {
+    extension : Light,
+    globalModelMatrix : mat4x4<f32>,
+    viewProjectionMatrix : mat4x4<f32>
+}
+
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
 @group(1) @binding(0) var<uniform> light: LightUniforms;
+
+@group(1) @binding(1) var<uniform> lights: array<LightUniform, 4>;
+
 @group(2) @binding(0) var<uniform> model: ModelUniforms;
 @group(3) @binding(0) var<uniform> material: MaterialUniforms;
 @group(3) @binding(1) var baseTexture: texture_2d<f32>;
 @group(3) @binding(2) var baseSampler: sampler;
-
-@group(4) @binding(0) var<uniform> lights: array<Light, 4>;
 
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {

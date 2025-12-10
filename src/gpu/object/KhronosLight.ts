@@ -1,10 +1,16 @@
+export enum LightType {
+    point,
+    directional,
+    spot
+}
+
 /**
  * Interface representing JSON structure for a Light as specified by Khronos Group in glTF 2.0.<br>
  * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
  */
 export interface IKHRLightExtension {
     name?: string;
-    readonly type: 'point' | 'directional' | 'spot';
+    readonly type: LightType;
     color?: [number, number, number];
     intensity?: number;
     range?: number;
@@ -17,7 +23,7 @@ export interface IKHRLightExtension {
  */
 export class KHRLightExtension {
     name?: string;
-    readonly type: 'point' | 'directional' | 'spot';
+    readonly type: LightType;
     color?: [number, number, number];
     intensity?: number;
     range?: number;
