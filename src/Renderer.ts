@@ -3,8 +3,8 @@ import { vec3, mat4 } from 'glm';
 
 // @ts-ignore
 import {Camera, Model, Texture, Material, Primitive} from './engine/core.js';
-import {Node} from "engine/core/Node";
-import { BaseRenderer } from 'engine/renderers/BaseRenderer';
+import { Node } from "engine/core/Node";
+import { BaseRenderer } from './engine/renderers/BaseRenderer';
 
 import {
     getLocalModelMatrix,
