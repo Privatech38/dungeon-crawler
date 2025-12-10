@@ -1,29 +1,44 @@
-import { mat4 } from 'glm';
-
+// @ts-ignore
 import * as WebGPU from '../WebGPU.js';
 
+// @ts-ignore
 import { createVertexBuffer } from '../core/VertexUtils.js';
+// @ts-ignore
+import { Mesh } from '../core/Mesh.js';
 
 export class BaseRenderer {
+    protected canvas: HTMLCanvasElement;
+    protected gpuObjects: WeakMap<WeakKey, any>;
 
-    constructor(canvas) {
+    // @ts-ignore
+    device: GPUDevice;
+    format!: GPUTextureFormat;
+    // @ts-ignore
+    renderPass: GPURenderPassEncoder;
+    private context: GPUCanvasContext | null | undefined;
+
+    constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.gpuObjects = new WeakMap();
     }
 
-    async initialize() {
-        const adapter = await navigator.gpu.requestAdapter();
-        const device = await adapter.requestDevice();
+    async initialize(): Promise<void> {
+        const adapter: GPUAdapter | null = await navigator.gpu.requestAdapter();
+        const device: GPUDevice | undefined = await adapter?.requestDevice();
+        if (!device) {
+            console.error('GPU device not found');
+            return;
+        }
         const context = this.canvas.getContext('webgpu');
         const format = navigator.gpu.getPreferredCanvasFormat();
-        context.configure({ device, format });
+        context?.configure({ device, format });
 
         this.device = device;
         this.context = context;
         this.format = format;
     }
 
-    prepareImage(image, isSRGB = false) {
+    prepareImage(image: any, isSRGB = false) {
         if (this.gpuObjects.has(image)) {
             return this.gpuObjects.get(image);
         }
@@ -38,7 +53,7 @@ export class BaseRenderer {
         return gpuObjects;
     }
 
-    prepareSampler(sampler) {
+    prepareSampler(sampler: GPUSampler) {
         if (this.gpuObjects.has(sampler)) {
             return this.gpuObjects.get(sampler);
         }
@@ -50,7 +65,7 @@ export class BaseRenderer {
         return gpuObjects;
     }
 
-    prepareMesh(mesh, layout) {
+    prepareMesh(mesh: Mesh, layout: GPUVertexBufferLayout) {
         if (this.gpuObjects.has(mesh)) {
             return this.gpuObjects.get(mesh);
         }
