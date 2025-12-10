@@ -71,7 +71,11 @@ function update(time: number, dt: number) {
 
 // Set cached light nodes
 const lights = scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension));
-// TODO Add method that creates empty lights if not enough lights are present (4)
+if (lights.length < 4) {
+    let emptyLightNode: Node = new Node();
+    emptyLightNode.addComponent(new KHRLightExtension({type: "directional"}));
+    lights.fill(emptyLightNode, lights.length, 5);
+}
 renderer.allLights = lights;
 
 function render() {
