@@ -22,21 +22,23 @@ export interface IKHRLightExtension {
  * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
  */
 export class KHRLightExtension {
-    name?: string;
+    name: string;
     readonly type: LightType;
-    color?: [number, number, number];
-    intensity?: number;
-    range?: number;
-    spot?: IKHRSpot;
+    color: [number, number, number];
+    intensity: number;
+    range: number;
+    spot: KHRSpot;
 
     constructor(json: IKHRLightExtension) {
         this.name = json.name ?? '';
         this.type = json.type;
         this.color = json.color ?? [1.0, 1.0, 1.0];
         this.intensity = json.intensity ?? 1.0;
-        this.range = json.range; // Has no default
+        this.range = json.range ?? 10000; // Has no default, but we set it to 10000 in our impl
         if (json.spot) {
             this.spot = new KHRSpot(json.spot);
+        } else {
+            this.spot = new KHRSpot();
         }
     }
 }
@@ -53,8 +55,8 @@ interface IKHRSpot {
  * Class representing the spotlight properties.
  */
 export class KHRSpot {
-    innerConeAngle?: number;
-    outerConeAngle?: number;
+    innerConeAngle: number;
+    outerConeAngle: number;
 
     constructor(json?: IKHRSpot) {
         this.innerConeAngle = json?.innerConeAngle ?? 0.0;
