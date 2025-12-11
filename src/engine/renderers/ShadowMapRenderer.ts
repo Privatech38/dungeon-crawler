@@ -72,7 +72,7 @@ const modelBindGroupLayout: GPUBindGroupLayoutDescriptor = {
  * resolution of shadows
  * @type {number}
  */
-const SHADOW_MAP_SIZE: number = 512
+export const SHADOW_MAP_SIZE: number = 512
 
 class CubeFace {
     targetDirection;
@@ -106,7 +106,7 @@ const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.0
 const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
 
 export class ShadowMapRenderer extends BaseRenderer {
-    shadowMaps: Map<Node, any>;
+    shadowMaps: Map<Node, { texture: GPUTexture; textureViews: Array<GPUTextureView>; }>;
     // @ts-ignore
     lightViewProjectionBindGroupLayout: GPUBindGroupLayout;
     // @ts-ignore
@@ -165,10 +165,11 @@ export class ShadowMapRenderer extends BaseRenderer {
      * Create a new shadow map with size of {@linkcode SHADOW_MAP_SIZE} or return an existing shadow map associated with
      * this light node
      * @param light A node with {@linkcode KHRLightExtension} component
-     * @returns {{ texture: WebGLTexture, textureViews: Array<GPUTextureView> }} An object representing the textures and their views
+     * @returns {{ texture: GPUTexture, textureViews: Array<GPUTextureView> }} An object representing the textures and their views
      */
-    prepareShadowMap(light: Node): { texture: WebGLTexture; textureViews: Array<GPUTextureView>; } {
+    prepareShadowMap(light: Node): { texture: GPUTexture; textureViews: Array<GPUTextureView>; } {
         if (this.shadowMaps.has(light)) {
+            // @ts-ignore
             return this.shadowMaps.get(light);
         }
 
@@ -178,7 +179,7 @@ export class ShadowMapRenderer extends BaseRenderer {
             label: "ShadowMap",
             size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, khrLightExtension.type === LightType.point ? 6 : 1],
             format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC
         });
 
         let textureViews;

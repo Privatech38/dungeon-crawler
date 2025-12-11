@@ -23,6 +23,7 @@ import lamberPerFragment from './lambertPerFragment.wgsl';
 // @ts-ignore
 import lamberPerVertex from './lambertPerVertex.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
+import {SHADOW_MAP_SIZE, ShadowMapRenderer} from "engine/renderers/ShadowMapRenderer";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -120,6 +121,8 @@ export class Renderer extends BaseRenderer {
     lightNeighbours: WeakMap<Node, Node>;
     // @ts-ignore
     lightsBuffer: { lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup };
+    // @ts-ignore
+    shadowCubeArray: { texture: GPUTexture, textureView: GPUTextureView };
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -245,6 +248,29 @@ export class Renderer extends BaseRenderer {
         return gpuObject;
     }
 
+    /**
+     * Prepares the cube array texture and view
+     */
+    prepareShadowCubeArray() {
+        if (this.shadowCubeArray) {
+            return this.shadowCubeArray;
+        }
+
+        const texture = this.device.createTexture({
+            label: 'Shadow cube array texture',
+            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 4 * 6],
+            format: "depth24plus",
+            usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING
+        });
+
+        const textureView = texture.createView({
+            label: 'Shadow cube array texture view',
+            dimension: "cube-array"
+        });
+
+        this.shadowCubeArray = { texture, textureView };
+        return this.shadowCubeArray;
+    }
 
     prepareCamera(camera: Camera) {
         if (this.gpuObjects.has(camera)) {
@@ -442,6 +468,9 @@ export class Renderer extends BaseRenderer {
             this.device.queue.writeBuffer(lightsUniformBuffer, i * 160, LightUniformValues);
         }
         this.renderPass.setBindGroup(1, lightBindGroup);
+
+        // Copy shadow maps
+
     }
 
     renderModel(model: Model) {
