@@ -24,6 +24,7 @@ import lamberPerFragment from './lambertPerFragment.wgsl';
 import lamberPerVertex from './lambertPerVertex.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
 import {SHADOW_MAP_SIZE, ShadowMapRenderer} from "engine/renderers/ShadowMapRenderer";
+import {shadowRenderer} from "./main";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -64,7 +65,17 @@ const lightBindGroupLayout: GPUBindGroupLayoutDescriptor = {
     entries: [
         {
             binding: 0,
-            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            visibility: GPUShaderStage.FRAGMENT,
+            buffer: {},
+        },
+        {
+            binding: 1,
+            visibility: GPUShaderStage.FRAGMENT,
+            buffer: {},
+        },
+        {
+            binding: 2,
+            visibility: GPUShaderStage.FRAGMENT,
             buffer: {},
         },
     ],
@@ -123,6 +134,8 @@ export class Renderer extends BaseRenderer {
     lightsBuffer: { lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup };
     // @ts-ignore
     shadowCubeArray: { texture: GPUTexture, textureView: GPUTextureView };
+    // @ts-ignore
+    private encoder: GPUCommandEncoder;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -360,8 +373,8 @@ export class Renderer extends BaseRenderer {
             this.recreateDepthTexture();
         }
 
-        const encoder = this.device.createCommandEncoder();
-        this.renderPass = encoder.beginRenderPass({
+        this.encoder = this.device.createCommandEncoder();
+        this.renderPass = this.encoder.beginRenderPass({
             colorAttachments: [
                 {
                     view: this.context.getCurrentTexture().createView(),
@@ -399,7 +412,7 @@ export class Renderer extends BaseRenderer {
         this.renderNode(scene);
 
         this.renderPass.end();
-        this.device.queue.submit([encoder.finish()]);
+        this.device.queue.submit([this.encoder.finish()]);
     }
 
     renderNode(node: Node, modelMatrix = mat4.create()) {
@@ -431,6 +444,7 @@ export class Renderer extends BaseRenderer {
      */
     calculateLighting(node: Node) {
         const { lightsUniformBuffer, lightBindGroup } = this.prepareLights();
+        const { texture, textureView } = this.prepareShadowCubeArray();
         // Use the closes 4 lights and cache them if not already
         const nodeTranslation: number[] = getTranslation(getGlobalModelMatrix(node));
 
@@ -466,11 +480,18 @@ export class Renderer extends BaseRenderer {
             LightUniformViews.viewProjectionMatrix.set(getGlobalViewMatrix(lightNode));
 
             this.device.queue.writeBuffer(lightsUniformBuffer, i * 160, LightUniformValues);
+
+            const shadowTexture = <GPUTexture>shadowRenderer.shadowMaps.get(lightNode)?.texture;
+
+            this.encoder.copyTextureToTexture(
+                {texture: shadowTexture},
+                {origin: [0,0,i*6], texture: texture},
+                [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 6]
+            );
         }
+
+        // TODO create new bind group with newly created textures
         this.renderPass.setBindGroup(1, lightBindGroup);
-
-        // Copy shadow maps
-
     }
 
     renderModel(model: Model) {

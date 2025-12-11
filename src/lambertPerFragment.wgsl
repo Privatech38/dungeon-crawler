@@ -57,9 +57,11 @@ struct LightUniform {
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
-@group(1) @binding(0) var<uniform> light: LightUniforms;
+//@group(1) @binding(0) var<uniform> light: LightUniforms;
 
-//@group(1) @binding(1) var<uniform> lights: array<LightUniform, 4>;
+@group(1) @binding(0) var<uniform> lights: array<LightUniform, 4>;
+@group(1) @binding(1) var<uniform> lights: texture_depth_cube_array;
+@group(1) @binding(2) var<uniform> lights: sampler;
 
 @group(2) @binding(0) var<uniform> model: ModelUniforms;
 @group(3) @binding(0) var<uniform> material: MaterialUniforms;
