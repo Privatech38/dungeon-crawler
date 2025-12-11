@@ -1,27 +1,23 @@
 // @ts-ignore
-import { ResizeSystem } from './engine/systems/ResizeSystem.js';
+import {ResizeSystem} from './engine/systems/ResizeSystem.js';
 // @ts-ignore
-import { UpdateSystem } from './engine/systems/UpdateSystem.js';
+import {UpdateSystem} from './engine/systems/UpdateSystem.js';
 // @ts-ignore
-import { GLTFLoader } from './engine/loaders/GLTFLoader.js';
+import {GLTFLoader} from './engine/loaders/GLTFLoader.js';
 
-import {
-    Camera,
-    Model,
-    Node,
-    Transform,
-    // @ts-ignore
-} from "./engine/core.js";
 // @ts-ignore
-import { Renderer } from './Renderer';
+import {Camera, Transform,} from "./engine/core.js";
+import {Node} from "./engine/core/Node";
 // @ts-ignore
-import { Light } from './Light.js';
-import { initalize } from "./game/init/WorldBuilder";
-import { PlayerController } from "./game/PlayerController";
-import { GameManager } from "./game/GameManager";
-import { player } from "./game/enteties";
-import { ShadowMapRenderer } from "engine/renderers/ShadowMapRenderer";
-import {KHRLightExtension} from "./gpu/object/KhronosLight";
+import {Renderer} from './Renderer';
+// @ts-ignore
+import {Light} from './Light.js';
+import {initalize} from "./game/init/WorldBuilder";
+import {PlayerController} from "./game/PlayerController";
+import {GameManager} from "./game/GameManager";
+import {player} from "./game/enteties";
+import {ShadowMapRenderer} from "engine/renderers/ShadowMapRenderer";
+import {KHRLightExtension, LightType} from "./gpu/object/KhronosLight";
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
@@ -31,7 +27,7 @@ const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('can
 const renderer = new Renderer(canvas);
 await renderer.initialize();
 
-const shadowRenderer = new ShadowMapRenderer(canvas);
+export const shadowRenderer = new ShadowMapRenderer(canvas);
 await shadowRenderer.initialize();
 // const renderer = new UnlitRenderer(canvas);
 // await renderer.initialize();
@@ -73,14 +69,14 @@ function update(time: number, dt: number) {
 const lights = scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension));
 if (lights.length < 4) {
     let emptyLightNode: Node = new Node();
-    emptyLightNode.addComponent(new KHRLightExtension({type: "directional"}));
+    emptyLightNode.addComponent(new KHRLightExtension({type: LightType.directional}));
     lights.fill(emptyLightNode, lights.length, 5);
 }
 renderer.allLights = lights;
 
 function render() {
-    renderer.render(scene, camera);
     shadowRenderer.renderSceneLights(scene);
+    renderer.render(scene, camera);
 }
 
 function resize({ displaySize: { width, height }}: { displaySize: { width: number; height: number } }) {
