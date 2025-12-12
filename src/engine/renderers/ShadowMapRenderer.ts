@@ -275,7 +275,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         const viewMatrix = getGlobalViewMatrix(light);
         const globalModelMatrix = getGlobalModelMatrix(light);
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(khronosLight);
-        this.device.queue.writeBuffer(lightUniformBuffer, 64, khronosLight.type === 'directional' ? ORTHOGRAPHIC_MATRIX : PERSPECTIVE_MATRIX);
+        this.device.queue.writeBuffer(lightUniformBuffer, 64, khronosLight.type === LightType.directional ? ORTHOGRAPHIC_MATRIX : PERSPECTIVE_MATRIX);
 
 
         for (let i = 0; i < shadowMapViews.length; i++) {
