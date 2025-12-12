@@ -131,7 +131,7 @@ export class Renderer extends BaseRenderer {
     allLights: Node[] = [];
     lightNeighbours: WeakMap<Node, Node>;
     // @ts-ignore
-    lightsBuffer: { lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup };
+    lightsBuffer: { lightsUniformBuffer: GPUBuffer; texture: GPUTexture; textureView: GPUTextureView; lightBindGroup: GPUBindGroup; };
     // @ts-ignore
     shadowCubeArray: { texture: GPUTexture, textureView: GPUTextureView };
     // @ts-ignore
@@ -235,14 +235,21 @@ export class Renderer extends BaseRenderer {
     }
 
     /**
-     * Returns a buffer and it's bind group for 4 closest lights
-     * @param node The node
-     * @returns {{lightsUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup}}
+     * Returns a buffer, and it's bind group for 4 closest lights
+     * @returns {{ lightsUniformBuffer: GPUBuffer, texture: GPUTexture, textureView: GPUTextureView, lightBindGroup: GPUBindGroup }}
      */
-    prepareLights() {
+    prepareLights(): { lightsUniformBuffer: GPUBuffer; texture: GPUTexture; textureView: GPUTextureView; lightBindGroup: GPUBindGroup; } {
         if (this.lightsBuffer) {
             return this.lightsBuffer;
         }
+
+        const { texture, textureView } = this.prepareShadowCubeArray();
+
+        const cmpSampler = this.device.createSampler({
+            magFilter: "linear",
+            minFilter: "linear",
+            compare: "less",
+        });
 
         const lightsUniformBuffer = this.device.createBuffer({
             size: 4*160,
@@ -253,10 +260,14 @@ export class Renderer extends BaseRenderer {
             layout: this.lightBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: lightsUniformBuffer } },
+                { binding: 1, resource: textureView },
+                { binding: 2, resource: cmpSampler }
             ],
         });
 
-        const gpuObject = { lightsUniformBuffer, lightBindGroup };
+        this.renderPass.setBindGroup(1, lightBindGroup);
+
+        const gpuObject = { lightsUniformBuffer, texture, textureView, lightBindGroup };
         this.lightsBuffer = gpuObject;
         return gpuObject;
     }
@@ -278,7 +289,9 @@ export class Renderer extends BaseRenderer {
 
         const textureView = texture.createView({
             label: 'Shadow cube array texture view',
-            dimension: "cube-array"
+            dimension: "cube-array",
+            aspect: "depth-only",
+            arrayLayerCount: 4 * 6
         });
 
         this.shadowCubeArray = { texture, textureView };
@@ -400,14 +413,14 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
-        const light = scene.find((node: Node) => node.getComponentOfType(Light));
-        const lightComponent = light?.getComponentOfType(Light);
-        const lightColor = vec3.scale(vec3.create(), lightComponent.color, 1 / 255);
-        const lightDirection = vec3.normalize(vec3.create(), lightComponent.direction);
-        const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
-        this.device.queue.writeBuffer(lightUniformBuffer, 0, lightColor);
-        this.device.queue.writeBuffer(lightUniformBuffer, 16, lightDirection);
-        this.renderPass.setBindGroup(1, lightBindGroup);
+        // const light = scene.find((node: Node) => node.getComponentOfType(Light));
+        // const lightComponent = light?.getComponentOfType(Light);
+        // const lightColor = vec3.scale(vec3.create(), lightComponent.color, 1 / 255);
+        // const lightDirection = vec3.normalize(vec3.create(), lightComponent.direction);
+        // const { lightUniformBuffer, lightBindGroup } = this.prepareLight(lightComponent);
+        // this.device.queue.writeBuffer(lightUniformBuffer, 0, lightColor);
+        // this.device.queue.writeBuffer(lightUniformBuffer, 16, lightDirection);
+        // this.renderPass.setBindGroup(1, lightBindGroup);
 
         this.renderNode(scene);
 
@@ -425,9 +438,9 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(modelUniformBuffer, 64, normalMatrix);
         this.renderPass.setBindGroup(2, modelBindGroup);
 
-        // if (node.getComponentOfType(Model)) {
-        //     this.calculateLighting(node);
-        // }
+        if (node.getComponentOfType(Model)) {
+            this.calculateLighting(node);
+        }
 
         for (const model of node.getComponentsOfType(Model)) {
             this.renderModel(model);
@@ -443,8 +456,7 @@ export class Renderer extends BaseRenderer {
      * @param node The node whose's
      */
     calculateLighting(node: Node) {
-        const { lightsUniformBuffer, lightBindGroup } = this.prepareLights();
-        const { texture, textureView } = this.prepareShadowCubeArray();
+        const { lightsUniformBuffer, texture, textureView, lightBindGroup } = this.prepareLights();
         // Use the closes 4 lights and cache them if not already
         const nodeTranslation: number[] = getTranslation(getGlobalModelMatrix(node));
 
@@ -484,14 +496,11 @@ export class Renderer extends BaseRenderer {
             const shadowTexture = <GPUTexture>shadowRenderer.shadowMaps.get(lightNode)?.texture;
 
             this.encoder.copyTextureToTexture(
-                {texture: shadowTexture},
-                {origin: [0,0,i*6], texture: texture},
+                {texture: shadowTexture, aspect: "depth-only"},
+                {origin: [0,0,i*6], texture: texture, aspect: "depth-only"},
                 [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 6]
             );
         }
-
-        // TODO create new bind group with newly created textures
-        this.renderPass.setBindGroup(1, lightBindGroup);
     }
 
     renderModel(model: Model) {
