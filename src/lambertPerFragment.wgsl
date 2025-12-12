@@ -1,3 +1,7 @@
+override ambientRed = 0.039;
+override ambientGreen = 0.039;
+override ambientBlue = 0.039;
+
 struct VertexInput {
     @location(0) position: vec3f,
     @location(1) texcoords: vec2f,
@@ -8,11 +12,13 @@ struct VertexOutput {
     @builtin(position) position: vec4f,
     @location(1) texcoords: vec2f,
     @location(2) normal: vec3f,
+    @location(3) worldPos: vec4f
 }
 
 struct FragmentInput {
     @location(1) texcoords: vec2f,
     @location(2) normal: vec3f,
+    @location(3) worldPos: vec4f
 }
 
 struct FragmentOutput {
@@ -57,11 +63,10 @@ struct LightUniform {
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
-//@group(1) @binding(0) var<uniform> light: LightUniforms;
 
 @group(1) @binding(0) var<uniform> lights: array<LightUniform, 4>;
-@group(1) @binding(1) var<uniform> lights: texture_depth_cube_array;
-@group(1) @binding(2) var<uniform> lights: sampler;
+@group(1) @binding(1) var depth_cube_array: texture_depth_cube_array;
+@group(1) @binding(2) var depth_cube_sampler: sampler_comparison;
 
 @group(2) @binding(0) var<uniform> model: ModelUniforms;
 @group(3) @binding(0) var<uniform> material: MaterialUniforms;
@@ -82,7 +87,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
 
     let N = normalize(input.normal);
-    let L = light.direction;
+
     let lambert = max(dot(N, L), 0.0);
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
@@ -92,4 +97,8 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     output.color = pow(finalColor, vec4(1 / 2.2));
 
     return output;
+}
+
+fn calculatePointLight(light: Light) -> vec4f {
+
 }
