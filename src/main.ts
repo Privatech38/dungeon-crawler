@@ -16,7 +16,7 @@ import {initalize} from "./game/init/WorldBuilder";
 import {PlayerController} from "./game/PlayerController";
 import {GameManager} from "./game/GameManager";
 import {player} from "./game/enteties";
-import {ShadowMapRenderer} from "engine/renderers/ShadowMapRenderer";
+import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
 import {KHRLightExtension, LightType} from "./gpu/object/KhronosLight";
 
 let manager = new GameManager(player, 20);

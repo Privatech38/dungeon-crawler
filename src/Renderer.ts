@@ -23,7 +23,7 @@ import lamberPerFragment from './lambertPerFragment.wgsl';
 // @ts-ignore
 import lamberPerVertex from './lambertPerVertex.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
-import {SHADOW_MAP_SIZE, ShadowMapRenderer} from "engine/renderers/ShadowMapRenderer";
+import {SHADOW_MAP_SIZE, ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
 import {shadowRenderer} from "./main";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
@@ -62,21 +62,22 @@ const cameraBindGroupLayout: GPUBindGroupLayoutDescriptor = {
 };
 
 const lightBindGroupLayout: GPUBindGroupLayoutDescriptor = {
+    label: "Light bind group layout",
     entries: [
         {
             binding: 0,
-            visibility: GPUShaderStage.FRAGMENT,
-            buffer: {},
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            buffer: { type: "uniform" },
         },
         {
             binding: 1,
-            visibility: GPUShaderStage.FRAGMENT,
-            buffer: {},
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            texture: { sampleType: "depth", viewDimension: "cube-array" },
         },
         {
             binding: 2,
-            visibility: GPUShaderStage.FRAGMENT,
-            buffer: {},
+            visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT,
+            sampler: { type: "comparison" },
         },
     ],
 };
@@ -136,6 +137,8 @@ export class Renderer extends BaseRenderer {
     shadowCubeArray: { texture: GPUTexture, textureView: GPUTextureView };
     // @ts-ignore
     private encoder: GPUCommandEncoder;
+
+    private logged: boolean = false;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -257,6 +260,7 @@ export class Renderer extends BaseRenderer {
         });
 
         const lightBindGroup = this.device.createBindGroup({
+            label: "Light bind group",
             layout: this.lightBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: lightsUniformBuffer } },
@@ -264,8 +268,6 @@ export class Renderer extends BaseRenderer {
                 { binding: 2, resource: cmpSampler }
             ],
         });
-
-        this.renderPass.setBindGroup(1, lightBindGroup);
 
         const gpuObject = { lightsUniformBuffer, texture, textureView, lightBindGroup };
         this.lightsBuffer = gpuObject;
@@ -460,8 +462,8 @@ export class Renderer extends BaseRenderer {
         // Use the closes 4 lights and cache them if not already
         const nodeTranslation: number[] = getTranslation(getGlobalModelMatrix(node));
 
-        const lights = this.allLights.sort((a, b) => vec3.distanceSquared(getTranslation(getGlobalModelMatrix(a)), nodeTranslation)
-            - vec3.distanceSquared(getTranslation(getGlobalModelMatrix(b)), nodeTranslation)
+        const lights = this.allLights.sort((a, b) => vec3.squaredDistance(getTranslation(getGlobalModelMatrix(a)), nodeTranslation)
+            - vec3.squaredDistance(getTranslation(getGlobalModelMatrix(b)), nodeTranslation)
         ).slice(0, 4);
 
         const LightUniformValues = new ArrayBuffer(160);
@@ -484,7 +486,7 @@ export class Renderer extends BaseRenderer {
             LightUniformViews.extension.color.set(khrExtension.color);
             LightUniformViews.extension.light_type[0] = khrExtension.type;
             LightUniformViews.extension.intensity[0] = khrExtension.intensity;
-            LightUniformViews.extension.range[0] = khrExtension.type;
+            LightUniformViews.extension.range[0] = khrExtension.range;
             LightUniformViews.extension.innerConeAngle[0] = khrExtension.spot.innerConeAngle;
             LightUniformViews.extension.outerConeAngle[0] = khrExtension.spot.outerConeAngle;
 
@@ -493,14 +495,16 @@ export class Renderer extends BaseRenderer {
 
             this.device.queue.writeBuffer(lightsUniformBuffer, i * 160, LightUniformValues);
 
-            const shadowTexture = <GPUTexture>shadowRenderer.shadowMaps.get(lightNode)?.texture;
-
-            this.encoder.copyTextureToTexture(
-                {texture: shadowTexture, aspect: "depth-only"},
-                {origin: [0,0,i*6], texture: texture, aspect: "depth-only"},
-                [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 6]
-            );
+            // const shadowTexture = <GPUTexture>shadowRenderer.shadowMaps.get(lightNode)?.texture;
+            //
+            // this.encoder.copyTextureToTexture(
+            //     {texture: shadowTexture, aspect: "depth-only"},
+            //     {origin: [0,0,i*6], texture: texture, aspect: "depth-only"},
+            //     [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 6]
+            // );
         }
+
+        this.renderPass.setBindGroup(1, lightBindGroup);
     }
 
     renderModel(model: Model) {

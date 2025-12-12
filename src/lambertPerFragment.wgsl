@@ -65,8 +65,8 @@ struct LightUniform {
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
 
 @group(1) @binding(0) var<uniform> lights: array<LightUniform, 4>;
-@group(1) @binding(1) var depth_cube_array: texture_depth_cube_array;
-@group(1) @binding(2) var depth_cube_sampler: sampler_comparison;
+@group(1) @binding(1) var depthCubeArray: texture_depth_cube_array;
+@group(1) @binding(2) var depthCubeSampler: sampler_comparison;
 
 @group(2) @binding(0) var<uniform> model: ModelUniforms;
 @group(3) @binding(0) var<uniform> material: MaterialUniforms;
@@ -79,6 +79,7 @@ fn vertex(input: VertexInput) -> VertexOutput {
     output.position = camera.projectionMatrix * camera.viewMatrix * model.modelMatrix * vec4(input.position, 1);
     output.texcoords = input.texcoords;
     output.normal = model.normalMatrix * input.normal;
+    output.worldPos = model.modelMatrix * vec4(input.position, 1);
     return output;
 }
 
@@ -86,19 +87,43 @@ fn vertex(input: VertexInput) -> VertexOutput {
 fn fragment(input: FragmentInput) -> FragmentOutput {
     var output: FragmentOutput;
 
-    let N = normalize(input.normal);
-
-    let lambert = max(dot(N, L), 0.0);
+    let N = vec4f(normalize(input.normal), 0);
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
 
-    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
+    var finalColor = vec4f(0.0);
+    for (var i = 0; i < 4; i++) {
+        let light = lights[i];
+        let lightModelMatrix: mat4x4<f32> = light.globalModelMatrix;
+        let lightPosition: vec4f = vec4f(lightModelMatrix[0].z, lightModelMatrix[1].z, lightModelMatrix[2].z, 1.0);
+        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor);
+    }
+
+//    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
 
     output.color = pow(finalColor, vec4(1 / 2.2));
 
     return output;
 }
 
-fn calculatePointLight(light: Light) -> vec4f {
+fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f) -> vec4f {
+    let lightDir: vec4f = normalize(lightPosition - position);
+    let diff: f32 = max(dot(normal, lightDir), 0.0);
+    // Attenuation
+    let lightDistance: f32 = distance(lightPosition, position);
+    let coefficients: vec3f = attenuationFromRange(light.range, 0.01);
+    let attenuation: f32 = 1.0 / (coefficients.x + coefficients.y * lightDistance + coefficients.z * lightDistance * lightDistance);
+    // Combine
+    let ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
+    var diffuse = vec4f(light.color, 1.0) * diff * baseColor;
+    diffuse *= attenuation;
+    return (ambient + diffuse);
+}
 
+fn attenuationFromRange(range: f32, threshold: f32) -> vec3f {
+    let constantAttenuation: f32 = 1.0;
+    let linearAttenuation: f32 = 0.0;
+    let t = max(threshold, 1e-6);
+    let quadraticAttenuation: f32 = (1.0 / t - constantAttenuation) / (range * range);
+    return vec3f(constantAttenuation, linearAttenuation, quadraticAttenuation);
 }
