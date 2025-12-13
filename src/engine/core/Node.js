@@ -69,8 +69,11 @@ export class Node {
     clone() {
         let clone = new Node();
 
-        clone.children   = this.children;
-        clone.components = this.components;
+        const rotation = this.components.find(c => Array.isArray(c?.rotation));
+        const primitive = this.components.find(c => Array.isArray(c?.primitives));
+
+        clone.addComponent(rotation);
+        clone.addComponent(primitive);
 
         return clone;
     }
