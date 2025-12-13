@@ -95,7 +95,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     for (var i = 0; i < 4; i++) {
         let light = lights[i];
         let lightModelMatrix: mat4x4<f32> = light.globalModelMatrix;
-        let lightPosition: vec4f = vec4f(lightModelMatrix[0].z, lightModelMatrix[1].z, lightModelMatrix[2].z, 1.0);
+        let lightPosition: vec4f = lightModelMatrix[3];
         finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor);
     }
 
@@ -111,11 +111,12 @@ fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, positi
     let diff: f32 = max(dot(normal, lightDir), 0.0);
     // Attenuation
     let lightDistance: f32 = distance(lightPosition, position);
-    let coefficients: vec3f = attenuationFromRange(light.range, 0.01);
+    let coefficients: vec3f = attenuationFromRange(light.intensity, 0.01);
     let attenuation: f32 = 1.0 / (coefficients.x + coefficients.y * lightDistance + coefficients.z * lightDistance * lightDistance);
     // Combine
-    let ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
+    var ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
     var diffuse = vec4f(light.color, 1.0) * diff * baseColor;
+    ambient *= attenuation;
     diffuse *= attenuation;
     return (ambient + diffuse);
 }
