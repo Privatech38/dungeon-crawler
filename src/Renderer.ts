@@ -138,8 +138,6 @@ export class Renderer extends BaseRenderer {
     // @ts-ignore
     private encoder: GPUCommandEncoder;
 
-    private logged: boolean = false;
-
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
         this.perFragment = true;
@@ -460,10 +458,9 @@ export class Renderer extends BaseRenderer {
     calculateLighting(node: Node) {
         const { lightsUniformBuffer, texture, textureView, lightBindGroup } = this.prepareLights();
         // Use the closes 4 lights and cache them if not already
-        const nodeTranslation: number[] = getTranslation(getGlobalModelMatrix(node));
-
-        const lights = this.allLights.sort((a, b) => vec3.squaredDistance(getTranslation(getGlobalModelMatrix(a)), nodeTranslation)
-            - vec3.squaredDistance(getTranslation(getGlobalModelMatrix(b)), nodeTranslation)
+        const nodeTranslation: vec3 = mat4.getTranslation(new vec3(), getGlobalModelMatrix(node));
+        const lights = this.allLights.sort((a, b) => vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(a)), nodeTranslation)
+            - vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(b)), nodeTranslation)
         ).slice(0, 4);
 
         const LightUniformValues = new ArrayBuffer(160);
