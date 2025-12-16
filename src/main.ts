@@ -13,7 +13,7 @@ import {
     // @ts-ignore
 } from "./engine/core.js";
 // @ts-ignore
-import { Renderer } from './Renderer.js';
+import { Renderer } from './Renderer';
 // @ts-ignore
 import { Light } from './Light.js';
 import {initalize} from "./game/init/WorldBuilder.js";

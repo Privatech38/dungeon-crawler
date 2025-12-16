@@ -1,4 +1,7 @@
 export class Node {
+    children: Node[];
+    parent: Node | null;
+    components: any[];
 
     constructor() {
         this.children = [];
@@ -6,13 +9,13 @@ export class Node {
         this.components = [];
     }
 
-    addChild(node) {
+    addChild(node: Node): void {
         node.parent?.removeChild(node);
         this.children.push(node);
         node.parent = this;
     }
 
-    removeChild(node) {
+    removeChild(node: Node): void {
         const index = this.children.indexOf(node);
         if (index >= 0) {
             this.children.splice(index, 1);
@@ -20,7 +23,7 @@ export class Node {
         }
     }
 
-    traverse(before, after) {
+    traverse(before?: (node: Node) => any, after?: (node: Node) => boolean) {
         before?.(this);
         for (const child of this.children) {
             child.traverse(before, after);
@@ -29,40 +32,40 @@ export class Node {
     }
 
     linearize() {
-        const array = [];
-        this.traverse(node => array.push(node));
+        const array: Node[] = [];
+        this.traverse((node: Node) => array.push(node));
         return array;
     }
 
-    filter(predicate) {
+    filter(predicate: (node: Node) => boolean): Node[] {
         return this.linearize().filter(predicate);
     }
 
-    find(predicate) {
+    find(predicate: (node: Node) => boolean) {
         return this.linearize().find(predicate);
     }
 
-    map(transform) {
+    map(transform: (node: Node) => boolean) {
         return this.linearize().map(transform);
     }
 
-    addComponent(component) {
+    addComponent(component: any) {
         this.components.push(component);
     }
 
-    removeComponent(component) {
+    removeComponent(component: any) {
         this.components = this.components.filter(c => c !== component);
     }
 
-    removeComponentsOfType(type) {
+    removeComponentsOfType(type: any) {
         this.components = this.components.filter(component => !(component instanceof type));
     }
 
-    getComponentOfType(type) {
+    getComponentOfType(type: any) {
         return this.components.find(component => component instanceof type);
     }
 
-    getComponentsOfType(type) {
+    getComponentsOfType(type: any) {
         return this.components.filter(component => component instanceof type);
     }
 

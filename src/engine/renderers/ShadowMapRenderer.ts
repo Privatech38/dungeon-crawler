@@ -1,6 +1,5 @@
 // @ts-ignore
 import { vec3, mat4 } from 'glm';
-// @ts-ignore
 import { BaseRenderer } from "./BaseRenderer";
 import { KHRLightExtension } from "../../gpu/object/KhronosLight";
 import {
@@ -15,7 +14,7 @@ import {Model} from "../core/Model.js";
 // @ts-ignore
 import shadowShader from './ShadowMap.wgsl';
 // @ts-ignore
-import {Node} from "engine/core/Node.js";
+import {Node} from "engine/core/Node";
 // @ts-ignore
 import {Primitive} from "engine/core/Primitive.js";
 
@@ -107,14 +106,7 @@ const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.0
 const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
 
 export class ShadowMapRenderer extends BaseRenderer {
-    // @ts-ignore
-    device: GPUDevice;
-    format!: GPUTextureFormat;
-    perFragment: boolean;
-    // @ts-ignore
-    renderPass: GPURenderPassEncoder;
-    shadowMaps;
-
+    shadowMaps: Map<Node, any>;
     // @ts-ignore
     lightViewProjectionBindGroupLayout: GPUBindGroupLayout;
     // @ts-ignore
@@ -124,7 +116,6 @@ export class ShadowMapRenderer extends BaseRenderer {
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
-        this.perFragment = false;
         this.shadowMaps = new Map();
     }
 
