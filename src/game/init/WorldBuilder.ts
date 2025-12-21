@@ -11,7 +11,7 @@ import {World} from "../map/World.js";
 // @ts-ignore
 import { vec3 } from 'glm';
 
-const cache = new Map<string, any>();
+const cache = new Map<string, Node>();
 
 
 export async function initalize(scene: Node, playerNode: Node, world: World): Promise<void> {
