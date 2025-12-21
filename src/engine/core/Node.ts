@@ -69,4 +69,16 @@ export class Node {
         return this.components.filter(component => component instanceof type);
     }
 
+    clone() {
+        let clone = new Node();
+
+        const rotation = this.components.find(c => Array.isArray(c?.rotation));
+        const primitive = this.components.find(c => Array.isArray(c?.primitives));
+
+        clone.addComponent(rotation);
+        clone.addComponent(primitive);
+
+        return clone;
+    }
+
 }
