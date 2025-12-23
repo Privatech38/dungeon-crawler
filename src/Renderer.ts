@@ -25,6 +25,7 @@ import lamberPerVertex from './lambertPerVertex.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
 import {SHADOW_MAP_SIZE, ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
 import {shadowRenderer} from "./main";
+import {LightIndex} from "./gpu/object/LightIndex";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -129,14 +130,15 @@ export class Renderer extends BaseRenderer {
     // @ts-ignore
     private depthTexture: GPUTexture;
 
-    allLights: Node[] = [];
     lightNeighbours: WeakMap<Node, Node>;
     // @ts-ignore
-    lightsBuffer: { lightsUniformBuffer: GPUBuffer; texture: GPUTexture; textureView: GPUTextureView; lightBindGroup: GPUBindGroup; };
+    lightsBuffer: { lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; };
     // @ts-ignore
     shadowCubeArray: { texture: GPUTexture, textureView: GPUTextureView };
     // @ts-ignore
     private encoder: GPUCommandEncoder;
+    // @ts-ignore
+    shadowData: { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] };
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -239,12 +241,10 @@ export class Renderer extends BaseRenderer {
      * Returns a buffer, and it's bind group for 4 closest lights
      * @returns {{ lightsUniformBuffer: GPUBuffer, texture: GPUTexture, textureView: GPUTextureView, lightBindGroup: GPUBindGroup }}
      */
-    prepareLights(): { lightsUniformBuffer: GPUBuffer; texture: GPUTexture; textureView: GPUTextureView; lightBindGroup: GPUBindGroup; } {
+    prepareLights(): { lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; } {
         if (this.lightsBuffer) {
             return this.lightsBuffer;
         }
-
-        const { texture, textureView } = this.prepareShadowCubeArray();
 
         const cmpSampler = this.device.createSampler({
             magFilter: "linear",
@@ -253,7 +253,7 @@ export class Renderer extends BaseRenderer {
         });
 
         const lightsUniformBuffer = this.device.createBuffer({
-            size: 4*160,
+            size: 4*176,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -262,12 +262,12 @@ export class Renderer extends BaseRenderer {
             layout: this.lightBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: lightsUniformBuffer } },
-                { binding: 1, resource: textureView },
+                { binding: 1, resource: this.shadowData.shadowMapView },
                 { binding: 2, resource: cmpSampler }
             ],
         });
 
-        const gpuObject = { lightsUniformBuffer, texture, textureView, lightBindGroup };
+        const gpuObject = { lightsUniformBuffer, lightBindGroup };
         this.lightsBuffer = gpuObject;
         return gpuObject;
     }
@@ -456,10 +456,10 @@ export class Renderer extends BaseRenderer {
      * @param node The node whose's
      */
     calculateLighting(node: Node) {
-        const { lightsUniformBuffer, texture, textureView, lightBindGroup } = this.prepareLights();
+        const { lightsUniformBuffer, lightBindGroup } = this.prepareLights();
         // Use the closes 4 lights and cache them if not already
         const nodeTranslation: vec3 = mat4.getTranslation(new vec3(), getGlobalModelMatrix(node));
-        const lights = this.allLights.sort((a, b) => vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(a)), nodeTranslation)
+        const lights = this.shadowData.lights.sort((a, b) => vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(a)), nodeTranslation)
             - vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(b)), nodeTranslation)
         ).slice(0, 4);
 
@@ -475,6 +475,7 @@ export class Renderer extends BaseRenderer {
             },
             globalModelMatrix: new Float32Array(LightUniformValues, 32, 16),
             viewProjectionMatrix: new Float32Array(LightUniformValues, 96, 16),
+            // lightIndex: new Int32Array(LightUniformValues, 172, 1),
         };
         for (let i = 0; i < lights.length; i++) {
             const lightNode = lights[i];
@@ -489,6 +490,8 @@ export class Renderer extends BaseRenderer {
 
             LightUniformViews.globalModelMatrix.set(getGlobalModelMatrix(lightNode));
             LightUniformViews.viewProjectionMatrix.set(getGlobalViewMatrix(lightNode));
+
+            // LightUniformViews.lightIndex[0] = lightNode.getComponentOfType(LightIndex).index;
 
             this.device.queue.writeBuffer(lightsUniformBuffer, i * 160, LightUniformValues);
 

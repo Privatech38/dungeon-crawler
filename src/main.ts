@@ -18,6 +18,11 @@ import {GameManager} from "./game/GameManager";
 import {player} from "./game/enteties";
 import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
 import {KHRLightExtension, LightType} from "./gpu/object/KhronosLight";
+// @ts-ignore
+import {getGlobalModelMatrix} from "./engine/core/SceneUtils.js";
+// @ts-ignore
+import { vec3, mat4 } from 'glm';
+
 
 let manager = new GameManager(player, 20);
 manager.generateWorld();
@@ -28,6 +33,8 @@ const renderer = new Renderer(canvas);
 await renderer.initialize();
 
 export const shadowRenderer = new ShadowMapRenderer(canvas);
+shadowRenderer.adapter = renderer.adapter;
+shadowRenderer.device = renderer.device;
 await shadowRenderer.initialize();
 // const renderer = new UnlitRenderer(canvas);
 // await renderer.initialize();
@@ -35,24 +42,13 @@ await shadowRenderer.initialize();
 const gltfLoader = new GLTFLoader();
 await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
-const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
-const playerNode = gltfLoader.loadNode("Player");
-const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
+const scene: Node = gltfLoader.loadScene(gltfLoader.defaultScene);
+const playerNode: Node = gltfLoader.loadNode("Player");
+const playerArmatureNode: Node = gltfLoader.loadNode("PlayerArmature");
 playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
 
-const camera = scene.find((node: Node) => node.getComponentOfType(Camera));
-// camera.addComponent(new FirstPersonController(camera, canvas));
-
-const light = new Node();
-light.addComponent(new Light({
-    // Should be 10, 10, 10 in final version as ambient color, since main lighting should be from torches
-    color: [220, 200, 150],
-    direction: [0.2, 1, 0.2],
-}));
-light.addComponent(new Transform({
-    translation: [0, 10, 0],
-}));
-scene.addChild(light);
+// @ts-ignore
+const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera));
 
 await initalize(scene, playerNode, world);
 
@@ -72,10 +68,14 @@ if (lights.length < 4) {
     emptyLightNode.addComponent(new KHRLightExtension({type: LightType.directional}));
     lights.fill(emptyLightNode, lights.length, 5);
 }
-renderer.allLights = lights;
+
+const shadowData: { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] } = shadowRenderer.renderSceneLights(scene);
+
+shadowData.lights.forEach((light: Node) => console.log(`Light at ${mat4.getTranslation(new vec3(), getGlobalModelMatrix(light))}`));
+// Send the data to renderer
+renderer.shadowData = shadowData;
 
 function render() {
-    shadowRenderer.renderSceneLights(scene);
     renderer.render(scene, camera);
 }
 

@@ -1,13 +1,9 @@
 // @ts-ignore
-import { vec3, mat4 } from 'glm';
-import { BaseRenderer } from "./BaseRenderer";
+import {mat4, vec3} from 'glm';
+import {BaseRenderer} from "./BaseRenderer";
 import {KHRLightExtension, LightType} from "../../gpu/object/KhronosLight";
-import {
-    getGlobalModelMatrix,
-    getGlobalViewMatrix,
-    getLocalModelMatrix
-    // @ts-ignore
-} from "../core/SceneUtils.js";
+// @ts-ignore
+import {getGlobalModelMatrix, getGlobalViewMatrix, getLocalModelMatrix} from "../core/SceneUtils.js";
 // @ts-ignore
 import {Model} from "../core/Model.js";
 
@@ -17,6 +13,7 @@ import shadowShader from './ShadowMap.wgsl';
 import {Node} from "engine/core/Node";
 // @ts-ignore
 import {Primitive} from "engine/core/Primitive.js";
+import {LightIndex} from "../../gpu/object/LightIndex";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -106,30 +103,28 @@ const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.0
 const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
 
 export class ShadowMapRenderer extends BaseRenderer {
-    shadowMaps: Map<Node, { texture: GPUTexture; textureViews: Array<GPUTextureView>; }>;
+    shadowMapNodeViews: Map<Node, Array<GPUTextureView>>;
     // @ts-ignore
     lightViewProjectionBindGroupLayout: GPUBindGroupLayout;
     // @ts-ignore
     modelBindGroupLayout: GPUBindGroupLayout;
     // @ts-ignore
     pipeline: GPURenderPipeline;
+    // @ts-ignore
+    adapter: GPUAdapter;
+    // @ts-ignore
+    shadowMapArray: GPUTexture;
+    // @ts-ignore
+    shadowMapView: GPUTextureView;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
-        this.shadowMaps = new Map();
+        this.shadowMapNodeViews = new Map();
     }
 
     async initialize() {
-
-        const adapter = await navigator.gpu.requestAdapter();
-        const device = await adapter?.requestDevice();
-        if (!device) {
-            return;
-        }
-        const format = navigator.gpu.getPreferredCanvasFormat();
-
-        this.device = device;
-        this.format = format;
+        // @ts-ignore
+        this.format = navigator.gpu.getPreferredCanvasFormat();
 
         const shader = await fetch(shadowShader).then(response => response.text());
 
@@ -165,40 +160,25 @@ export class ShadowMapRenderer extends BaseRenderer {
      * Create a new shadow map with size of {@linkcode SHADOW_MAP_SIZE} or return an existing shadow map associated with
      * this light node
      * @param light A node with {@linkcode KHRLightExtension} component
-     * @returns {{ texture: GPUTexture, textureViews: Array<GPUTextureView> }} An object representing the textures and their views
+     * @returns textureViews: Array<GPUTextureView> An object representing the textures and their views
      */
-    prepareShadowMap(light: Node): { texture: GPUTexture; textureViews: Array<GPUTextureView>; } {
-        if (this.shadowMaps.has(light)) {
+    prepareShadowMapViews(light: Node): Array<GPUTextureView> {
+        if (this.shadowMapNodeViews.has(light)) {
             // @ts-ignore
-            return this.shadowMaps.get(light);
+            return this.shadowMapNodeViews.get(light);
         }
 
-        const khrLightExtension: KHRLightExtension = light.getComponentOfType(KHRLightExtension);
+        const lightIndex: LightIndex = light.getComponentOfType(LightIndex);
 
-        const texture = this.device.createTexture({
-            label: "ShadowMap",
-            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, khrLightExtension.type === LightType.point ? 6 : 1],
-            format: 'depth24plus',
-            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_SRC
-        });
+        let textureViews = [0,1,2,3,4,5].map(index => this.shadowMapArray.createView({
+            label: "Shadow map (cube) view",
+            dimension: "2d",
+            arrayLayerCount: 1,
+            baseArrayLayer: index + lightIndex.index
+        }));
 
-        let textureViews;
-        if (khrLightExtension.type === LightType.point) {
-            textureViews = [0,1,2,3,4,5].map(index => texture.createView({
-                label: "Shadow map (cube) view",
-                dimension: "2d",
-                arrayLayerCount: 1,
-                baseArrayLayer: index
-            }));
-        } else {
-            textureViews = [texture.createView({
-                label: "Shadow map view"
-            })];
-        }
-
-        const textureObject = { texture, textureViews };
-        this.shadowMaps.set(light, textureObject);
-        return textureObject;
+        this.shadowMapNodeViews.set(light, textureViews);
+        return textureViews;
     }
 
     /**
@@ -254,11 +234,31 @@ export class ShadowMapRenderer extends BaseRenderer {
      * Renders the scene (node), by creating shadow/depth maps for every node with KHRLightExtension component.
      * If a light node is already cached it will not render it's shadow/depth map(s)
      * @param scene A scene
+     * @return {{ shadowMap: GPUTextureView; shadowMapView: GPUTextureView, lights: Node[] }} The shadow map and it's view crated from the lights in the scene
      */
-    renderSceneLights(scene: Node) {
-        scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension) && !this.shadowMaps.has(node)).forEach((node: Node) => {
-            this.render(scene, node);
+    renderSceneLights(scene: Node): { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] } {
+        let lights: Node[] = scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension));
+        // Do not go over the limit on GPU
+        lights.slice(0, Math.ceil(this.adapter.limits.maxTextureArrayLayers / 6));
+        for (let i = 0; i < lights.length; i++) {
+            lights[i].addComponent(new LightIndex(i));
+        }
+        // Prepare cube texture array
+        this.shadowMapArray = this.device.createTexture({
+            label: "Depth/Shadow texture cube array",
+            format: "depth24plus",
+            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 6 * lights.length],
+            usage: GPUTextureUsage.RENDER_ATTACHMENT | GPUTextureUsage.TEXTURE_BINDING
         });
+        this.shadowMapView = this.shadowMapArray.createView({
+            label: "Depth/Shadow texture cube array view",
+            format: "depth24plus",
+            dimension: "cube-array",
+            aspect: "depth-only"
+        });
+        // Now render all lights
+        lights.forEach((light: Node) => this.render(scene, light));
+        return { shadowMap: this.shadowMapView, shadowMapView: this.shadowMapView, lights: lights };
     }
 
     /**
@@ -267,8 +267,7 @@ export class ShadowMapRenderer extends BaseRenderer {
      * @param light The light node
      */
     render(scene: Node, light: Node) {
-        const shadowMap = this.prepareShadowMap(light);
-        const shadowMapViews = shadowMap.textureViews;
+        const shadowMapViews = this.prepareShadowMapViews(light);
 
         // Setup view and projection matrix
         const khronosLight = light.getComponentOfType(KHRLightExtension);
