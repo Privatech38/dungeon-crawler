@@ -132,7 +132,7 @@ export class Renderer extends BaseRenderer {
 
     lightNeighbours: WeakMap<Node, Node>;
     // @ts-ignore
-    lightsBuffer: { lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; };
+    lightBuffers: WeakMap<Node, { lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; }> = new WeakMap<Node, {lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup}>();
     // @ts-ignore
     shadowCubeArray: { texture: GPUTexture, textureView: GPUTextureView };
     // @ts-ignore
@@ -241,9 +241,10 @@ export class Renderer extends BaseRenderer {
      * Returns a buffer, and it's bind group for 4 closest lights
      * @returns {{ lightsUniformBuffer: GPUBuffer, texture: GPUTexture, textureView: GPUTextureView, lightBindGroup: GPUBindGroup }}
      */
-    prepareLights(): { lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; } {
-        if (this.lightsBuffer) {
-            return this.lightsBuffer;
+    prepareLights(node: Node): { lightsUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; } {
+        if (this.lightBuffers.has(node)) {
+            // @ts-ignore
+            return this.lightBuffers.get(node);
         }
 
         const cmpSampler = this.device.createSampler({
@@ -268,7 +269,7 @@ export class Renderer extends BaseRenderer {
         });
 
         const gpuObject = { lightsUniformBuffer, lightBindGroup };
-        this.lightsBuffer = gpuObject;
+        this.lightBuffers.set(node, gpuObject);
         return gpuObject;
     }
 
@@ -456,12 +457,14 @@ export class Renderer extends BaseRenderer {
      * @param node The node whose's
      */
     calculateLighting(node: Node) {
-        const { lightsUniformBuffer, lightBindGroup } = this.prepareLights();
+        const { lightsUniformBuffer, lightBindGroup } = this.prepareLights(node);
         // Use the closes 4 lights and cache them if not already
         const nodeTranslation: vec3 = mat4.getTranslation(new vec3(), getGlobalModelMatrix(node));
-        const lights = this.shadowData.lights.sort((a, b) => vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(a)), nodeTranslation)
+        const nearestLights = this.shadowData.lights.sort((a, b) => vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(a)), nodeTranslation)
             - vec3.squaredDistance(mat4.getTranslation(new vec3(), getGlobalModelMatrix(b)), nodeTranslation)
         ).slice(0, 4);
+
+        // console.log(`Nearest light indices: ${nearestLights.map((light: Node) => light.getComponentOfType(LightIndex).index)}`)
 
         const LightUniformValues = new ArrayBuffer(160);
         const LightUniformViews = {
@@ -477,8 +480,8 @@ export class Renderer extends BaseRenderer {
             viewProjectionMatrix: new Float32Array(LightUniformValues, 96, 16),
             // lightIndex: new Int32Array(LightUniformValues, 172, 1),
         };
-        for (let i = 0; i < lights.length; i++) {
-            const lightNode = lights[i];
+        for (let i = 0; i < nearestLights.length; i++) {
+            const lightNode = nearestLights[i];
             const khrExtension: KHRLightExtension = lightNode.getComponentOfType(KHRLightExtension);
 
             LightUniformViews.extension.color.set(khrExtension.color);
@@ -494,14 +497,6 @@ export class Renderer extends BaseRenderer {
             // LightUniformViews.lightIndex[0] = lightNode.getComponentOfType(LightIndex).index;
 
             this.device.queue.writeBuffer(lightsUniformBuffer, i * 160, LightUniformValues);
-
-            // const shadowTexture = <GPUTexture>shadowRenderer.shadowMaps.get(lightNode)?.texture;
-            //
-            // this.encoder.copyTextureToTexture(
-            //     {texture: shadowTexture, aspect: "depth-only"},
-            //     {origin: [0,0,i*6], texture: texture, aspect: "depth-only"},
-            //     [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 6]
-            // );
         }
 
         this.renderPass.setBindGroup(1, lightBindGroup);
