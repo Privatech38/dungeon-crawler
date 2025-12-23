@@ -273,32 +273,6 @@ export class Renderer extends BaseRenderer {
         return gpuObject;
     }
 
-    /**
-     * Prepares the cube array texture and view
-     */
-    prepareShadowCubeArray() {
-        if (this.shadowCubeArray) {
-            return this.shadowCubeArray;
-        }
-
-        const texture = this.device.createTexture({
-            label: 'Shadow cube array texture',
-            size: [SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 4 * 6],
-            format: "depth24plus",
-            usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING
-        });
-
-        const textureView = texture.createView({
-            label: 'Shadow cube array texture view',
-            dimension: "cube-array",
-            aspect: "depth-only",
-            arrayLayerCount: 4 * 6
-        });
-
-        this.shadowCubeArray = { texture, textureView };
-        return this.shadowCubeArray;
-    }
-
     prepareCamera(camera: Camera) {
         if (this.gpuObjects.has(camera)) {
             return this.gpuObjects.get(camera);
