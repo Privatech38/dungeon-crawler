@@ -18,6 +18,7 @@ import {
 // @ts-ignore
 import lamberPerFragment from './lambertPerFragment.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
+import { FAR_PLANE } from "./engine/renderers/ShadowMapRenderer";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -163,6 +164,9 @@ export class Renderer extends BaseRenderer {
             fragment: {
                 module: modulePerFragment,
                 targets: [{ format: this.format }],
+                constants: {
+                    farPlane: FAR_PLANE
+                }
             },
             depthStencil: {
                 format: 'depth24plus',

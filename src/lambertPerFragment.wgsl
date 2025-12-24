@@ -1,6 +1,9 @@
-override ambientRed = 0.039;
-override ambientGreen = 0.039;
-override ambientBlue = 0.039;
+override ambientRed: f32 = 0.039;
+override ambientGreen: f32 = 0.039;
+override ambientBlue: f32 = 0.039;
+
+override farPlane: f32 = 30;
+override nearPlane: f32 = 0.01;
 
 struct VertexInput {
     @location(0) position: vec3f,
@@ -97,10 +100,10 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         let light = lights[i];
         let lightModelMatrix: mat4x4<f32> = light.globalModelMatrix;
         let lightPosition: vec4f = lightModelMatrix[3];
-        if (distance(lightPosition, input.worldPos) > 10) {
-            continue;
-        }
-        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor);
+//        if (distance(lightPosition, input.worldPos) > 10) {
+//            continue;
+//        }
+        finalColor += calculatePointLight(light.extension, i, lightPosition, N, input.worldPos, baseColor);
     }
 
 //    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
@@ -110,7 +113,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     return output;
 }
 
-fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f) -> vec4f {
+fn calculatePointLight(light: Light, lightIndex: u32, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f) -> vec4f {
     let lightDir: vec4f = normalize(lightPosition - position);
     let diff: f32 = max(dot(normal, lightDir), 0.0);
     // Attenuation
@@ -118,11 +121,13 @@ fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, positi
     let coefficients: vec3f = attenuationFromRange(light.intensity, 0.01);
     let attenuation: f32 = 1.0 / (coefficients.x + coefficients.y * lightDistance + coefficients.z * lightDistance * lightDistance);
     // Combine
-    var ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
-    var diffuse = vec4f(light.color, 1.0) * diff * baseColor;
+    var ambient = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
+    var diffuse = vec4f(light.color, 1.0) * diff;
     ambient *= attenuation;
     diffuse *= attenuation;
-    return (ambient + diffuse);
+
+    let shadow: f32 = computeShadow(position.xyz, lightPosition.xyz, lightIndex * 6);
+    return (ambient + shadow * diffuse) * baseColor;
 }
 
 fn attenuationFromRange(range: f32, threshold: f32) -> vec3f {
@@ -131,4 +136,11 @@ fn attenuationFromRange(range: f32, threshold: f32) -> vec3f {
     let t = max(threshold, 1e-6);
     let quadraticAttenuation: f32 = (1.0 / t - constantAttenuation) / (range * range);
     return vec3f(constantAttenuation, linearAttenuation, quadraticAttenuation);
+}
+
+fn computeShadow(fragPos: vec3f, lightPos: vec3f, lightIndex: u32) -> f32 {
+    let fragToLight: vec3f = fragPos - lightPos;
+    var referenceDepth: f32 = length(fragToLight);
+    referenceDepth = (referenceDepth - nearPlane) / (farPlane - nearPlane);
+    return textureSampleCompare(depthCubeArray, depthCubeSampler, normalize(fragToLight), lightIndex, referenceDepth);
 }
