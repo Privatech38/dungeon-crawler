@@ -1,6 +1,6 @@
-override ambientRed = 0.039;
-override ambientGreen = 0.039;
-override ambientBlue = 0.039;
+override ambientRed = 0.01;
+override ambientGreen = 0.01;
+override ambientBlue = 0.01;
 
 struct VertexInput {
     @location(0) position: vec3f,
@@ -91,7 +91,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
 
-    var finalColor = vec4f(0.0);
+    var finalColor = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0) * baseColor;
     var lightAmount: u32 = arrayLength(&lights);
     for (var i: u32 = 0; i < lightAmount; i++) {
         let light = lights[i];
