@@ -1,12 +1,16 @@
+import {KHRLightExtension} from "../../gpu/object/KhronosLight";
+
 export class Node {
     children: Node[];
     parent: Node | null;
     components: any[];
+    isStatic: boolean;
 
     constructor() {
         this.children = [];
         this.parent = null;
         this.components = [];
+        this.isStatic = false;
     }
 
     addChild(node: Node): void {
@@ -71,12 +75,9 @@ export class Node {
 
     clone() {
         let clone = new Node();
-
-        const rotation = this.components.find(c => Array.isArray(c?.rotation));
-        const primitive = this.components.find(c => Array.isArray(c?.primitives));
-
-        clone.addComponent(rotation);
-        clone.addComponent(primitive);
+        clone.children = this.children.map((child: Node) => child.clone());
+        clone.children.forEach((child: Node) => child.parent = clone);
+        clone.components = Array.from(this.components);
 
         return clone;
     }
