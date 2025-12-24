@@ -247,7 +247,7 @@ export class Renderer extends BaseRenderer {
         }
 
         const cameraUniformBuffer = this.device.createBuffer({
-            size: 128,
+            size: 192,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -329,9 +329,11 @@ export class Renderer extends BaseRenderer {
         const cameraComponent = camera.getComponentOfType(Camera);
         const viewMatrix = getGlobalViewMatrix(camera);
         const projectionMatrix = getProjectionMatrix(camera);
+        const modelMatrix = getGlobalModelMatrix(camera);
         const { cameraUniformBuffer, cameraBindGroup } = this.prepareCamera(cameraComponent);
         this.device.queue.writeBuffer(cameraUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
+        this.device.queue.writeBuffer(cameraUniformBuffer, 128, modelMatrix);
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
         // Update lights
