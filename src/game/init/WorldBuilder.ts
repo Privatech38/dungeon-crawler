@@ -147,15 +147,15 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
         // const torch: Node = torchLoader.loadNode('Torch');
         // torch.isStatic = true;
         // wallPillar.addChild(torch);
-        createTorch(wallPillarClone);
+        createTorch(torchTransform, scene);
     }
 }
 
 /**
  * Creates a torch on a specified parent node.
- * @param {Transform} location the location of the torch
+ * @param location The location
  */
-export async function createTorch(parent: Node): Promise<void> {
+export async function createTorch(location: Transform, scene: Node): Promise<void> {
     const path: string = 'assets/models/rooms/walls/Torch/Torch.gltf';
     if (!cache.has(path)) {
         const torchLoader = new GLTFLoader();
@@ -168,7 +168,7 @@ export async function createTorch(parent: Node): Promise<void> {
 
     torchClone.isStatic = true;
     torchClone.addComponent(location);
-    parent.addChild(torchClone);
+    scene.addChild(torchClone);
 }
 
 /**
@@ -200,18 +200,16 @@ export async function createFloor(location: Transform, scene: Node): Promise<voi
  */
 export async function createDoor(location: Transform, scene: Node): Promise<void> {
     const path: string = 'assets/models/rooms/walls/WallDoor/WallDoor.gltf';
-    let door: Node;
     if (!cache.has(path)) {
         const doorLoader = new GLTFLoader();
         await doorLoader.load(path);
-        door = doorLoader.loadNode('DoorWallUpper');    
+        const door = doorLoader.loadNode('DoorWallUpper');
         cache.set(path, door);
     }
-    else {
-        door = cache.get(path).clone();
-    }
+
+    const doorClone = cache.get(path).clone();
     
-    door.isStatic = true;
-    door.addComponent(location);
-    scene.addChild(door);
+    doorClone.isStatic = true;
+    doorClone.addComponent(location);
+    scene.addChild(doorClone);
 }
