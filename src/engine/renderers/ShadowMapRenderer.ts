@@ -18,6 +18,7 @@ import {LightIndex} from "../../gpu/object/LightIndex";
 export const FAR_PLANE = 100;
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
+    label: "Shadow vertex buffer layout",
     arrayStride: 32,
     attributes: [
         {
@@ -194,11 +195,13 @@ export class ShadowMapRenderer extends BaseRenderer {
         }
 
         const lightUniformBuffer = this.device.createBuffer({
+            label: "Shadow light buffer",
             size: 128,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
         const lightBindGroup = this.device.createBindGroup({
+            label: "Shadow light bind group",
             layout: this.lightViewProjectionBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: lightUniformBuffer } },
@@ -216,11 +219,13 @@ export class ShadowMapRenderer extends BaseRenderer {
         }
 
         const modelUniformBuffer = this.device.createBuffer({
+            label: "Model uniform buffer",
             size: 128,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
         const modelBindGroup = this.device.createBindGroup({
+            label: "Model bind group",
             layout: this.modelBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: modelUniformBuffer } },
@@ -259,6 +264,7 @@ export class ShadowMapRenderer extends BaseRenderer {
             aspect: "depth-only"
         });
         // Now render all lights
+        console.log(lights.length);
         lights.forEach((light: Node) => this.render(scene, light));
         return { shadowMap: this.shadowMapView, shadowMapView: this.shadowMapView, lights: lights };
     }
