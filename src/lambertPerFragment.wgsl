@@ -64,7 +64,7 @@ struct LightUniform {
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
 
-@group(1) @binding(0) var<uniform> lights: array<LightUniform, 4>;
+@group(1) @binding(0) var<storage, read> lights: array<LightUniform>;
 @group(1) @binding(1) var depthCubeArray: texture_depth_cube_array;
 @group(1) @binding(2) var depthCubeSampler: sampler_comparison;
 
@@ -92,10 +92,14 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
 
     var finalColor = vec4f(0.0);
-    for (var i = 0; i < 4; i++) {
+    var lightAmount: u32 = arrayLength(&lights);
+    for (var i: u32 = 0; i < lightAmount; i++) {
         let light = lights[i];
         let lightModelMatrix: mat4x4<f32> = light.globalModelMatrix;
         let lightPosition: vec4f = lightModelMatrix[3];
+        if (distance(lightPosition, input.worldPos) > 10) {
+            continue;
+        }
         finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor);
     }
 
