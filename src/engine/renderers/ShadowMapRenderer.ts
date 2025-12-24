@@ -15,6 +15,8 @@ import {Node} from "engine/core/Node";
 import {Primitive} from "engine/core/Primitive.js";
 import {LightIndex} from "../../gpu/object/LightIndex";
 
+export const FAR_PLANE = 100;
+
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
     attributes: [
@@ -99,8 +101,8 @@ const CUBE_VECTORS = [
     new CubeFace([0,0,-1], [0,-1,0])  // -Z
 ]
 
-const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, 1000);
-const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 1000);
+const PERSPECTIVE_MATRIX = mat4.perspectiveZO(mat4.create(), Math.PI / 2, 1, 0.01, FAR_PLANE);
+const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, FAR_PLANE);
 
 export class ShadowMapRenderer extends BaseRenderer {
     shadowMapNodeViews: Map<Node, Array<GPUTextureView>>;
@@ -174,7 +176,7 @@ export class ShadowMapRenderer extends BaseRenderer {
             label: "Shadow map (cube) view",
             dimension: "2d",
             arrayLayerCount: 1,
-            baseArrayLayer: index + lightIndex.index
+            baseArrayLayer: index + lightIndex.index * 6
         }));
 
         this.shadowMapNodeViews.set(light, textureViews);
@@ -184,7 +186,7 @@ export class ShadowMapRenderer extends BaseRenderer {
     /**
      * Prepare a buffer for the light's view and projection matrices
      * @param light A node that has a KhronosLight component
-     * @returns {{lightUniformBuffer: WebGLBuffer, lightBindGroup: GPUBindGroup}}
+     * @returns {{lightUniformBuffer: GPUBuffer, lightBindGroup: GPUBindGroup}} the buffer and bind group
      */
     prepareLight(light: Node): { lightUniformBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; } {
         if (this.gpuObjects.has(light)) {
