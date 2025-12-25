@@ -264,7 +264,6 @@ export class ShadowMapRenderer extends BaseRenderer {
             aspect: "depth-only"
         });
         // Now render all lights
-        console.log(lights.length);
         lights.forEach((light: Node) => this.render(scene, light));
         return { shadowMap: this.shadowMapView, shadowMapView: this.shadowMapView, lights: lights };
     }
