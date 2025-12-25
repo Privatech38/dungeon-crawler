@@ -16,7 +16,7 @@ import {
 import { Renderer } from './Renderer';
 // @ts-ignore
 import { Light } from './Light.js';
-import {initalize} from "./game/init/WorldBuilder.js";
+import {initialize} from "./game/init/WorldBuilder.js";
 import { PlayerController } from "./game/PlayerController.js";
 import {GameManager} from "./game/GameManager.js";
 import { player } from "./game/enteties.js";
@@ -59,7 +59,7 @@ light.addComponent(new Transform({
 }));
 scene.addChild(light);
 
-await initalize(scene, playerNode, world);
+await initialize(scene, playerNode, world);
 
 function update(time: number, dt: number) {
     manager.update(dt);
