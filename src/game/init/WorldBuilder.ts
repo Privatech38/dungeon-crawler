@@ -147,7 +147,7 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
         // const torch: Node = torchLoader.loadNode('Torch');
         // torch.isStatic = true;
         // wallPillar.addChild(torch);
-        createTorch(torchTransform, scene);
+        await createTorch(torchTransform, scene);
     }
 }
 
