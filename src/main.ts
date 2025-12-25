@@ -71,7 +71,6 @@ if (lights.length < 4) {
 
 const shadowData: { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] } = shadowRenderer.renderSceneLights(scene);
 
-shadowData.lights.forEach((light: Node) => console.log(`Light at ${mat4.getTranslation(new vec3(), getGlobalModelMatrix(light))}`));
 // Send the data to renderer
 renderer.shadowData = shadowData;
 
