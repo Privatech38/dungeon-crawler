@@ -3,8 +3,9 @@ import { mat4 } from 'glm';
 import { Camera } from './Camera.js';
 import { Model } from './Model.js';
 import { Transform } from './Transform.js';
+import { Node } from './Node.js';
 
-export function getLocalModelMatrix(node) {
+export function getLocalModelMatrix(node: Node) {
     const matrix = mat4.create();
     for (const transform of node.getComponentsOfType(Transform)) {
         mat4.mul(matrix, matrix, transform.matrix);
@@ -12,7 +13,7 @@ export function getLocalModelMatrix(node) {
     return matrix;
 }
 
-export function getGlobalModelMatrix(node) {
+export function getGlobalModelMatrix(node: Node): mat4 {
     if (node.parent) {
         const parentMatrix = getGlobalModelMatrix(node.parent);
         const modelMatrix = getLocalModelMatrix(node);
@@ -22,21 +23,21 @@ export function getGlobalModelMatrix(node) {
     }
 }
 
-export function getLocalViewMatrix(node) {
+export function getLocalViewMatrix(node: Node) {
     const matrix = getLocalModelMatrix(node);
     return mat4.invert(matrix, matrix);
 }
 
-export function getGlobalViewMatrix(node) {
+export function getGlobalViewMatrix(node: Node) {
     const matrix = getGlobalModelMatrix(node);
     return mat4.invert(matrix, matrix);
 }
 
-export function getProjectionMatrix(node) {
+export function getProjectionMatrix(node: Node) {
     const camera = node.getComponentOfType(Camera);
     return camera ? camera.projectionMatrix : mat4.create();
 }
 
-export function getModels(node) {
+export function getModels(node: Node) {
     return node.getComponentsOfType(Model);
 }

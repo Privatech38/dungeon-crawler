@@ -1,6 +1,6 @@
 import { Accessor } from './Accessor.js';
 
-export function parseFormat(format) {
+export function parseFormat(format: { match: (arg0: RegExp) => { (): any; new(): any; groups: any; }; }) {
     const regex = /(?<type>float|((?<sign>u|s)(?<norm>int|norm)))(?<bits>\d+)x(?<count>\d+)/;
     const groups = format.match(regex).groups;
 
@@ -13,14 +13,17 @@ export function parseFormat(format) {
     };
 }
 
-export function createVertexBuffer(vertices, layout) {
+export function createVertexBuffer(vertices: string | any[], layout: { arrayStride: number; attributes: any[]; }) {
     const buffer = new ArrayBuffer(layout.arrayStride * vertices.length);
-    const accessors = layout.attributes.map(attribute => new Accessor({
-        buffer,
-        stride: layout.arrayStride,
-        ...parseFormat(attribute.format),
-        ...attribute,
-    }));
+    const accessors = layout.attributes.map((attribute) => {
+        if (!attribute) throw new Error('Attribute is undefined');
+        return new Accessor({
+            buffer,
+            stride: layout.arrayStride,
+            ...parseFormat(attribute.format),
+            ...attribute,
+        });
+    });
 
     for (let i = 0; i < vertices.length; i++) {
         const vertex = vertices[i];

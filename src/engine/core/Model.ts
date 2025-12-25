@@ -1,5 +1,6 @@
 export class Model {
-
+    primitives: any;
+    
     constructor({
         primitives = [],
     } = {}) {

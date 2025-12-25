@@ -1,5 +1,13 @@
 export class Sampler {
 
+    minFilter: string;
+    magFilter: string;
+    mipmapFilter: string;
+    addressModeU: string;
+    addressModeV: string;
+    addressModeW: string;
+    maxAnisotropy: number;
+
     constructor({
         minFilter = 'linear',
         magFilter = 'linear',

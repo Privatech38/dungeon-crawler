@@ -1,12 +1,31 @@
+// @ts-ignore
+import {vec3, vec4} from 'glm';
+
 export class Material {
+    baseTexture: any;
+    emissionTexture: any;
+    normalTexture: any;
+    occlusionTexture: any;
+    roughnessTexture: any;
+    metalnessTexture: any;    
+    
+    baseFactor: vec4;
+    emissionFactor: vec3;
+    normalFactor: number;
+    occlusionFactor: number;
+    roughnessFactor: number;
+    metalnessFactor: number;
+
+    ambientFactor: number;
+    ambientColor: vec3;
 
     constructor({
-        baseTexture,
-        emissionTexture,
-        normalTexture,
-        occlusionTexture,
-        roughnessTexture,
-        metalnessTexture,
+        baseTexture = null,
+        emissionTexture = null,
+        normalTexture = null,
+        occlusionTexture = null,
+        roughnessTexture = null,
+        metalnessTexture = null,
 
         baseFactor = [1, 1, 1, 1],
         emissionFactor = [0, 0, 0],

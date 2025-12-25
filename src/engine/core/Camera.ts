@@ -1,6 +1,13 @@
+// @ts-ignore
 import { mat4 } from 'glm';
 
 export class Camera {
+    orthographic: number;
+    aspect: number;
+    fovy: number;
+    halfy: number;
+    near: number;
+    far: number;
 
     constructor({
         orthographic = 0,

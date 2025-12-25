@@ -1,9 +1,17 @@
 export class Texture {
 
+    image: any;
+    sampler: any;
+    isSRGB: boolean;
+
     constructor({
         image,
         sampler,
         isSRGB = false,
+    }: {
+        image?: any;
+        sampler?: any;
+        isSRGB?: boolean;
     } = {}) {
         this.image = image;
         this.sampler = sampler;
@@ -11,11 +19,11 @@ export class Texture {
     }
 
     get width() {
-        return this.image.width;
+        return this.image?.width;
     }
 
     get height() {
-        return this.image.height;
+        return this.image?.height;
     }
 
 }

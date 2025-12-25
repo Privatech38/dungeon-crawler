@@ -1,17 +1,42 @@
 export class Accessor {
-
+    buffer: ArrayBuffer | SharedArrayBuffer | null;
+    view: any;
+    offset: number;
+    stride: number;
+    offsetInElements: number;
+    strideInElements: number;
+    count: number;
+    componentType: any;
+    componentCount: number;
+    componentSize: number;
+    componentSigned: boolean;
+    componentNormalized: boolean;
+    normalize: (x: any) => any;
+    denormalize: (x: any) => any;
     constructor({
-        buffer,
-        viewLength,
-        viewOffset = 0,
-        offset = 0,
-        stride = componentSize,
-
         componentType = 'int',
         componentCount = 1,
-        componentSize = 1,
         componentSigned = false,
         componentNormalized = false,
+        componentSize = 1,
+
+        stride = componentSize,
+        buffer = null,
+        viewLength = null,
+        viewOffset = 0,
+        offset = 0,
+
+    }: {
+        buffer?: any;
+        viewLength?: number | null;
+        viewOffset?: number;
+        offset?: number;
+        componentSize?: number;
+        stride?: number;
+        componentType?: string;
+        componentCount?: number;
+        componentSigned?: boolean;
+        componentNormalized?: boolean;
     } = {}) {
         this.buffer = buffer;
         this.offset = offset;
@@ -29,7 +54,11 @@ export class Accessor {
             componentSigned,
         });
 
-        if (viewLength !== undefined) {
+        if (!viewType) {
+            throw new Error();
+        }
+
+        if (viewLength !== undefined && viewLength !== null) {
             this.view = new viewType(buffer, viewOffset, viewLength / viewType.BYTES_PER_ELEMENT);
         } else {
             this.view = new viewType(buffer, viewOffset);
@@ -55,13 +84,13 @@ export class Accessor {
         });
     }
 
-    get(index) {
+    get(index: number) {
         const start = index * this.strideInElements + this.offsetInElements;
         const end = start + this.componentCount;
         return [...this.view.slice(start, end)].map(this.normalize);
     }
 
-    set(index, value) {
+    set(index: number, value: any[]) {
         const start = index * this.strideInElements + this.offsetInElements;
         this.view.set(value.map(this.denormalize), start);
     }
@@ -71,16 +100,21 @@ export class Accessor {
         componentSize,
         componentSigned,
         componentNormalized,
-    }) {
+    }: {
+        componentType: string;
+        componentSize: number;
+        componentSigned: boolean;
+        componentNormalized: boolean;
+    }): (x: number) => number {
         if (!componentNormalized || componentType === 'float') {
-            return x => x;
+            return (x: number) => x;
         }
 
         const multiplier = componentSigned
             ? 2 ** ((componentSize * 8) - 1) - 1
             : 2 ** (componentSize * 8) - 1;
 
-        return x => Math.max(x / multiplier, -1);
+        return (x: number) => Math.max(x / multiplier, -1);
     }
 
     getDenormalizer({
@@ -88,9 +122,14 @@ export class Accessor {
         componentSize,
         componentSigned,
         componentNormalized,
-    }) {
+    }: {
+        componentType: string;
+        componentSize: number;
+        componentSigned: boolean;
+        componentNormalized: boolean;
+    }): (x: number) => number {
         if (!componentNormalized || componentType === 'float') {
-            return x => x;
+            return (x: number) => x;
         }
 
         const multiplier = componentSigned
@@ -100,13 +139,17 @@ export class Accessor {
         const min = componentSigned ? -1 : 0;
         const max = 1;
 
-        return x => Math.floor(0.5 + multiplier * Math.min(Math.max(x, min), max));
+        return (x: number) => Math.floor(0.5 + multiplier * Math.min(Math.max(x, min), max));
     }
 
     getViewType({
         componentType,
         componentSize,
         componentSigned,
+    }: {
+        componentType: string;
+        componentSize: number;
+        componentSigned: boolean;
     }) {
         if (componentType === 'float') {
             if (componentSize === 4) {

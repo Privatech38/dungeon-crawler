@@ -1,5 +1,7 @@
 export class Mesh {
-
+    vertices: number[];
+    indices: number[];
+    
     constructor({
         vertices = [],
         indices = [],
