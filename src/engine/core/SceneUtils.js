@@ -40,3 +40,12 @@ export function getProjectionMatrix(node) {
 export function getModels(node) {
     return node.getComponentsOfType(Model);
 }
+
+/**
+ * Returns the translation vector
+ * @param mat {Array<number>} A 4x4 matrix
+ * @returns {number[]} Translation vector
+ */
+export function getTranslation(mat) {
+    return [mat[3], mat[7], mat[11]];
+}
