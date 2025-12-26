@@ -157,6 +157,7 @@ export class Renderer extends BaseRenderer {
         });
 
         this.pipelinePerFragment = await this.device.createRenderPipelineAsync({
+            label: "Main renderer pipeline",
             vertex: {
                 module: modulePerFragment,
                 buffers: [ vertexBufferLayout ],
@@ -194,11 +195,13 @@ export class Renderer extends BaseRenderer {
         }
 
         const modelUniformBuffer = this.device.createBuffer({
+            label: "Model uniform buffer",
             size: 128,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
         const modelBindGroup = this.device.createBindGroup({
+            label: "Model bind group",
             layout: this.modelBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: modelUniformBuffer } },
@@ -220,12 +223,14 @@ export class Renderer extends BaseRenderer {
         }
 
         const cmpSampler = this.device.createSampler({
+            label: "Depth cube array sampler",
             magFilter: "linear",
             minFilter: "linear",
             compare: "less",
         });
 
         const lightsStorageBuffer = this.device.createBuffer({
+            label: "Lights storage buffer",
             size: this.shadowData.lights.length * 160,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
         });
@@ -288,11 +293,13 @@ export class Renderer extends BaseRenderer {
         const baseTexture = this.prepareTexture(material.baseTexture);
 
         const materialUniformBuffer = this.device.createBuffer({
+            label: "Material uniform buffer",
             size: 48,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
         const materialBindGroup = this.device.createBindGroup({
+            label: "Material bind group",
             layout: this.materialBindGroupLayout,
             entries: [
                 { binding: 0, resource: { buffer: materialUniformBuffer } },

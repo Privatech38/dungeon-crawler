@@ -12,7 +12,7 @@ import {Node} from "./engine/core/Node";
 import {Renderer} from './Renderer';
 // @ts-ignore
 import {Light} from './Light.js';
-import {initalize} from "./game/init/WorldBuilder";
+import {initialize} from "./game/init/WorldBuilder";
 import {PlayerController} from "./game/PlayerController";
 import {GameManager} from "./game/GameManager";
 import {player} from "./game/enteties";
@@ -50,7 +50,7 @@ playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, can
 // @ts-ignore
 const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera));
 
-await initalize(scene, playerNode, world);
+await initialize(scene, playerNode, world);
 
 function update(time: number, dt: number) {
     manager.update(dt);
@@ -71,7 +71,6 @@ if (lights.length < 4) {
 
 const shadowData: { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] } = shadowRenderer.renderSceneLights(scene);
 
-shadowData.lights.forEach((light: Node) => console.log(`Light at ${mat4.getTranslation(new vec3(), getGlobalModelMatrix(light))}`));
 // Send the data to renderer
 renderer.shadowData = shadowData;
 
