@@ -1,3 +1,4 @@
+// @ts-ignore
 import { vec3 } from 'glm';
 
 export class Torch {

@@ -1,5 +1,6 @@
 import { Node } from "../core/Node.js";
 import { AABB } from "../core/AABB.js";
+// @ts-ignore
 import { vec3 } from 'glm';
 import { Torch } from "./Tourch.js";
 import { Structure } from "./Structure.js";

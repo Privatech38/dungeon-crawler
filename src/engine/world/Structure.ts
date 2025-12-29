@@ -1,4 +1,5 @@
 import { AABB } from "engine/core/AABB";
+// @ts-ignore
 import { vec3 } from 'glm';
 
 export class Structure extends Node {
@@ -15,6 +16,6 @@ export class Structure extends Node {
     }
 
     addComponent(component: any): void {
-        this.addChild(component);
+        this.addComponent(component);
     }
 }
