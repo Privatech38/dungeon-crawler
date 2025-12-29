@@ -1,3 +1,4 @@
+// @ts-ignore
 import { mat4 } from 'glm';
 
 import { Camera } from './Camera.js';
@@ -23,21 +24,21 @@ export function getGlobalModelMatrix(node: Node): mat4 {
     }
 }
 
-export function getLocalViewMatrix(node: Node) {
+export function getLocalViewMatrix(node: Node): mat4 {
     const matrix = getLocalModelMatrix(node);
     return mat4.invert(matrix, matrix);
 }
 
-export function getGlobalViewMatrix(node: Node) {
+export function getGlobalViewMatrix(node: Node): mat4 {
     const matrix = getGlobalModelMatrix(node);
     return mat4.invert(matrix, matrix);
 }
 
-export function getProjectionMatrix(node: Node) {
+export function getProjectionMatrix(node: Node): mat4 {
     const camera = node.getComponentOfType(Camera);
     return camera ? camera.projectionMatrix : mat4.create();
 }
 
-export function getModels(node: Node) {
+export function getModels(node: Node): Model[] {
     return node.getComponentsOfType(Model);
 }
