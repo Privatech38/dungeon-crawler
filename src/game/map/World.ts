@@ -1,11 +1,13 @@
 import { Room } from "./Room.js";
 import { MapGenerator } from "./MapGenerator.js";
+import {EnemyGenerator} from "./EnemyGenerator.js";
 import { Structure } from "./Structures/Structure.js";
 import {Wall} from "./Structures/Wall.js";
 import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
 import {BottomWall} from "./Structures/BottomWall.js";
 import {AddDoors} from "./AddDoors.js";
+import { Enemy } from "game/entities/Enemy.js";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.
@@ -19,9 +21,11 @@ class World {
      * @private {MapGenerator} mapGenerator - Instance of MapGenerator used for generating and placing rooms.
      */
     private readonly rooms: Room[];
+    private readonly enemies: Enemy[];
     private readonly maxSurfaceArea: number;
     private currentSurfaceArea: number;
     private mapGenerator: MapGenerator;
+    private enemyGenerator: EnemyGenerator;
 
     /**
      * Creates a new World instance.
@@ -29,9 +33,11 @@ class World {
      */
     constructor(maxSurfaceArea: number = 100) {
         this.rooms = [];
+        this.enemies = [];
         this.maxSurfaceArea = maxSurfaceArea;
         this.currentSurfaceArea = 0;
         this.mapGenerator = new MapGenerator((maxSurfaceArea/10) * 3);
+        this.enemyGenerator = new EnemyGenerator((maxSurfaceArea/20));
     }
 
     /**
@@ -54,6 +60,13 @@ class World {
             if (placed) {
                 this.rooms.push(this.mapGenerator.getLastRoom);
                 this.surfaceArea(room);
+
+                // n % chance to make enemy in current room
+                if (this.enemyGenerator.shouldEnemySpawn()) {
+                    const enemy = this.enemyGenerator.makeEnemy(room);
+                    this.enemies.push(enemy);
+    
+                }
             }
         }
 

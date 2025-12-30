@@ -10,6 +10,7 @@ import {Wall} from "./map/Structures/Wall.js";
 import {Vector3} from "../math/Vector.js";
 import {OBB} from "./entities/hitboxes/OBB.js";
 import {Weapon} from "./entities/items/Weapon.js";
+import { MeleeWeapon } from "./entities/items/MeleeWeapon.js";
 import {Projectile} from "./attack/types/Projectile.js";
 import {Hitbox} from "./entities/hitboxes/Hitbox";
 import {player} from "./enteties";
@@ -20,7 +21,7 @@ class GameManager {
 
     private deltaTime: number;
     private readonly world: World;
-
+    
 
     constructor(player: Player, worldSurfaceArea: number) {
         this.player = player;

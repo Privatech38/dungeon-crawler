@@ -45,6 +45,9 @@ const playerNode = gltfLoader.loadNode("Player");
 const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
 playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
 
+const enemyNode = gltfLoader.loadNode("Enemy");
+
+
 const camera = scene.find((node: Node) => node.getComponentOfType(Camera));
 // camera.addComponent(new FirstPersonController(camera, canvas));
 

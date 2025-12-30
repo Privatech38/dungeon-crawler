@@ -7,7 +7,7 @@ import {Weapon} from "./items/Weapon.js";
 
 class Enemy extends Entity {
     movement: Movement;
-    weapon: Weapon
+    // weapon: Weapon
 
 
     constructor(
@@ -15,11 +15,11 @@ class Enemy extends Entity {
         speed: number,
         hitbox: Hitbox,
         initialPosition: Vector3,
-        weapon: Weapon,
+        // weapon: Weapon,
     ) {
         super(health, speed, hitbox, initialPosition);
         this.movement = new Movement(initialPosition, speed);
-        this.weapon = weapon
+        // this.weapon = weapon
     }
 
     private moveTowardsPlayer(player: Player) {

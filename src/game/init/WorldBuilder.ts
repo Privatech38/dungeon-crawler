@@ -215,3 +215,11 @@ export async function createDoor(location: Transform, scene: Node): Promise<void
     door.addComponent(location);
     scene.addChild(door);
 }
+
+export async function createEnemy( location: Transform, scene: Node ): Promise<void> {
+        const path: string = 'assets/models/characters/skeleton.gltf';
+        const wallPillarLoader = new GLTFLoader();
+            await wallPillarLoader.load(path);
+            const wallPillar: Node = wallPillarLoader.loadNode('WallPole');
+            cache.set(path, wallPillar);
+}
