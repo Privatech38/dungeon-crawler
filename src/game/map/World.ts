@@ -65,7 +65,6 @@ class World {
                 if (this.enemyGenerator.shouldEnemySpawn()) {
                     const enemy = this.enemyGenerator.makeEnemy(room);
                     this.enemies.push(enemy);
-    
                 }
             }
         }
@@ -166,6 +165,10 @@ class World {
             })
         })
         return uniquePillar;
+    }
+
+    public getEnemies(): Enemy[] {
+        return this.enemies;
     }
 
     get getGrid(): number[][] {

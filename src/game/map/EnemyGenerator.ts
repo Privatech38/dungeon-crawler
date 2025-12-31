@@ -1,8 +1,8 @@
-import {Enemy} from "game/entities/Enemy";
-import {Vector3} from "math/Vector";
-import {Room} from "./Room";
-import {OBB} from "game/entities/hitboxes/OBB";
-import { Weapon } from "game/entities/items/Weapon";
+import {Enemy} from "/src/game/entities/Enemy.js";
+import {Vector3} from "/src/math/Vector.js";
+import {Room} from "./Room.js";
+import {OBB} from "/src/game/entities/hitboxes/OBB.js";
+import { Weapon } from "game/entities/items/Weapon.js";
 
 class EnemyGenerator {
     private maxEnemies: number;
@@ -20,7 +20,8 @@ class EnemyGenerator {
     public shouldEnemySpawn(): boolean {
         if (this.enemyCount >= this.maxEnemies) return false;
 
-        let chance = Math.floor(Math.random() * (1000 - 0 + 1)) + 1000;
+        let chance = Math.floor(Math.random() * 1000);
+        console.log("chance:", chance);
         if (chance > this.SPAWN_CHANCE) return false;
 
         this.SPAWN_CHANCE /= 1.5; // lower chance every time an enemy spawns
@@ -35,6 +36,8 @@ class EnemyGenerator {
             this.enemyPosition( room ), 
             // this.enemyWeapon()
         );
+
+        console.log("made enemy");
 
         this.enemyList.push(enemy);
 
@@ -73,9 +76,10 @@ class EnemyGenerator {
 
     private enemyPosition( room: Room ): Vector3 {
         const min = 0, max = room.getFloors.length;
-        let index = Math.floor(Math.random() * (max - min + 1)) + max;
+        let index = Math.floor(Math.random() * max) + min;
 
         // select random floor
+        console.log("floors:", room.getFloors);
         let position: Vector3 = room.getFloors[index].getCenter; // modify if nececery
         return position;
     }

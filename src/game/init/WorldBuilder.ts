@@ -64,6 +64,13 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
             rotation: floor.getQuaternions,
         }), scene);
     }
+
+    for (const enemy of world.getEnemies()) {
+        await createEnemy(new Transform({
+            translation: enemy.getPosition.toArray,
+            rotation: [0, 0, 0, 1]
+        }), scene);
+    }
 }
 
 /**
@@ -217,9 +224,20 @@ export async function createDoor(location: Transform, scene: Node): Promise<void
 }
 
 export async function createEnemy( location: Transform, scene: Node ): Promise<void> {
-        const path: string = 'assets/models/characters/skeleton.gltf';
-        const wallPillarLoader = new GLTFLoader();
-            await wallPillarLoader.load(path);
-            const wallPillar: Node = wallPillarLoader.loadNode('WallPole');
-            cache.set(path, wallPillar);
+        const path: string = 'assets/models/characters/skeleton/skeleton.gltf';
+        let enemy: Node;
+        if (!cache.has(path)) {
+            console.log("load enemy");
+            const enemyLoader = new GLTFLoader();
+            await enemyLoader.load(path);
+            enemy = enemyLoader.loadNode("PlayerArmature.001");
+            cache.set(path, enemy);
+        }
+        else {
+            enemy = cache.get(path).clone();
+        }
+
+        enemy.isStatic = false;
+        enemy.addComponent(location);
+        scene.addChild(enemy);
 }
