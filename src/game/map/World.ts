@@ -71,6 +71,14 @@ class World {
         }
 
         new AddDoors(this).addDoorsAll();
+
+        for (let i = 0; i < this.rooms.length; ++i) {
+            let room = this.rooms[i];
+            console.log("room", i+1);
+            for (let floor of room.getFloors) {
+                console.log(floor.getCenter);
+            }
+        }
     }
 
     /**
@@ -168,7 +176,7 @@ class World {
         return uniquePillar;
     }
 
-    public getEnemies(): Enemy[] {
+    get getEnemies(): Enemy[] {
         return this.enemies;
     }
 

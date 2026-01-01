@@ -66,7 +66,7 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
         }), scene);
     }
 
-    for (const enemy of world.getEnemies()) {
+    for (const enemy of world.getEnemies) {
         await createEnemy(new Transform({
             translation: enemy.getPosition.toArray,
             rotation: [0, 0, 0, 1]
@@ -225,22 +225,19 @@ export async function createDoor(location: Transform, scene: Node): Promise<void
  */
 export async function createEnemy( location: Transform, scene: Node ): Promise<void> {
     const path: string = 'assets/models/characters/skeleton/skeleton.gltf';
-    let enemy: Node;
     if (!cache.has(path)) {
-        console.log("load enemy");
         const enemyLoader = new GLTFLoader();
         await enemyLoader.load(path);
-        enemy = enemyLoader.loadNode("Skeleton");
+        const enemy = enemyLoader.loadNode("Skeleton");
 
         cache.set(path, enemy);
     }
-    else {
-        enemy = cache.get(path).clone();
-    }
+ 
+    const enemyClone = cache.get(path).clone();
 
-    enemy.isStatic = false;
-    enemy.addComponent(location);
-    scene.addChild(enemy);
+    enemyClone.isStatic = false;
+    enemyClone.addComponent(location);
+    scene.addChild(enemyClone);
 
-    console.log("made enemy:", enemy, "at", location.translation);
+    console.log("made enemy:", enemyClone, "at", location.translation);
 }
