@@ -223,21 +223,29 @@ export async function createDoor(location: Transform, scene: Node): Promise<void
     scene.addChild(door);
 }
 
+/**
+ * Creates an enemy at the specified location.
+ * @param {Transform} location the location of the enemy
+ * @param {Node} scene the scene to which the enemy will be added
+ */
 export async function createEnemy( location: Transform, scene: Node ): Promise<void> {
-        const path: string = 'assets/models/characters/skeleton/skeleton.gltf';
-        let enemy: Node;
-        if (!cache.has(path)) {
-            console.log("load enemy");
-            const enemyLoader = new GLTFLoader();
-            await enemyLoader.load(path);
-            enemy = enemyLoader.loadNode("PlayerArmature.001");
-            cache.set(path, enemy);
-        }
-        else {
-            enemy = cache.get(path).clone();
-        }
+    const path: string = 'assets/models/characters/skeleton/skeleton.gltf';
+    let enemy: Node;
+    if (!cache.has(path)) {
+        console.log("load enemy");
+        const enemyLoader = new GLTFLoader();
+        await enemyLoader.load(path);
+        enemy = enemyLoader.loadNode("PlayerArmature.001");
 
-        enemy.isStatic = false;
-        enemy.addComponent(location);
-        scene.addChild(enemy);
+        cache.set(path, enemy);
+    }
+    else {
+        enemy = cache.get(path).clone();
+    }
+
+    enemy.isStatic = false;
+    enemy.addComponent(location);
+    scene.addChild(enemy);
+
+    console.log("made enemy:", enemy, "at", location.translation);
 }

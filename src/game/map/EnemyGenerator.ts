@@ -8,20 +8,23 @@ class EnemyGenerator {
     private maxEnemies: number;
     private enemyCount: number;
     private enemyList: Enemy[];
+    private minSafeDist: number;
+    private playerPosition: Vector3;
 
     private SPAWN_CHANCE = 1000;
 
-    constructor(maxEnemies: number) {
+    constructor(maxEnemies: number, playerPosition: Vector3) {
         this.maxEnemies = maxEnemies;
         this.enemyList = [];
+        this.minSafeDist = 3;
         this.enemyCount = 0;
+        this.playerPosition = playerPosition;
     }
 
     public shouldEnemySpawn(): boolean {
         if (this.enemyCount >= this.maxEnemies) return false;
 
         let chance = Math.floor(Math.random() * 1000);
-        console.log("chance:", chance);
         if (chance > this.SPAWN_CHANCE) return false;
 
         this.SPAWN_CHANCE /= 1.5; // lower chance every time an enemy spawns
@@ -36,8 +39,6 @@ class EnemyGenerator {
             this.enemyPosition( room ), 
             // this.enemyWeapon()
         );
-
-        console.log("made enemy");
 
         this.enemyList.push(enemy);
 
@@ -75,17 +76,33 @@ class EnemyGenerator {
     }
 
     private enemyPosition( room: Room ): Vector3 {
-        const min = 0, max = room.getFloors.length;
-        let index = Math.floor(Math.random() * max) + min;
+        const floors = room.getFloors;
+        const max = floors.length;
 
-        // select random floor
-        console.log("floors:", room.getFloors);
-        let position: Vector3 = room.getFloors[index].getCenter; // modify if nececery
-        return position;
+        let fallback = floors[0].getCenter;
+
+        for (let attempts = 0; attempts < 50; attempts++) {
+            const index = Math.floor(Math.random() * max);
+            const pos = floors[index].getCenter;
+
+            if (this.calculateDistToPlayer(pos) >= this.minSafeDist) {
+                return pos;
+            }
+        }
+
+        return fallback;
     }
 
     private enemyWeapon()/*: Weapon*/ {
         // make weapon
+    }
+
+    private calculateDistToPlayer(position: Vector3) {
+        const dx = position.x - this.playerPosition.x;
+        const dy = position.y - this.playerPosition.y;
+        const dz = position.z - this.playerPosition.z;
+
+        return Math.sqrt(dx*dx + dy*dy + dz*dz);
     }
 }
 

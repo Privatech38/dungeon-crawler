@@ -27,7 +27,7 @@ class GameManager {
         this.player = player;
         this.deltaTime = 0;
         this.entities = new Set<Entity>;
-        this.world = new World(worldSurfaceArea);
+        this.world = new World(worldSurfaceArea, player.getInitialPosition);
     }
 
     public update(dt: number): void {
