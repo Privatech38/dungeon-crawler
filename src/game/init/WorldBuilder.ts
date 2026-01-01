@@ -230,7 +230,7 @@ export async function createEnemy( location: Transform, scene: Node ): Promise<v
         console.log("load enemy");
         const enemyLoader = new GLTFLoader();
         await enemyLoader.load(path);
-        enemy = enemyLoader.loadNode("PlayerArmature.001");
+        enemy = enemyLoader.loadNode("Skeleton");
 
         cache.set(path, enemy);
     }

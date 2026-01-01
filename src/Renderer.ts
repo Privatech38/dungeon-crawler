@@ -360,6 +360,7 @@ export class Renderer extends BaseRenderer {
 
     renderModel(model: Model) {
         for (const primitive of model.primitives) {
+            if (!primitive.material || !primitive.material.baseTexture) continue;
             this.renderPrimitive(primitive);
         }
     }

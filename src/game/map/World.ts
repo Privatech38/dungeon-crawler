@@ -63,7 +63,7 @@ class World {
                 this.surfaceArea(room);
 
                 // n % chance to make enemy in current room
-                if (this.enemyGenerator.shouldEnemySpawn()) {
+                if (this.enemyGenerator.shouldEnemySpawn(room)) {
                     const enemy = this.enemyGenerator.makeEnemy(room);
                     this.enemies.push(enemy);
                 }

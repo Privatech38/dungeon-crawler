@@ -16,27 +16,34 @@ class EnemyGenerator {
     constructor(maxEnemies: number, playerPosition: Vector3) {
         this.maxEnemies = maxEnemies;
         this.enemyList = [];
-        this.minSafeDist = 3;
+        this.minSafeDist = 5;
         this.enemyCount = 0;
         this.playerPosition = playerPosition;
     }
 
-    public shouldEnemySpawn(): boolean {
+    public shouldEnemySpawn(room: Room): boolean {
         if (this.enemyCount >= this.maxEnemies) return false;
 
         let chance = Math.floor(Math.random() * 1000);
         if (chance > this.SPAWN_CHANCE) return false;
 
-        this.SPAWN_CHANCE /= 1.5; // lower chance every time an enemy spawns
-        return true;
+        // check if there is space
+        for (let floor of room.getFloors) {
+            if (this.calculateDistToPlayer(floor.getCenter) >= this.minSafeDist) {
+                this.SPAWN_CHANCE /= 1.5; // lower chance every time an enemy spawns
+                return true;       
+            }
+        }
+
+        return false;
     }
 
-    public makeEnemy( room: Room ): Enemy {
+    public makeEnemy(room: Room): Enemy {
         let enemy = new Enemy( 
             this.enemyHP(),
             this.enemySpeed(), 
             this.enemyHitbox(), 
-            this.enemyPosition( room ), 
+            this.enemyPosition(room), 
             // this.enemyWeapon()
         );
 
@@ -79,13 +86,14 @@ class EnemyGenerator {
         const floors = room.getFloors;
         const max = floors.length;
 
-        let fallback = floors[0].getCenter;
+        let fallback = floors[floors.length-1].getCenter;
 
         for (let attempts = 0; attempts < 50; attempts++) {
             const index = Math.floor(Math.random() * max);
             const pos = floors[index].getCenter;
 
             if (this.calculateDistToPlayer(pos) >= this.minSafeDist) {
+                console.log("distance:", this.calculateDistToPlayer(pos));
                 return pos;
             }
         }
