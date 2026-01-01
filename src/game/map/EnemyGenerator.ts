@@ -11,12 +11,13 @@ class EnemyGenerator {
     private minSafeDist: number;
     private playerPosition: Vector3;
 
-    private SPAWN_CHANCE = 1000;
+    private SPAWN_CHANCE = 0;
+    private SPAWN_GROWTH = 5;
 
     constructor(maxEnemies: number, playerPosition: Vector3) {
         this.maxEnemies = maxEnemies;
         this.enemyList = [];
-        this.minSafeDist = 5;
+        this.minSafeDist = 4;
         this.enemyCount = 0;
         this.playerPosition = playerPosition;
     }
@@ -25,12 +26,15 @@ class EnemyGenerator {
         if (this.enemyCount >= this.maxEnemies) return false;
 
         let chance = Math.floor(Math.random() * 1000);
-        if (chance > this.SPAWN_CHANCE) return false;
+        console.log(chance, "vs", this.SPAWN_CHANCE);
+        if (chance > this.SPAWN_CHANCE) {
+            this.SPAWN_CHANCE = Math.floor( (this.SPAWN_CHANCE + 10) * this.SPAWN_GROWTH);
+            return false;
+        }
 
         // check if there is space
         for (let floor of room.getFloors) {
             if (this.calculateDistToPlayer(floor.getCenter) >= this.minSafeDist) {
-                this.SPAWN_CHANCE /= 1.5; // lower chance every time an enemy spawns
                 return true;       
             }
         }
@@ -86,19 +90,11 @@ class EnemyGenerator {
         const floors = room.getFloors;
         const max = floors.length;
 
-        let fallback = floors[floors.length-1].getCenter;
+        const index = Math.floor(Math.random() * max);
+        const pos = floors[index].getCenter;
 
-        for (let attempts = 0; attempts < 50; attempts++) {
-            const index = Math.floor(Math.random() * max);
-            const pos = floors[index].getCenter;
-
-            if (this.calculateDistToPlayer(pos) >= this.minSafeDist) {
-                console.log("distance:", this.calculateDistToPlayer(pos));
-                return pos;
-            }
-        }
-
-        return fallback;
+        console.log("distance:", this.calculateDistToPlayer(pos));
+        return pos;
     }
 
     private enemyWeapon()/*: Weapon*/ {

@@ -38,7 +38,7 @@ class World {
         this.maxSurfaceArea = maxSurfaceArea;
         this.currentSurfaceArea = 0;
         this.mapGenerator = new MapGenerator((maxSurfaceArea/10) * 3);
-        this.enemyGenerator = new EnemyGenerator((maxSurfaceArea/10), playerPosition);
+        this.enemyGenerator = new EnemyGenerator((maxSurfaceArea/5), playerPosition);
     }
 
     /**
