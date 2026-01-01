@@ -23,3 +23,5 @@ class MeleeWeapon extends Weapon {
     }
 
 }
+
+export { MeleeWeapon }

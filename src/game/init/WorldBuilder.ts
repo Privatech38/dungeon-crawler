@@ -1,4 +1,6 @@
 import {
+    Camera,
+    Model,
     Node,
     Transform,
     // @ts-ignore
@@ -63,6 +65,23 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
             rotation: floor.getQuaternions,
         }), scene);
     }
+
+    for (const enemy of world.getEnemies) {
+        await createEnemy(new Transform({
+            translation: enemy.getPosition.toArray,
+            rotation: [0, 0, 0, 1]
+        }), scene);
+    }
+}
+
+/**
+ * Creates a camera located at (0,0,0).
+ * @returns {Node} The camera node.
+ */
+export function createCamera(): Node {
+    const camera = new Node();
+    camera.addComponent(new Camera());
+    return camera;
 }
 
 /**
@@ -197,4 +216,28 @@ export async function createDoor(location: Transform, scene: Node): Promise<void
     doorClone.isStatic = true;
     doorClone.addComponent(location);
     scene.addChild(doorClone);
+}
+
+/**
+ * Creates an enemy at the specified location.
+ * @param {Transform} location the location of the enemy
+ * @param {Node} scene the scene to which the enemy will be added
+ */
+export async function createEnemy( location: Transform, scene: Node ): Promise<void> {
+    const path: string = 'assets/models/characters/skeleton/skeleton.gltf';
+    if (!cache.has(path)) {
+        const enemyLoader = new GLTFLoader();
+        await enemyLoader.load(path);
+        const enemy = enemyLoader.loadNode("Skeleton");
+
+        cache.set(path, enemy);
+    }
+ 
+    const enemyClone = cache.get(path).clone();
+
+    enemyClone.isStatic = false;
+    enemyClone.addComponent(location);
+    scene.addChild(enemyClone);
+
+    console.log("made enemy:", enemyClone, "at", location.translation);
 }

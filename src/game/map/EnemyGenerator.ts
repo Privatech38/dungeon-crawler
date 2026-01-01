@@ -1,0 +1,113 @@
+import {Enemy} from "/src/game/entities/Enemy.js";
+import {Vector3} from "/src/math/Vector.js";
+import {Room} from "./Room.js";
+import {OBB} from "/src/game/entities/hitboxes/OBB.js";
+import { Weapon } from "game/entities/items/Weapon.js";
+
+class EnemyGenerator {
+    private maxEnemies: number;
+    private enemyCount: number;
+    private enemyList: Enemy[];
+    private minSafeDist: number;
+    private playerPosition: Vector3;
+
+    private SPAWN_CHANCE = 0;
+    private SPAWN_GROWTH = 5;
+
+    constructor(maxEnemies: number, playerPosition: Vector3) {
+        this.maxEnemies = maxEnemies;
+        this.enemyList = [];
+        this.minSafeDist = 4;
+        this.enemyCount = 0;
+        this.playerPosition = playerPosition;
+    }
+
+    public shouldEnemySpawn(room: Room): boolean {
+        if (this.enemyCount >= this.maxEnemies) return false;
+
+        let chance = Math.floor(Math.random() * 1000);
+        console.log(chance, "vs", this.SPAWN_CHANCE);
+        if (chance > this.SPAWN_CHANCE) {
+            this.SPAWN_CHANCE = Math.floor( (this.SPAWN_CHANCE + 10) * this.SPAWN_GROWTH);
+            return false;
+        }
+
+        // check if there is space
+        for (let floor of room.getFloors) {
+            if (this.calculateDistToPlayer(floor.getCenter) >= this.minSafeDist) {
+                return true;       
+            }
+        }
+
+        return false;
+    }
+
+    public makeEnemy(room: Room): Enemy {
+        let enemy = new Enemy( 
+            this.enemyHP(),
+            this.enemySpeed(), 
+            this.enemyHitbox(), 
+            this.enemyPosition(room), 
+            // this.enemyWeapon()
+        );
+
+        this.enemyList.push(enemy);
+
+        this.enemyCount++;
+        return enemy;
+    }
+
+    private enemyHitbox(): OBB {
+        const defaultAxis: [Vector3, Vector3, Vector3] = [
+            new Vector3(1, 0, 0),
+            new Vector3(0, 1, 0),
+            new Vector3(0, 0, 1),
+        ]
+
+        const enemyHitbox = new OBB(
+            defaultAxis,
+            new Vector3(0.324, 0.7, 0.286),
+        )
+
+        return enemyHitbox;
+    }
+
+    private enemyHP(): number {
+        // may differ given the enemy weapon type
+        // melee high, ranged low
+
+        return 100;
+    }
+
+    private enemySpeed(): number {
+        // may differ given the enemy weapon type
+        // melee high, ranged low
+
+        return 2;
+    }
+
+    private enemyPosition( room: Room ): Vector3 {
+        const floors = room.getFloors;
+        const max = floors.length;
+
+        const index = Math.floor(Math.random() * max);
+        const pos = floors[index].getCenter;
+
+        console.log("distance:", this.calculateDistToPlayer(pos));
+        return pos;
+    }
+
+    private enemyWeapon()/*: Weapon*/ {
+        // make weapon
+    }
+
+    private calculateDistToPlayer(position: Vector3) {
+        const dx = position.x - this.playerPosition.x;
+        const dy = position.y - this.playerPosition.y;
+        const dz = position.z - this.playerPosition.z;
+
+        return Math.sqrt(dx*dx + dy*dy + dz*dz);
+    }
+}
+
+export {EnemyGenerator}
