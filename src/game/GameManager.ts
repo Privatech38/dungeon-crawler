@@ -57,7 +57,7 @@ class GameManager {
                 if (this.collisionWithWall(entity.getHitbox)) {
                     return;
                 }
-                entity.update(this.player)
+                entity.update(this.player, this.deltaTime);
             }
         })
     }

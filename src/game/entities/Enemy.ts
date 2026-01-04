@@ -31,23 +31,23 @@ class Enemy extends Entity {
         // this.weapon = weapon
     }
 
-    private moveTowardsPlayer(player: Player) {
+    private moveTowardsPlayer(player: Player, dt: number) {
         const playerPosition = player.getPosition;
 
         const moveVector: Vector3 = this.position.subtract(playerPosition).normalize();
 
         this.movement.setVelocity(moveVector.x, moveVector.z);
+        this.movement.checkMovement(dt);
         this.movement.update();
 
         const transforms = this.node.getComponentsOfType(Transform);
         if (transforms[2]) {
             vec3.copy(transforms[2].translation, this.movement.getPosition.toArray);
-            console.log(transforms[2]);
         }
     }
 
-    public update(player: Player): void {
-        this.moveTowardsPlayer(player);
+    public update(player: Player, dt: number): void {
+        this.moveTowardsPlayer(player, dt);
 
     }
 
