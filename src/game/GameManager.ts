@@ -1,7 +1,7 @@
 import {Entity} from "./entities/Entity.js";
 import {Player} from "./entities/Player.js";
 import {PlayerMovement} from "./entities/PlayerMovement.js";
-import { World } from "./map/World.js";
+import {World} from "./map/World.js";
 import {Room} from "./map/Room.js";
 import {CollisionManager} from "./entities/hitboxes/Collision.js";
 import {Enemy} from "./entities/Enemy.js";
@@ -21,7 +21,6 @@ class GameManager {
 
     private deltaTime: number;
     private readonly world: World;
-    
 
     constructor(player: Player, worldSurfaceArea: number) {
         this.player = player;
@@ -63,7 +62,7 @@ class GameManager {
         })
     }
 
-    public generateWorld() {
+    public async generateWorld() {
         this.world.generateWorld();
     }
 

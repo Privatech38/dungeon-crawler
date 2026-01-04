@@ -346,6 +346,11 @@ export class Renderer extends BaseRenderer {
 
         const { modelUniformBuffer, modelBindGroup } = this.prepareNode(node);
         this.device.queue.writeBuffer(modelUniformBuffer, 0, modelMatrix);
+
+        if (!normalMatrix) {
+            console.log("normal matrix:", normalMatrix);
+        }
+
         this.device.queue.writeBuffer(modelUniformBuffer, 64, normalMatrix);
         this.renderPass.setBindGroup(2, modelBindGroup);
 

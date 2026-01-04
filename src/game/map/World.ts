@@ -1,13 +1,11 @@
 import { Room } from "./Room.js";
 import { MapGenerator } from "./MapGenerator.js";
-import {EnemyGenerator} from "./EnemyGenerator.js";
 import { Structure } from "./Structures/Structure.js";
 import {Wall} from "./Structures/Wall.js";
 import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
 import {BottomWall} from "./Structures/BottomWall.js";
 import {AddDoors} from "./AddDoors.js";
-import { Enemy } from "game/entities/Enemy.js";
 import { Vector3 } from "math/Vector.js";
 
 /**
@@ -22,11 +20,9 @@ class World {
      * @private {MapGenerator} mapGenerator - Instance of MapGenerator used for generating and placing rooms.
      */
     private readonly rooms: Room[];
-    private readonly enemies: Enemy[];
     private readonly maxSurfaceArea: number;
     private currentSurfaceArea: number;
     private mapGenerator: MapGenerator;
-    private enemyGenerator: EnemyGenerator;
 
     /**
      * Creates a new World instance.
@@ -34,11 +30,9 @@ class World {
      */
     constructor(maxSurfaceArea: number = 100, playerPosition: Vector3) {
         this.rooms = [];
-        this.enemies = [];
         this.maxSurfaceArea = maxSurfaceArea;
         this.currentSurfaceArea = 0;
         this.mapGenerator = new MapGenerator((maxSurfaceArea/10) * 3);
-        this.enemyGenerator = new EnemyGenerator((maxSurfaceArea/5), playerPosition);
     }
 
     /**
@@ -61,24 +55,18 @@ class World {
             if (placed) {
                 this.rooms.push(this.mapGenerator.getLastRoom);
                 this.surfaceArea(room);
-
-                // n % chance to make enemy in current room
-                if (this.enemyGenerator.shouldEnemySpawn(room)) {
-                    const enemy = this.enemyGenerator.makeEnemy(room);
-                    this.enemies.push(enemy);
-                }
             }
         }
 
         new AddDoors(this).addDoorsAll();
 
-        for (let i = 0; i < this.rooms.length; ++i) {
-            let room = this.rooms[i];
-            console.log("room", i+1);
-            for (let floor of room.getFloors) {
-                console.log(floor.getCenter);
-            }
-        }
+        // for (let i = 0; i < this.rooms.length; ++i) {
+        //     let room = this.rooms[i];
+        //     console.log("room", i+1);
+        //     for (let floor of room.getFloors) {
+        //         console.log(floor.getCenter);
+        //     }
+        // }
     }
 
     /**
@@ -176,12 +164,12 @@ class World {
         return uniquePillar;
     }
 
-    get getEnemies(): Enemy[] {
-        return this.enemies;
-    }
-
     get getGrid(): number[][] {
         return this.mapGenerator.getMap;
+    }
+
+    get getMaxSurfaceArea(): number {
+        return this.maxSurfaceArea;
     }
 }
 export { World };
