@@ -32,9 +32,11 @@ class Enemy extends Entity {
     }
 
     private moveTowardsPlayer(player: Player, dt: number) {
+
         const playerPosition = player.getPosition;
 
-        const moveVector: Vector3 = this.position.subtract(playerPosition).normalize();
+        // const moveVector: Vector3 = this.position.subtract(playerPosition).normalize();
+        const moveVector: Vector3 = playerPosition.subtract(this.position).normalize();
 
         this.movement.setVelocity(moveVector.x, moveVector.z);
         this.movement.checkMovement(dt);
@@ -44,9 +46,22 @@ class Enemy extends Entity {
         if (transforms[2]) {
             vec3.copy(transforms[2].translation, this.movement.getPosition.toArray);
         }
+
+        const x = transforms[2].translation[0];
+        const y = transforms[2].translation[1];
+        const z = transforms[2].translation[2];
+
+        this.updatePosition(new Vector3(x, y, z));
+
+        if (this.node.getId() === "opozicija_1") {
+            console.log("enemy hitbox:", this.hitbox.center);
+        }
+
+        // TODO: roation
     }
 
     public update(player: Player, dt: number): void {
+        console.log("enemy.update");
         this.moveTowardsPlayer(player, dt);
 
     }

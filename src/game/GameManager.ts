@@ -52,10 +52,10 @@ class GameManager {
 
     public entityMove() {
         this.entities.forEach((entity: Entity) => {
-            if (this.checkCollision(entity).length !== 0) {return}
+            // if (this.checkCollision(entity).length !== 0) {return}
             if (entity instanceof Enemy) {
                 if (this.collisionWithWall(entity.getHitbox)) {
-                    return;
+                    // return;
                 }
                 entity.update(this.player, this.deltaTime);
             }

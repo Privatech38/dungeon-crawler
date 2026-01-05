@@ -178,6 +178,11 @@ class OBB extends Hitbox {
 
             const projection1 = this.getProjectionRadius(axisNormalized);
             const projection2 = other.getProjectionRadius(axisNormalized);
+
+            if (!this.center.subtract) {
+                console.log("no subtarct")
+            }
+            
             const centerDistance = Math.abs(
                 this.center.subtract(other.center).dot(axisNormalized)
             );
