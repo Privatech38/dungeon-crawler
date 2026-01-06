@@ -3,6 +3,8 @@ export class Node {
     parent: Node | null;
     components: any[];
     isStatic: boolean;
+    // for debug
+    id: string = "empty";
 
     constructor() {
         this.children = [];
@@ -83,4 +85,11 @@ export class Node {
         return clone;
     }
 
+    public setId( id: string ) {
+        this.id = id;
+    }
+
+    public getId() {
+        return this.id;
+    }
 }

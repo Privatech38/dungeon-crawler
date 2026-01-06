@@ -21,10 +21,7 @@ import { PlayerController } from "./game/PlayerController";
 import {GameManager} from "./game/GameManager";
 import { player } from "./game/enteties";
 import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
-
-let manager = new GameManager(player, 20);
-manager.generateWorld();
-let world = manager.getWorld;
+import {EnemyManager} from "./game/EnemyManager.js";
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const renderer = new Renderer(canvas);
@@ -39,8 +36,20 @@ const gltfLoader = new GLTFLoader();
 await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
 const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
+
+let manager = new GameManager(player, 20);
+await manager.generateWorld();
+let world = manager.getWorld;
+
+const enemyManager = new EnemyManager(world.getMaxSurfaceArea/5, player.getPosition);
+await enemyManager.init();
+// generate enemies
+await enemyManager.generateEnemies(world.getRooms, scene, manager);
+
 const playerNode = gltfLoader.loadNode("Player");
+playerNode.setId("playerNode");
 const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
+playerArmatureNode.setId("playerArmatureNode");
 playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
 
 const camera = scene.find((node: Node) => node.getComponentOfType(Camera));

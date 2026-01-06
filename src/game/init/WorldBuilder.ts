@@ -1,4 +1,6 @@
 import {
+    Camera,
+    Model,
     Node,
     Transform,
     // @ts-ignore
@@ -63,6 +65,16 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
             rotation: floor.getQuaternions,
         }), scene);
     }
+}
+
+/**
+ * Creates a camera located at (0,0,0).
+ * @returns {Node} The camera node.
+ */
+export function createCamera(): Node {
+    const camera = new Node();
+    camera.addComponent(new Camera());
+    return camera;
 }
 
 /**

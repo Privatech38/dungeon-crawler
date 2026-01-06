@@ -6,6 +6,7 @@ import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
 import {BottomWall} from "./Structures/BottomWall.js";
 import {AddDoors} from "./AddDoors.js";
+import { Vector3 } from "math/Vector.js";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.
@@ -27,7 +28,7 @@ class World {
      * Creates a new World instance.
      * @param {number} [maxSurfaceArea=100] - The maximum allowable surface area for the world (default: 10x10).
      */
-    constructor(maxSurfaceArea: number = 100) {
+    constructor(maxSurfaceArea: number = 100, playerPosition: Vector3) {
         this.rooms = [];
         this.maxSurfaceArea = maxSurfaceArea;
         this.currentSurfaceArea = 0;
@@ -58,6 +59,14 @@ class World {
         }
 
         new AddDoors(this).addDoorsAll();
+
+        // for (let i = 0; i < this.rooms.length; ++i) {
+        //     let room = this.rooms[i];
+        //     console.log("room", i+1);
+        //     for (let floor of room.getFloors) {
+        //         console.log(floor.getCenter);
+        //     }
+        // }
     }
 
     /**
@@ -157,6 +166,10 @@ class World {
 
     get getGrid(): number[][] {
         return this.mapGenerator.getMap;
+    }
+
+    get getMaxSurfaceArea(): number {
+        return this.maxSurfaceArea;
     }
 }
 export { World };
