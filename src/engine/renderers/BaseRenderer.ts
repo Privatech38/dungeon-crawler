@@ -11,6 +11,8 @@ export class BaseRenderer {
     protected gpuObjects: WeakMap<WeakKey, any>;
 
     // @ts-ignore
+    adapter: GPUAdapter;
+    // @ts-ignore
     device: GPUDevice;
     format!: GPUTextureFormat;
     // @ts-ignore
@@ -37,6 +39,8 @@ export class BaseRenderer {
         }
         const format = navigator.gpu.getPreferredCanvasFormat();
         context?.configure({ device, format });
+        // @ts-ignore
+        this.adapter = adapter;
         this.device = device;
         this.context = context;
         this.format = format;
