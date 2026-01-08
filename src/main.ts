@@ -16,7 +16,7 @@ import {initialize} from "./game/init/WorldBuilder";
 import {PlayerController} from "./game/PlayerController";
 import {GameManager} from "./game/GameManager";
 import {player} from "./game/enteties";
-import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
+import {ShadowData, ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
 import {KHRLightExtension, LightType} from "./gpu/object/KhronosLight";
 // @ts-ignore
 import {getGlobalModelMatrix} from "./engine/core/SceneUtils.js";
@@ -69,7 +69,7 @@ if (lights.length < 4) {
     lights.fill(emptyLightNode, lights.length, 5);
 }
 
-const shadowData: { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] } = shadowRenderer.renderSceneLights(scene);
+const shadowData: ShadowData = shadowRenderer.renderSceneLights(scene);
 
 // Send the data to renderer
 renderer.shadowData = shadowData;

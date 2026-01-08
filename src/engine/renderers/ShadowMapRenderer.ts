@@ -17,6 +17,13 @@ import {LightIndex} from "../../gpu/object/LightIndex";
 
 export const FAR_PLANE = 100;
 
+export type ShadowData = {
+    shadowMap: GPUTextureView
+    shadowMapView: GPUTextureView
+    lightViewMatrices: Map<Node, Float32Array>
+    lights: Node[]
+};
+
 const vertexBufferLayout: GPUVertexBufferLayout = {
     label: "Shadow vertex buffer layout",
     arrayStride: 32,
@@ -107,6 +114,7 @@ const ORTHOGRAPHIC_MATRIX = mat4.orthoZO(mat4.create(), -10, 10, -10, 10, 0.01, 
 
 export class ShadowMapRenderer extends BaseRenderer {
     shadowMapNodeViews: Map<Node, Array<GPUTextureView>>;
+    lightViewMatrices: Map<Node, Float32Array> = new Map<Node, Float32Array>();
     // @ts-ignore
     lightViewProjectionBindGroupLayout: GPUBindGroupLayout;
     // @ts-ignore
@@ -241,9 +249,9 @@ export class ShadowMapRenderer extends BaseRenderer {
      * Renders the scene (node), by creating shadow/depth maps for every node with KHRLightExtension component.
      * If a light node is already cached it will not render it's shadow/depth map(s)
      * @param scene A scene
-     * @return {{ shadowMap: GPUTextureView; shadowMapView: GPUTextureView, lights: Node[] }} The shadow map and it's view crated from the lights in the scene
+     * @return {ShadowData} The shadow map and it's view crated from the lights in the scene
      */
-    renderSceneLights(scene: Node): { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] } {
+    renderSceneLights(scene: Node): ShadowData {
         let lights: Node[] = scene.filter((node: Node) => node.getComponentOfType(KHRLightExtension));
         // Do not go over the limit on GPU
         lights.slice(0, Math.ceil(this.adapter.limits.maxTextureArrayLayers / 6));
@@ -265,7 +273,7 @@ export class ShadowMapRenderer extends BaseRenderer {
         });
         // Now render all lights
         lights.forEach((light: Node) => this.render(scene, light));
-        return { shadowMap: this.shadowMapView, shadowMapView: this.shadowMapView, lights: lights };
+        return { shadowMap: this.shadowMapView, shadowMapView: this.shadowMapView, lights: lights, lightViewMatrices: this.lightViewMatrices };
     }
 
     /**
@@ -283,7 +291,11 @@ export class ShadowMapRenderer extends BaseRenderer {
         const { lightUniformBuffer, lightBindGroup } = this.prepareLight(khronosLight);
         this.device.queue.writeBuffer(lightUniformBuffer, 64, khronosLight.type === LightType.directional ? ORTHOGRAPHIC_MATRIX : PERSPECTIVE_MATRIX);
 
+        // Prepare data for view matrices
+        let viewProjMatrixData = new Float32Array(96);
+        this.lightViewMatrices.set(light, viewProjMatrixData);
 
+        // Render each cube face
         for (let i = 0; i < shadowMapViews.length; i++) {
             const encoder = this.device.createCommandEncoder();
             const shadowMapView = shadowMapViews[i];
@@ -300,6 +312,7 @@ export class ShadowMapRenderer extends BaseRenderer {
 
             let toViewMatrix = CUBE_VECTORS[i].toViewMatrix(globalModelMatrix);
             this.device.queue.writeBuffer(lightUniformBuffer, 0, shadowMapViews.length > 1 ? toViewMatrix : viewMatrix);
+            viewProjMatrixData.set(mat4.mul(mat4.create(), PERSPECTIVE_MATRIX, toViewMatrix), i * 16);
             this.renderPass.setBindGroup(0, lightBindGroup);
 
             this.renderPass.setPipeline(this.pipeline);

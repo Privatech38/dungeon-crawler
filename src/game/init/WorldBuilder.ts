@@ -135,6 +135,8 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
     }
 }
 
+let torchCount = 0;
+
 /**
  * Creates a torch on a specified parent node.
  * @param location The location
@@ -147,6 +149,10 @@ export async function createTorch(location: Transform, scene: Node): Promise<voi
         await torchLoader.load(path);
         const torch: Node = torchLoader.loadNode('Torch');
         cache.set(path, torch);
+    }
+
+    if (torchCount++ !== 1) {
+        return;
     }
 
     const torchClone: Node = cache.get(path).clone();

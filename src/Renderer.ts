@@ -18,7 +18,7 @@ import {
 // @ts-ignore
 import lamberPerFragment from './lambertPerFragment.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
-import { FAR_PLANE } from "./engine/renderers/ShadowMapRenderer";
+import {FAR_PLANE, ShadowData} from "./engine/renderers/ShadowMapRenderer";
 
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
@@ -128,7 +128,7 @@ export class Renderer extends BaseRenderer {
     // @ts-ignore
     private encoder: GPUCommandEncoder;
     // @ts-ignore
-    shadowData: { shadowMap: GPUTextureView; shadowMapView: GPUTextureView; lights: Node[] };
+    shadowData: ShadowData;
 
     constructor(canvas: HTMLCanvasElement) {
         super(canvas);
@@ -214,7 +214,7 @@ export class Renderer extends BaseRenderer {
     }
 
     /**
-     * Returns a buffer, and it's bind group for 4 closest lights
+     * Returns a buffer, and it's bind group
      * @returns {{ lightsStorageBuffer: GPUBuffer, texture: GPUTexture, textureView: GPUTextureView, lightBindGroup: GPUBindGroup }}
      */
     prepareLights(): { lightsStorageBuffer: GPUBuffer; lightBindGroup: GPUBindGroup; } {
@@ -231,7 +231,7 @@ export class Renderer extends BaseRenderer {
 
         const lightsStorageBuffer = this.device.createBuffer({
             label: "Lights storage buffer",
-            size: this.shadowData.lights.length * 160,
+            size: this.shadowData.lights.length * 480,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
         });
 
@@ -376,7 +376,7 @@ export class Renderer extends BaseRenderer {
     writeLights() {
         const { lightsStorageBuffer, lightBindGroup } = this.prepareLights();
 
-        const LightUniformValues = new ArrayBuffer(160);
+        const LightUniformValues = new ArrayBuffer(480);
         const LightUniformViews = {
             extension: {
                 color: new Float32Array(LightUniformValues, 0, 3),
@@ -387,7 +387,7 @@ export class Renderer extends BaseRenderer {
                 outerConeAngle: new Float32Array(LightUniformValues, 28, 1),
             },
             globalModelMatrix: new Float32Array(LightUniformValues, 32, 16),
-            viewProjectionMatrix: new Float32Array(LightUniformValues, 96, 16),
+            viewProjectionMatrix: new Float32Array(LightUniformValues, 96, 96),
         };
 
         for (let i = 0; i < this.shadowData.lights.length; i++) {
@@ -402,9 +402,9 @@ export class Renderer extends BaseRenderer {
             LightUniformViews.extension.outerConeAngle[0] = khrExtension.spot.outerConeAngle;
 
             LightUniformViews.globalModelMatrix.set(getGlobalModelMatrix(lightNode));
-            LightUniformViews.viewProjectionMatrix.set(getGlobalViewMatrix(lightNode));
+            LightUniformViews.viewProjectionMatrix.set(<Float32Array>this.shadowData.lightViewMatrices.get(lightNode));
 
-            this.device.queue.writeBuffer(lightsStorageBuffer, i * 160, LightUniformValues);
+            this.device.queue.writeBuffer(lightsStorageBuffer, i * 480, LightUniformValues);
         }
 
         this.renderPass.setBindGroup(1, lightBindGroup);

@@ -62,7 +62,7 @@ struct Light {
 struct LightUniform {
     extension : Light,
     globalModelMatrix : mat4x4<f32>,
-    viewProjectionMatrix : mat4x4<f32>
+    viewProjMatrices : array<mat4x4<f32>, 6>
 }
 
 @group(0) @binding(0) var<uniform> camera: CameraUniforms;
@@ -126,7 +126,7 @@ fn calculatePointLight(light: Light, lightIndex: u32, lightPosition: vec4f, norm
     ambient *= attenuation;
     diffuse *= attenuation;
 
-    let shadow: f32 = computeShadow(position.xyz, lightPosition.xyz, lightIndex * 6);
+    let shadow: f32 = computeShadow(position, lightPosition, lightIndex);
     return (ambient + shadow * diffuse) * baseColor;
 }
 
@@ -138,9 +138,30 @@ fn attenuationFromRange(range: f32, threshold: f32) -> vec3f {
     return vec3f(constantAttenuation, linearAttenuation, quadraticAttenuation);
 }
 
-fn computeShadow(fragPos: vec3f, lightPos: vec3f, lightIndex: u32) -> f32 {
-    let fragToLight: vec3f = fragPos - lightPos;
-    var referenceDepth: f32 = length(fragToLight);
-    referenceDepth = (referenceDepth - nearPlane) / (farPlane - nearPlane);
-    return textureSampleCompare(depthCubeArray, depthCubeSampler, normalize(fragToLight), lightIndex, referenceDepth);
+fn computeShadow(fragPos: vec4f, lightPos: vec4f, lightIndex: u32) -> f32 {
+    let light: LightUniform = lights[lightIndex];
+    let fragToLight: vec4f = fragPos - lightPos;
+    let faceIndex: u32 = cubemap_face_index(fragToLight);
+    let lightVPMatrix: mat4x4<f32> = light.viewProjMatrices[faceIndex];
+
+    let lightClipPos: vec4f = lightVPMatrix * fragPos;
+
+    let ndc: vec4f = lightClipPos / lightClipPos.w;
+    // ndc.z is in range [-1, 1] for typical perspective projection
+    let shadowDepth: f32 = ndc.z * 0.5 + 0.5; // Now in [0, 1] (suitable for shadow map compare)
+    return textureSampleCompare(depthCubeArray, depthCubeSampler, normalize(fragToLight).xyz, lightIndex, shadowDepth);
+}
+
+fn cubemap_face_index(dir: vec4f) -> u32 {
+    let absDir = abs(dir);
+    if (absDir.x > absDir.y && absDir.x > absDir.z) {
+        // X axis is dominant
+        return select(1u, 0u, dir.x > 0.0); // 0: +X, 1: -X
+    } else if (absDir.y > absDir.z) {
+        // Y axis is dominant
+        return select(3u, 2u, dir.y > 0.0); // 2: +Y, 3: -Y
+    } else {
+        // Z axis is dominant
+        return select(5u, 4u, dir.z > 0.0); // 4: +Z, 5: -Z
+    }
 }
