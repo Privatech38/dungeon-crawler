@@ -20,6 +20,9 @@ export interface IKHRLightExtension {
     spot?: IKHRSpot;
 }
 
+const FLICKER_SPEED = 2;
+const INTENSITY_OFFSET_PERCEMT = 0.33;
+
 /**
  * Class representing structure for a Light extension as specified by Khronos Group in glTF 2.0.<br>
  * https://github.com/KhronosGroup/glTF/blob/main/extensions/2.0/Khronos/KHR_lights_punctual/README.md
@@ -51,8 +54,8 @@ export class KHRLightExtension {
     }
 
     update(time: number, dt: number) {
-        const rawNoise: number = noise.perlin2(time * 2, this.startOffset);
-        this.intensity = this.baseIntensity + rawNoise * 5;
+        const rawNoise: number = noise.perlin2(time * FLICKER_SPEED, this.startOffset);
+        this.intensity = this.baseIntensity + rawNoise * this.baseIntensity * INTENSITY_OFFSET_PERCEMT;
     }
 
     clone() {
