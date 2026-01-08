@@ -121,7 +121,7 @@ fn calculatePointLight(light: Light, lightIndex: u32, lightPosition: vec4f, norm
     let coefficients: vec3f = attenuationFromRange(light.intensity, 0.01);
     let attenuation: f32 = 1.0 / (coefficients.x + coefficients.y * lightDistance + coefficients.z * lightDistance * lightDistance);
     // Combine
-    var ambient = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
+    var ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
     var diffuse = vec4f(light.color, 1.0) * diff;
     ambient *= attenuation;
     diffuse *= attenuation;
