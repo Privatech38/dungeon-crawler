@@ -1,3 +1,6 @@
+// @ts-ignore
+import { noise } from "../../math/perlin.js"
+
 export enum LightType {
     point,
     directional,
@@ -26,20 +29,42 @@ export class KHRLightExtension {
     readonly type: LightType;
     color: [number, number, number];
     intensity: number;
+    baseIntensity: number;
     range: number;
     spot: KHRSpot;
+    // Flicker data
+    startOffset: number;
 
     constructor(json: IKHRLightExtension) {
         this.name = json.name ?? '';
         this.type = json.type;
         this.color = json.color ?? [1.0, 1.0, 1.0];
         this.intensity = json.intensity ?? 1.0;
+        this.baseIntensity = this.intensity;
         this.range = json.range ?? 10000; // Has no default, but we set it to 10000 in our impl
         if (json.spot) {
             this.spot = new KHRSpot(json.spot);
         } else {
             this.spot = new KHRSpot();
         }
+        this.startOffset = Math.random() * 1000;
+    }
+
+    update(time: number, dt: number) {
+        const rawNoise: number = noise.perlin2(time * 2, this.startOffset);
+        this.intensity = this.baseIntensity + rawNoise * 5;
+    }
+
+    clone() {
+        console.log("Clone called")
+        return new KHRLightExtension({
+            name: this.name,
+            type: this.type,
+            color: this.color,
+            intensity: this.intensity,
+            range: this.range,
+            spot: this.spot
+        });
     }
 }
 
