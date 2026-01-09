@@ -75,6 +75,8 @@ function update(time: number, dt: number) {
             component.update?.(time, dt);
         }
     });
+
+    // if (player.isDead())
 }
 
 function render() {

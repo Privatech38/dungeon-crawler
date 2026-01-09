@@ -9,8 +9,8 @@ abstract class Weapon{
     protected hurtbox: Hitbox;
     protected node: Node;
 
-    protected lastAttack: number = 0;
-    protected attackCooldown: number;
+    protected cooldown: number;
+    protected ATTACK_COOLDOWN: number;
 
     protected constructor(
         attackDamage: number,
@@ -22,15 +22,20 @@ abstract class Weapon{
         this.attackDamage = attackDamage;
         this.effects = effects;
         this.hurtbox = hurtbox;
-        this.attackCooldown = cooldown;
+        this.ATTACK_COOLDOWN = cooldown;
+        this.cooldown = 0;
         this.node = node;
     }
 
     // returns dmg that sould be delt (takes atk cooldown into account)
     public attack(dt: number) {
-        if (dt - this.lastAttack > this.attackCooldown) {
+        this.cooldown -= dt;
+
+        if (this.cooldown <= 0) {
+            this.cooldown = this.ATTACK_COOLDOWN;
             return this.attackDamage;
         }
+
         return 0;
     }
 
