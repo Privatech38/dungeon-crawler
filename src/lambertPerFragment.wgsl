@@ -92,6 +92,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let N = vec4f(normalize(input.normal), 0);
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+    let rougness = textureSample(roughnessTexture, baseSampler, input.texcoords).g;
 
     var finalColor = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0) * baseColor;
     let lightAmount: u32 = arrayLength(&lights);
@@ -103,7 +104,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         if (distance(lightPosition, input.worldPos) > 10) {
             continue;
         }
-        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor, viewDir);
+        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor, rougness, viewDir);
     }
 
 //    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
@@ -113,7 +114,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     return output;
 }
 
-fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f, viewDir: vec4f) -> vec4f {
+fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f, roughness: f32, viewDir: vec4f) -> vec4f {
     let lightDir: vec4f = normalize(lightPosition - position);
     let diff: f32 = max(dot(normal, lightDir), 0.0);
     // Attenuation
@@ -124,7 +125,7 @@ fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, positi
     var ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
     var diffuse = vec4f(light.color, 1.0) * diff * baseColor;
     let reflectDir = reflect(-lightDir, normal);
-    var specular = pow(max(dot(viewDir, reflectDir), 0.0), 6) * vec4f(light.color, 1.0);
+    var specular = pow(max(dot(viewDir, reflectDir), 0.0), 32) * vec4f(light.color, 1.0) * (1.0 - roughness);
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
