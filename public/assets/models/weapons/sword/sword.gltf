@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.3.47",
+		"generator":"Khronos glTF Blender I/O v5.0.21",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -15,18 +15,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Sword",
-			"rotation":[
-				0.6996456980705261,
-				0.1024489551782608,
-				-0.0918651670217514,
-				0.7011140584945679
-			],
-			"translation":[
-				1.1282870769500732,
-				0.6448494791984558,
-				-3.025378465652466
-			]
+			"name":"Sword"
 		}
 	],
 	"materials":[
@@ -38,7 +27,9 @@
 					"index":0
 				},
 				"metallicFactor":0,
-				"roughnessFactor":0.699999988079071
+				"metallicRoughnessTexture":{
+					"index":1
+				}
 			}
 		}
 	],
@@ -62,6 +53,10 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":1,
+			"source":1
 		}
 	],
 	"images":[
@@ -69,6 +64,11 @@
 			"mimeType":"image/png",
 			"name":"main-texture",
 			"uri":"../../../textures/main-texture.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"main_roughness",
+			"uri":"../../../textures/main_roughness.png"
 		}
 	],
 	"accessors":[
@@ -137,6 +137,10 @@
 		{
 			"magFilter":9728,
 			"minFilter":9984
+		},
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[

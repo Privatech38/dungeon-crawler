@@ -102,6 +102,11 @@ const materialBindGroupLayout: GPUBindGroupLayoutDescriptor = {
             visibility: GPUShaderStage.FRAGMENT,
             sampler: {},
         },
+        {
+            binding: 3,
+            visibility: GPUShaderStage.FRAGMENT,
+            texture: {}
+        }
     ],
 };
 
@@ -287,6 +292,19 @@ export class Renderer extends BaseRenderer {
         }
 
         const baseTexture = this.prepareTexture(material.baseTexture);
+        let roughnessTexture;
+        if (material.roughnessTexture) {
+            roughnessTexture = this.prepareTexture(material.roughnessTexture);
+        } else {
+            roughnessTexture = {
+                gpuTexture: this.device.createTexture({
+                    label: "Default roughness texture",
+                    format: "rgba8unorm",
+                    size: [1,1,1],
+                    usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.RENDER_ATTACHMENT
+                })
+            }
+        }
 
         const materialUniformBuffer = this.device.createBuffer({
             label: "Material uniform buffer",
@@ -301,6 +319,7 @@ export class Renderer extends BaseRenderer {
                 { binding: 0, resource: { buffer: materialUniformBuffer } },
                 { binding: 1, resource: baseTexture.gpuTexture.createView() },
                 { binding: 2, resource: baseTexture.gpuSampler },
+                { binding: 3, resource: roughnessTexture.gpuTexture.createView() }
             ],
         });
 
