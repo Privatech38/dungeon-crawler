@@ -1,6 +1,6 @@
-override ambientRed = 0.039;
-override ambientGreen = 0.039;
-override ambientBlue = 0.039;
+override ambientRed = 0.01;
+override ambientGreen = 0.01;
+override ambientBlue = 0.01;
 
 struct VertexInput {
     @location(0) position: vec3f,
@@ -73,6 +73,7 @@ struct LightUniform {
 @group(3) @binding(0) var<uniform> material: MaterialUniforms;
 @group(3) @binding(1) var baseTexture: texture_2d<f32>;
 @group(3) @binding(2) var baseSampler: sampler;
+@group(3) @binding(3) var roughnessTexture: texture_2d<f32>;
 
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {
@@ -92,7 +93,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
 
-    var finalColor = vec4f(0.0);
+    var finalColor = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0) * baseColor;
     let lightAmount: u32 = arrayLength(&lights);
     let viewDir = normalize(camera.modelMatrix[3] - input.worldPos);
     for (var i: u32 = 0; i < lightAmount; i++) {

@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.3.47",
+		"generator":"Khronos glTF Blender I/O v5.0.21",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -15,18 +15,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Bow",
-			"rotation":[
-				0.005573012866079807,
-				0.14661939442157745,
-				0.037571560591459274,
-				0.9884635210037231
-			],
-			"translation":[
-				2.768414258956909,
-				0.6442434191703796,
-				-3.023057699203491
-			]
+			"name":"Bow"
 		}
 	],
 	"materials":[
@@ -38,7 +27,9 @@
 					"index":0
 				},
 				"metallicFactor":0,
-				"roughnessFactor":0.699999988079071
+				"metallicRoughnessTexture":{
+					"index":1
+				}
 			}
 		}
 	],
@@ -62,6 +53,10 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":1,
+			"source":1
 		}
 	],
 	"images":[
@@ -69,13 +64,18 @@
 			"mimeType":"image/png",
 			"name":"main-texture",
 			"uri":"../../../textures/main-texture.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"main_roughness",
+			"uri":"../../../textures/main_roughness.png"
 		}
 	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":384,
+			"count":410,
 			"max":[
 				0.027910996228456497,
 				0.2418529987335205,
@@ -91,13 +91,13 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":384,
+			"count":410,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":384,
+			"count":410,
 			"type":"VEC2"
 		},
 		{
@@ -110,26 +110,26 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":4608,
+			"byteLength":4920,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":4608,
-			"byteOffset":4608,
+			"byteLength":4920,
+			"byteOffset":4920,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3072,
-			"byteOffset":9216,
+			"byteLength":3280,
+			"byteOffset":9840,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":1152,
-			"byteOffset":12288,
+			"byteOffset":13120,
 			"target":34963
 		}
 	],
@@ -137,12 +137,16 @@
 		{
 			"magFilter":9728,
 			"minFilter":9984
+		},
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":13440,
-			"uri":"bow.bin"
+			"byteLength":14272,
+			"uri":"Bow.bin"
 		}
 	]
 }

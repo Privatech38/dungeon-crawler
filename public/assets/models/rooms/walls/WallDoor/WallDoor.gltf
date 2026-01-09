@@ -1,6 +1,6 @@
 {
 	"asset":{
-		"generator":"Khronos glTF Blender I/O v4.3.47",
+		"generator":"Khronos glTF Blender I/O v5.0.21",
 		"version":"2.0"
 	},
 	"scene":0,
@@ -43,7 +43,9 @@
 					"index":0
 				},
 				"metallicFactor":0,
-				"roughnessFactor":0.699999988079071
+				"metallicRoughnessTexture":{
+					"index":1
+				}
 			}
 		}
 	],
@@ -67,6 +69,10 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":1,
+			"source":1
 		}
 	],
 	"images":[
@@ -74,13 +80,18 @@
 			"mimeType":"image/png",
 			"name":"main-texture",
 			"uri":"../../../../textures/main-texture.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"main_roughness",
+			"uri":"../../../../textures/main_roughness.png"
 		}
 	],
 	"accessors":[
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":2675,
+			"count":2713,
 			"max":[
 				1.3005564212799072,
 				1.3999948501586914,
@@ -96,13 +107,13 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":2675,
+			"count":2713,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":2675,
+			"count":2713,
 			"type":"VEC2"
 		},
 		{
@@ -115,26 +126,26 @@
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":32100,
+			"byteLength":32556,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":32100,
-			"byteOffset":32100,
+			"byteLength":32556,
+			"byteOffset":32556,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":21400,
-			"byteOffset":64200,
+			"byteLength":21704,
+			"byteOffset":65112,
 			"target":34962
 		},
 		{
 			"buffer":0,
 			"byteLength":8082,
-			"byteOffset":85600,
+			"byteOffset":86816,
 			"target":34963
 		}
 	],
@@ -142,11 +153,15 @@
 		{
 			"magFilter":9728,
 			"minFilter":9984
+		},
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":93684,
+			"byteLength":94900,
 			"uri":"WallDoor.bin"
 		}
 	]
