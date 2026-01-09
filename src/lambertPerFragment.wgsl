@@ -72,6 +72,7 @@ struct LightUniform {
 @group(3) @binding(0) var<uniform> material: MaterialUniforms;
 @group(3) @binding(1) var baseTexture: texture_2d<f32>;
 @group(3) @binding(2) var baseSampler: sampler;
+@group(3) @binding(3) var roughnessTexture: texture_2d<f32>;
 
 @vertex
 fn vertex(input: VertexInput) -> VertexOutput {
