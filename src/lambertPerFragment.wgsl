@@ -28,6 +28,7 @@ struct FragmentOutput {
 struct CameraUniforms {
     viewMatrix: mat4x4f,
     projectionMatrix: mat4x4f,
+    modelMatrix: mat4x4f
 }
 
 struct LightUniforms {
@@ -91,9 +92,11 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     let N = vec4f(normalize(input.normal), 0);
 
     let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
+    let rougness = textureSample(roughnessTexture, baseSampler, input.texcoords).g;
 
     var finalColor = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0) * baseColor;
-    var lightAmount: u32 = arrayLength(&lights);
+    let lightAmount: u32 = arrayLength(&lights);
+    let viewDir = normalize(camera.modelMatrix[3] - input.worldPos);
     for (var i: u32 = 0; i < lightAmount; i++) {
         let light = lights[i];
         let lightModelMatrix: mat4x4<f32> = light.globalModelMatrix;
@@ -101,7 +104,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
         if (distance(lightPosition, input.worldPos) > 10) {
             continue;
         }
-        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor);
+        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor, rougness, viewDir);
     }
 
 //    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
@@ -111,7 +114,7 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
     return output;
 }
 
-fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f) -> vec4f {
+fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f, roughness: f32, viewDir: vec4f) -> vec4f {
     let lightDir: vec4f = normalize(lightPosition - position);
     let diff: f32 = max(dot(normal, lightDir), 0.0);
     // Attenuation
@@ -121,9 +124,12 @@ fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, positi
     // Combine
     var ambient = baseColor * vec4f(ambientRed, ambientGreen, ambientBlue, 1.0);
     var diffuse = vec4f(light.color, 1.0) * diff * baseColor;
+    let reflectDir = reflect(-lightDir, normal);
+    var specular = pow(max(dot(viewDir, reflectDir), 0.0), 32) * vec4f(light.color, 1.0) * (1.0 - roughness);
     ambient *= attenuation;
     diffuse *= attenuation;
-    return (ambient + diffuse);
+    specular *= attenuation;
+    return (ambient + diffuse + specular);
 }
 
 fn attenuationFromRange(range: f32, threshold: f32) -> vec3f {
