@@ -52,12 +52,20 @@ class GameManager {
 
     public entityMove() {
         this.entities.forEach((entity: Entity) => {
+            const colidesWith = this.checkCollision(entity);
             // if (this.checkCollision(entity).length !== 0) {return}
             if (entity instanceof Enemy) {
                 if (this.collisionWithWall(entity.getHitbox)) {
                     // return;
                 }
                 entity.update(this.player, this.deltaTime);
+
+                // attck player
+                if (colidesWith.includes(player)) {
+                    console.log("player took damage");
+                    const itIsSoOver = player.takeDamage(entity.attack(this.deltaTime));
+                    // if attack landed do something ig
+                }
             }
         })
     }

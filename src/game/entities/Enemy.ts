@@ -10,12 +10,12 @@ import {Node} from "../../engine/core.js"
 import {Transform} from '../../engine/core/Transform.js';
 // @ts-ignore
 import {mat4, quat, vec3} from 'glm';
+import { MeleeWeapon } from "./items/MeleeWeapon.js";
 
 class Enemy extends Entity {
     movement: Movement;
     node: Node;
-    // weapon: Weapon
-
+    weapon!: Weapon
 
     constructor(
         health: number,
@@ -23,12 +23,15 @@ class Enemy extends Entity {
         hitbox: Hitbox,
         initialPosition: Vector3,
         node: Node,
-        // weapon: Weapon,
     ) {
         super(health, speed, hitbox, initialPosition);
         this.movement = new Movement(initialPosition, speed);
         this.node = node;
-        // this.weapon = weapon
+    }
+
+    public addWeapon(weapon: Weapon) {
+        this.weapon = weapon;
+        // this.node.addChild(weapon.getNode);
     }
 
     private moveTowardsPlayer(player: Player, dt: number) {
@@ -59,9 +62,9 @@ class Enemy extends Entity {
         quat.rotateY(rotation, rotation, angleRadians);
         transform.rotation = rotation;
 
-        if (this.node.getId() === "opozicija_1") {
-            console.log("enemy hitbox:", this.hitbox.center);
-        }
+        // if (this.node.getId() === "opozicija_1") {
+        //     console.log("enemy hitbox:", this.hitbox.center);
+        // }
 
     }
 
@@ -71,8 +74,12 @@ class Enemy extends Entity {
 
     }
 
-    public attack(player: Player) {
-        const playerPosition = player.getPosition;
+    public attack(dt: number): number {
+        return this.weapon.attack(dt)
+    }
+
+    get getNode(): Node {
+        return this.node;
     }
 
 }

@@ -41,10 +41,10 @@ let manager = new GameManager(player, 20);
 await manager.generateWorld();
 let world = manager.getWorld;
 
-const enemyManager = new EnemyManager(world.getMaxSurfaceArea/5, player.getPosition);
+const enemyManager = new EnemyManager(world.getMaxSurfaceArea/5, player.getPosition, scene);
 await enemyManager.init();
 // generate enemies
-await enemyManager.generateEnemies(world.getRooms, scene, manager);
+await enemyManager.generateEnemies(world.getRooms, manager);
 
 const playerNode = gltfLoader.loadNode("Player");
 playerNode.setId("playerNode");

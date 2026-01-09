@@ -30,6 +30,10 @@ export class Node {
     traverse(before?: (node: Node) => any, after?: (node: Node) => boolean) {
         before?.(this);
         for (const child of this.children) {
+            if (!child.traverse) {
+                console.log("child:", child);
+                continue;
+            }
             child.traverse(before, after);
         }
         after?.(this);

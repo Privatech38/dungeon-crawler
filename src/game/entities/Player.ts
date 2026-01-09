@@ -40,6 +40,23 @@ class Player extends Entity {
         })
     }
 
+    // returns true if player is dead
+    public takeDamage(dmg: number): boolean{
+        console.log("dmg:", dmg);
+        this.healthPoints -= dmg;
+
+        if (this.healthPoints <= 0) {
+            // GAME OVER
+            return true;
+        }
+
+        return false;
+    }
+
+    public isDead(): boolean {
+        return this.healthPoints <= 0;
+    }
+
     public move(keys: Set<string>, deltaTime: number) {
         this.movement.move(keys);
         this.position = this.movement.getPosition.clone();
@@ -52,7 +69,6 @@ class Player extends Entity {
     get getSpeed(): number{
         return this.speed;
     }
-
 
 }
 
