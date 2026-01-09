@@ -70,13 +70,15 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"name":"MainMaterial",
+			"name":"TorchMaterial",
 			"pbrMetallicRoughness":{
 				"baseColorTexture":{
 					"index":0
 				},
 				"metallicFactor":0,
-				"roughnessFactor":0.699999988079071
+				"metallicRoughnessTexture":{
+					"index":1
+				}
 			}
 		}
 	],
@@ -100,6 +102,10 @@
 		{
 			"sampler":0,
 			"source":0
+		},
+		{
+			"sampler":1,
+			"source":1
 		}
 	],
 	"images":[
@@ -107,6 +113,11 @@
 			"mimeType":"image/png",
 			"name":"torch-albedo",
 			"uri":"torch-albedo.png"
+		},
+		{
+			"mimeType":"image/png",
+			"name":"torch-roughness",
+			"uri":"torch-roughness.png"
 		}
 	],
 	"accessors":[
@@ -175,6 +186,10 @@
 		{
 			"magFilter":9728,
 			"minFilter":9984
+		},
+		{
+			"magFilter":9729,
+			"minFilter":9987
 		}
 	],
 	"buffers":[
