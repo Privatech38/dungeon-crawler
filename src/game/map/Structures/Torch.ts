@@ -1,7 +1,7 @@
 import {Structure} from "./Structure.js";
 import {Vector3} from "../../../math/Vector.js";
 
-class Tourch extends Structure{
+class Torch extends Structure{
     constructor(center: Vector3, quaternions= [0, 0, 0, 1]) {
         super(center, quaternions);
     }
@@ -10,4 +10,4 @@ class Tourch extends Structure{
     }
 }
 
-export {Tourch};
+export {Torch};

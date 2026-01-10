@@ -1,3 +1,4 @@
+import { compileFunction } from 'vm';
 import {
     Node,
     Transform,
@@ -49,12 +50,7 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
             translation: pillar.getCenter.toArray,
             rotation: pillar.getQuaternions,
         });
-        let translation = pillar.getCenter.toArray;
-        translation[1] = -0.4;
-        let torchTransform = new Transform({
-            translation: translation
-        })
-        await createWallPillar(transform, scene, pillar.getIsCorner ? undefined : torchTransform);
+        await createWallPillar(transform, scene);
     }
 
     for (const floor of world.getFloors()) {
@@ -63,6 +59,14 @@ async function buildWorld(scene: Node, world: World): Promise<void> {
             rotation: floor.getQuaternions,
         }), scene);
     }
+
+    for (const torch of world.getTorches()) {
+        await createTorch(new Transform({
+            translation: torch.getCenter.toArray,
+            rotation: torch.getQuaternions,
+        }), scene);
+    }
+
 }
 
 /**
@@ -115,13 +119,12 @@ export async function createLowerWall(location: Transform, scene: Node): Promise
  * @param {Node} scene the scene to which the wall pillar will be added
  * @param {Transform} torchTransform the rotation of the torch on the wall pillar, pass null if you don't want a torch
  */
-export async function createWallPillar(location: Transform, scene: Node, torchTransform: Transform = null): Promise<void> {
+export async function createWallPillar(location: Transform, scene: Node): Promise<void> {
     const path: string = 'assets/models/rooms/walls/WallPillar/WallPillar.gltf'
     if (!cache.has(path)) {
         const wallPillarLoader = new GLTFLoader();
         await wallPillarLoader.load(path);
         const wallPillar: Node = wallPillarLoader.loadNode('WallPole');
-        console.log('Loaded wall pillar:', wallPillar);
         cache.set(path, wallPillar);
     }
 
@@ -130,10 +133,6 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
     wallPillarClone.isStatic = true;
     wallPillarClone.addComponent(location);
     scene.addChild(wallPillarClone);
-
-    if (torchTransform) {
-        await createTorch(torchTransform, scene);
-    }
 }
 
 /**
