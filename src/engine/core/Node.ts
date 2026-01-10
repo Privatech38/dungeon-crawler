@@ -84,7 +84,13 @@ export class Node {
         let clone = new Node();
         clone.children = this.children.map((child: Node) => child.clone());
         clone.children.forEach((child: Node) => child.parent = clone);
-        clone.components = Array.from(this.components);
+        clone.components = this.components.map((commponent: any) => {
+            if (typeof commponent.clone === 'function') {
+                return commponent.clone();
+            } else {
+                return commponent;
+            }
+        });
 
         return clone;
     }
