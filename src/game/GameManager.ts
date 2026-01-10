@@ -62,7 +62,6 @@ class GameManager {
 
                 // attck player
                 if (colidesWith.includes(player)) {
-                    console.log("player took damage");
                     const itIsSoOver = player.takeDamage(entity.attack(this.deltaTime));
                     // if attack landed do something ig
                 }

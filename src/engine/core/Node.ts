@@ -31,7 +31,6 @@ export class Node {
         before?.(this);
         for (const child of this.children) {
             if (!child.traverse) {
-                console.log("child:", child);
                 continue;
             }
             child.traverse(before, after);

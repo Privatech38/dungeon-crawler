@@ -1,6 +1,7 @@
 import {Enemy} from "/src/game/entities/Enemy.js";
 import {Vector3} from "/src/math/Vector.js";
 import {Room} from "./Room.js";
+import {Floor} from "./Structures/Floor.js"
 import {OBB} from "/src/game/entities/hitboxes/OBB.js";
 import {Transform, Node} from '/src/engine/core.js';
 import {GLTFLoader} from "/src/engine/loaders/GLTFLoader.js"
@@ -12,7 +13,7 @@ class EnemyManager {
     private enemyCount: number = 0;
     private enemyList: Enemy[] = [];
     private enemyNodeList: Node[] = [];
-    private MIN_SAFE_DIST: number = 4;
+    private MIN_SAFE_DIST: number = 5;
     private playerPosition: Vector3;
 
     private scene: Node;
@@ -28,7 +29,7 @@ class EnemyManager {
     MIN_COOLDOWN: number = 0.05;
 
     private SPAWN_CHANCE = 0;
-    private SPAWN_GROWTH = 6;
+    private SPAWN_GROWTH = 1.2;
 
     private ENEMY_NODE: Node;
 
@@ -57,7 +58,7 @@ class EnemyManager {
         await loader.load(meleePath);
         this.MELEE_NODE = loader.loadNode("Sword");
         this.MELEE_NODE.addComponent(new Transform({
-                translation: [0.2, 1, 0.2],
+                translation: [0, 0, 0],
                 rotation: [0, 0, 0, 1],
                 scale: [1, 1, 1]
             }));
@@ -66,37 +67,39 @@ class EnemyManager {
 
     public generateEnemies(rooms: Room[], manager: GameManager): void {
         for (let room of rooms) {
-            if (this.shouldEnemySpawn(room)) {
-                const enemy = this.makeEnemy(room);
-                manager.addEntity(enemy);
+            for (let floor of room.getFloors) {
+                if (this.shouldEnemySpawn(floor)) {
+                    const enemy = this.makeEnemy(floor);
+                    manager.addEntity(enemy);
+                }
             }
         }
     }
 
-    public shouldEnemySpawn(room: Room): boolean {
+    public shouldEnemySpawn(floor: Floor): boolean {
+        console.log("floor:", floor);
+    
         if (this.enemyCount >= this.maxEnemies) return false;
 
         let chance = Math.floor(Math.random() * 1000);
-        console.log(chance, "vs", this.SPAWN_CHANCE);
         if (chance > this.SPAWN_CHANCE) {
             this.SPAWN_CHANCE = Math.floor( (this.SPAWN_CHANCE + 10) * this.SPAWN_GROWTH);
             return false;
         }
 
-        // check if there is space
-        for (let floor of room.getFloors) {
-            if (this.calculateDistToPlayer(floor.getCenter) >= this.MIN_SAFE_DIST) {
-                return true;       
-            }
+        if (floor.getCenter.magnitude() >= this.MIN_SAFE_DIST) {
+            return true;
         }
+
+        // if (this.calculateDistToPlayer(floor.getCenter) >= this.MIN_SAFE_DIST) {
+        //     return true;       
+        // }   
 
         return false;
     }
 
-    public makeEnemy(room: Room): Enemy {
-        const position = this.enemyPosition(room);
-
-        console.log("position:", position);
+    public makeEnemy(floor: Floor): Enemy {
+        const position = floor.getCenter;
 
         const enemyNode = this.makeEnemyNode(new Transform({
             translation: position.toArray,
@@ -109,7 +112,8 @@ class EnemyManager {
             this.enemySpeed(), 
             this.enemyHitbox(position), 
             position, 
-            enemyNode
+            enemyNode,
+            4
         );
 
         const weapon = this.enemyMeleeWeapon(enemy, enemyNode);
@@ -166,7 +170,12 @@ class EnemyManager {
     }
 
     private enemyMeleeWeapon(enemy: Enemy, enemyNode: Node): MeleeWeapon {
-        const weaponNode = this.makeWeaponNode();
+        const weaponNode = this.makeWeaponNode(new Transform({
+            translation: [0.4, 0.7, 0.1],
+            rotation: [ Math.sin(Math.PI / 4), 0, 0, 1],
+            scale: [1, 1, 1]
+        }));
+
         enemyNode.addComponent(weaponNode);
 
         const cooldown = Math.floor(Math.random() * this.MAX_COOLDOWN) + this.MIN_COOLDOWN;
@@ -176,13 +185,11 @@ class EnemyManager {
         return weapon;
     }
 
-    private makeWeaponNode(): Node {
+    private makeWeaponNode(location: Transform): Node {
         const weaponClone = this.MELEE_NODE.clone();
 
         weaponClone.isStatic = false;
         weaponClone.addComponent(location);
-
-        console.log("made enemy weapon:", weaponClone);
 
         weaponClone.setId(`hladno_orozje${this.enemyCount}`);
         return weaponClone;
@@ -195,14 +202,13 @@ class EnemyManager {
         enemyClone.addComponent(location);
         this.scene.addChild(enemyClone);
 
-        console.log("made enemy:", enemyClone, "at", location.translation);
-
         enemyClone.setId(`opozicija_${this.enemyCount+1}`);
         return enemyClone;
     }
 
 
     private calculateDistToPlayer(position: Vector3) {
+
         const dx = position.x - this.playerPosition.x;
         const dy = position.y - this.playerPosition.y;
         const dz = position.z - this.playerPosition.z;

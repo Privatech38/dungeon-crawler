@@ -13,6 +13,7 @@ import {mat4, quat, vec3} from 'glm';
 import { MeleeWeapon } from "./items/MeleeWeapon.js";
 
 class Enemy extends Entity {
+    activeRange: number;
     movement: Movement;
     node: Node;
     weapon!: Weapon
@@ -23,10 +24,12 @@ class Enemy extends Entity {
         hitbox: Hitbox,
         initialPosition: Vector3,
         node: Node,
+        range: number
     ) {
         super(health, speed, hitbox, initialPosition);
         this.movement = new Movement(initialPosition, speed);
         this.node = node;
+        this.activeRange = range
     }
 
     public addWeapon(weapon: Weapon) {
@@ -35,11 +38,17 @@ class Enemy extends Entity {
     }
 
     private moveTowardsPlayer(player: Player, dt: number) {
-
         const playerPosition = player.getPosition;
 
-        const moveVector: Vector3 = playerPosition.subtract(this.position).normalize();
+        let moveVector: Vector3 = playerPosition.subtract(this.position);
 
+        // if player is close enough
+        if (moveVector.magnitude() > this.activeRange) {
+            // player to far 
+            return;
+        }
+        
+        moveVector = moveVector.normalize();
         this.movement.setVelocity(moveVector.x, moveVector.z);
         this.movement.checkMovement(dt);
         this.movement.update();
@@ -61,15 +70,9 @@ class Enemy extends Entity {
         let angleRadians = Math.atan2(moveVector.x, moveVector.z);
         quat.rotateY(rotation, rotation, angleRadians);
         transform.rotation = rotation;
-
-        // if (this.node.getId() === "opozicija_1") {
-        //     console.log("enemy hitbox:", this.hitbox.center);
-        // }
-
     }
 
     public update(player: Player, dt: number): void {
-        console.log("enemy.update");
         this.moveTowardsPlayer(player, dt);
 
     }

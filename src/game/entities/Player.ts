@@ -42,7 +42,6 @@ class Player extends Entity {
 
     // returns true if player is dead
     public takeDamage(dmg: number): boolean{
-        console.log("dmg:", dmg);
         this.healthPoints -= dmg;
 
         if (this.healthPoints <= 0) {
