@@ -5,6 +5,7 @@ import {Entity} from "../entities/Entity.js";
 import {Pillar} from "./Structures/Pillar.js";
 import {Floor} from "./Structures/Floor.js";
 import {BottomWall} from "./Structures/BottomWall.js";
+import { Torche } from "./Structures/Torche.js";
 
 /**
  * Represents a room in a 3D space with walls, pillars, floors, and other elements.
@@ -21,6 +22,7 @@ class Room {
     private readonly corners: Array<Vector3>;
     private ID: number;
     private neighbors: Set<Room>;
+    private readonly Torches: Array<Torche>;
 
     /**
      * Initializes the room with a specified or random size.
@@ -31,6 +33,7 @@ class Room {
         this.pillars = [];
         this.floors = [];
         this.bottomWalls = [];
+        this.Torches = [];
         this.width = 0;
         this.depth = 0;
         this.startPoint = new Vector3(0, 0, 0);
@@ -81,37 +84,10 @@ class Room {
      */
     private generateRoom(): void {
 
-        // Generate bottom pillars and walls
-        this.generatePillar(
-            new Vector3(0, 0, 0).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, 1)
-        );
-        this.generateWalls(
-            new Vector3(1.5, 0, 0).add(this.startPoint), this.width, "horizontal"
-        );
+        // Generate pillars
+        this.generatePillars(this.depth, this.width, this.startPoint.clone());
 
-        // Generate top pillars
-        this.generatePillar(
-            new Vector3(0, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal", new Vector3(0, 0, -1)
-        );
-        this.generateWalls(
-            new Vector3(1.5, 0, this.depth * 3).add(this.startPoint), this.width, "horizontal"
-        );
-
-        // Generate left pillars
-        this.generatePillar(
-            new Vector3(0, 0, 0).add(this.startPoint), this.depth, "vertical", new Vector3(1, 0, 0)
-        );
-        this.generateWalls(
-            new Vector3(0, 0, 1.5).add(this.startPoint), this.depth, "vertical"
-        );
-
-        // Generate right pillars
-        this.generatePillar(
-            new Vector3(this.width * 3, 0, 0).add(this.startPoint), this.depth, "vertical", new Vector3(-1, 0, 0)
-        );
-        this.generateWalls(
-            new Vector3(this.width * 3, 0, 1.5).add(this.startPoint), this.depth, "vertical"
-        );
+        this.generateWalls(this.depth, this.width, this.startPoint.clone());
 
         // Generate floor
         let center = new Vector3(1.5, 0, 1.5).add(this.startPoint);
@@ -129,30 +105,47 @@ class Room {
         }
     }
 
-    /**
-     * Generates a series of pillars along a given direction.
-     * @param center - The starting position for the pillars.
-     * @param amount - The number of pillars to generate.
-     * @param direction - The direction of the pillars ('horizontal' or 'vertical').
-     * @param orientation - The orientation vector for pillar placement.
-     */
-    private generatePillar(center: Vector3, amount: number, direction: string, orientation: Vector3): void {
-        for (let i = 0; i <= amount; i++) {
-            let pillar;
-            if (i === 0 || i === amount - 1) {
-                pillar = new Pillar(center.clone(), false, orientation);
-            } else {
-                pillar = new Pillar(center.clone(), true, orientation);
+    private generatePillars(x: number, y: number, start: Vector3): void {
+        let isCorner = false;
+
+        for (let i = 0; i < x; i++) {
+            for (let j = 0; j < y; j++) {
+                if (i === 0 && j === 0 || i === x - 1 && j === y - 1) {
+                    isCorner = true;
+                }
+
+                if (i === 0 || j === 0 || i === x - 1 || j === y - 1) {
+                    const pillar = new Pillar(new Vector3(i * 3, 0, j * 3).add(start), isCorner, new Vector3(0, 1, 0));
+                    pillar.rotate(["Y"], 90);
+                    pillar.rotate(["Y"], 90);
+                    pillar.rotate(["Y"], 90);
+                    this.pillars.push(pillar);
+                }
             }
-            if (direction === 'horizontal') {
-                center.x += 3;
-            } else {
-                center.z += 3;
+        }
+    }
+
+
+    private generateWalls(x: number, y: number, start: Vector3): void {
+        for (let i = 0; i < x; i++) {
+            for (let j = 0; j < y; j++) {
+                let orientation = (i === 0 || i === x - 1) ? 0 : Number(j === 0 || j === y - 1) * 1;
+                const wall = new Wall(orientation * 90, new Vector3(i * 3, 0, j * 3)
+                    .add(start)
+                    .add(new Vector3(1.5 * orientation, 0, 1.5 * (orientation - 1))));
+                const bottomWall = new BottomWall(orientation * 90, new Vector3(i * 3, 0, j * 3)
+                    .add(start)
+                    .add(new Vector3(1.5 * orientation, 0, 1.5 * (orientation - 1))));
+                if (orientation === 0) {
+                    wall.rotateHitbox();
+                    wall.rotate(["Y"], 90, 0, false);
+                    bottomWall.rotate(["Y"], 90, 0, false);
+                }
+                bottomWall.rotate(["Y"], 180);
+                this.bottomWalls.push(bottomWall);
+                wall.rotate(["Y", "X", "Z"], 180)
+                this.walls.push(wall);
             }
-            pillar.rotate(["Y"], 90);
-            pillar.rotate(["Y"], 90);
-            pillar.rotate(["Y"], 90);
-            this.pillars.push(pillar);
         }
     }
 
@@ -162,7 +155,7 @@ class Room {
      * @param amount - The number of walls to generate.
      * @param direction - The direction of the walls ('horizontal' or 'vertical').
      */
-    private generateWalls(center: Vector3, amount: number, direction: string): void {
+    private generateWall(center: Vector3, amount: number, direction: string): void {
         for (let i = 0; i < amount; i++) {
             let wall;
             let bottomWall;

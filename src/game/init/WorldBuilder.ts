@@ -121,6 +121,7 @@ export async function createWallPillar(location: Transform, scene: Node, torchTr
         const wallPillarLoader = new GLTFLoader();
         await wallPillarLoader.load(path);
         const wallPillar: Node = wallPillarLoader.loadNode('WallPole');
+        console.log('Loaded wall pillar:', wallPillar);
         cache.set(path, wallPillar);
     }
 
