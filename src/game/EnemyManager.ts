@@ -57,7 +57,7 @@ class EnemyManager {
         await loader.load(meleePath);
         this.MELEE_NODE = loader.loadNode("Sword");
         this.MELEE_NODE.addComponent(new Transform({
-                translation: [1, 1, 1],
+                translation: [0.2, 1, 0.2],
                 rotation: [0, 0, 0, 1],
                 scale: [1, 1, 1]
             }));
@@ -114,7 +114,7 @@ class EnemyManager {
 
         const weapon = this.enemyMeleeWeapon(enemy, enemyNode);
         enemy.addWeapon(weapon);
-        this.scene.addChild(weapon.getNode);
+        enemyNode.addChild(weapon.getNode);
 
         this.enemyList.push(enemy);
         this.enemyNodeList.push(enemyNode);

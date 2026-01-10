@@ -25,8 +25,10 @@ import {getGlobalModelMatrix} from "./engine/core/SceneUtils.js";
 // @ts-ignore
 import { vec3, mat4 } from 'glm';
 
-let gamePaused = false;
-let gameOver = false;
+export const GameState = {
+    paused: false,
+    gameOver: false
+};
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const renderer = new Renderer(canvas);
@@ -57,7 +59,9 @@ const playerNode = gltfLoader.loadNode("Player");
 playerNode.setId("playerNode");
 const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
 playerArmatureNode.setId("playerArmatureNode");
-playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
+
+const playerControler = new PlayerController(playerNode, playerArmatureNode, canvas, manager);
+playerNode.addComponent(playerControler);
 
 // @ts-ignore
 const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera));
@@ -65,7 +69,8 @@ const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera))
 await initialize(scene, playerNode, world);
 
 function update(time: number, dt: number) {
-    if (gamePaused || gameOver) {
+    if(GameState.gameOver) {
+        showMessage();
 
         return;
     }
@@ -78,8 +83,7 @@ function update(time: number, dt: number) {
     });
 
     if (player.isDead()) {
-        showDeathMessage();
-        gameOver = true;
+        GameState.gameOver = true;
     }
 }
 
@@ -104,7 +108,7 @@ function resize({ displaySize: { width, height }}: { displaySize: { width: numbe
     camera.getComponentOfType(Camera).aspect = width / height;
 }
 
-function showDeathMessage(message = "YOU DIED") {
+function showMessage(message = "YOU DIED") {
     const el = document.getElementById("death-screen");
     if (!el) return;
 
