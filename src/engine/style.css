@@ -54,3 +54,16 @@ body, html {
       0% { transform: rotate(0deg); }
     100% { transform: rotate(1800deg); }
 }
+
+#death-screen {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  color: red;
+  font-size: 48px;
+  font-family: monospace;
+  z-index: 9999;
+}

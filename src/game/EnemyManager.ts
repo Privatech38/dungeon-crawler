@@ -17,15 +17,15 @@ class EnemyManager {
 
     private scene: Node;
 
-    private MELEE_DMG = 5;
+    private MELEE_DMG = 2;
     private MELEE_SPAWN_CHANCE = 750
     private MELEE_NODE: Node;
 
     private PROJECTILE_DMG = 5;
     private PROJECTILE_SPAWN_CHANCE = 1000 - this.MELEE_SPAWN_CHANCE;
 
-    MAX_COOLDOWN: number = 0.015;
-    MIN_COOLDOWN: number = 0.005;
+    MAX_COOLDOWN: number = 0.15;
+    MIN_COOLDOWN: number = 0.05;
 
     private SPAWN_CHANCE = 0;
     private SPAWN_GROWTH = 6;

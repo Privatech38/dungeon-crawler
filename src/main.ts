@@ -25,6 +25,9 @@ import {getGlobalModelMatrix} from "./engine/core/SceneUtils.js";
 // @ts-ignore
 import { vec3, mat4 } from 'glm';
 
+let gamePaused = false;
+let gameOver = false;
+
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const renderer = new Renderer(canvas);
 await renderer.initialize();
@@ -62,6 +65,11 @@ const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera))
 await initialize(scene, playerNode, world);
 
 function update(time: number, dt: number) {
+    if (gamePaused || gameOver) {
+
+        return;
+    }
+
     manager.update(dt);
     scene.traverse((node: Node) => {
         for (const component of node.components) {
@@ -69,7 +77,10 @@ function update(time: number, dt: number) {
         }
     });
 
-    // if (player.isDead())
+    if (player.isDead()) {
+        showDeathMessage();
+        gameOver = true;
+    }
 }
 
 // Set cached light nodes
@@ -91,6 +102,14 @@ function render() {
 
 function resize({ displaySize: { width, height }}: { displaySize: { width: number; height: number } }) {
     camera.getComponentOfType(Camera).aspect = width / height;
+}
+
+function showDeathMessage(message = "YOU DIED") {
+    const el = document.getElementById("death-screen");
+    if (!el) return;
+
+    el.textContent = message;
+    el.style.display = "flex";
 }
 
 new ResizeSystem({ canvas, resize }).start();
