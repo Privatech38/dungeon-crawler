@@ -1,11 +1,11 @@
-import {Random} from "../../math/Random.js";
-import {Wall} from "./Structures/Wall.js";
-import {Vector3} from "../../math/Vector.js";
-import {Entity} from "../entities/Entity.js";
-import {Pillar} from "./Structures/Pillar.js";
-import {Floor} from "./Structures/Floor.js";
-import {BottomWall} from "./Structures/BottomWall.js";
-import { Torch } from "./Structures/Torch.js";
+import {Random} from "../../math/Random";
+import {Wall} from "./Structures/Wall";
+import {Vector3} from "../../math/Vector";
+import {Entity} from "../entities/Entity";
+import {Pillar} from "./Structures/Pillar";
+import {Floor} from "./Structures/Floor";
+import {BottomWall} from "./Structures/BottomWall";
+import { Torch } from "./Structures/Torch";
 import { RotateQuat } from '../../math/RotateQuat';
 import { quat } from 'glm';
 

@@ -1,4 +1,3 @@
-import { compileFunction } from 'vm';
 import {
     Node,
     Transform,
