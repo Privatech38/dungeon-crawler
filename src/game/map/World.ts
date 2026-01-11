@@ -1,11 +1,12 @@
-import { Room } from "./Room";
-import { MapGenerator } from "./MapGenerator";
-import { Structure } from "./Structures/Structure";
-import {Wall} from "./Structures/Wall";
-import {Pillar} from "./Structures/Pillar";
-import {Floor} from "./Structures/Floor";
-import {BottomWall} from "./Structures/BottomWall";
-import {AddDoors} from "./AddDoors";
+import { Room } from "./Room.js";
+import { MapGenerator } from "./MapGenerator.js";
+import { Structure } from "./Structures/Structure.js";
+import {Wall} from "./Structures/Wall.js";
+import {Pillar} from "./Structures/Pillar.js";
+import {Floor} from "./Structures/Floor.js";
+import {BottomWall} from "./Structures/BottomWall.js";
+import {AddDoors} from "./AddDoors.js";
+import { Vector3 } from "math/Vector.js";
 import { Torch } from "./Structures/Torch";
 import { Vector3 } from "math/Vector";
 

@@ -16,6 +16,9 @@ import {Hitbox} from "./entities/hitboxes/Hitbox";
 import {player} from "./enteties";
 
 class GameManager {
+    private deathAudio = new Audio("/assets/sounds/fah.mp3");
+    private hitAudio   = new Audio("/assets/sounds/rah.mp3");
+
     private entities: Set<Entity>;
     private readonly player: Player;
 
@@ -62,8 +65,14 @@ class GameManager {
 
                 // attck player
                 if (colidesWith.includes(player)) {
-                    const itIsSoOver = player.takeDamage(entity.attack(this.deltaTime));
-                    // if attack landed do something ig
+                    const dmg = entity.attack(this.deltaTime);
+                    if (dmg > 0) {
+                        this.hitAudio.play();
+                    }
+                    const itIsSoOver = player.takeDamage(dmg);
+                    if (itIsSoOver) {
+                        this.deathAudio.play();
+                    }
                 }
             }
         })
