@@ -16,8 +16,8 @@ import {Hitbox} from "./entities/hitboxes/Hitbox";
 import {player} from "./enteties";
 
 class GameManager {
-    private deathAudio = new Audio("/public/assets/sounds/fah.mp3");
-    private hitAudio   = new Audio("/public/assets/sounds/rah.mp3");
+    private deathAudio = new Audio("/assets/sounds/fah.mp3");
+    private hitAudio   = new Audio("/assets/sounds/rah.mp3");
 
     private entities: Set<Entity>;
     private readonly player: Player;
