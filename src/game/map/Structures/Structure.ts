@@ -7,14 +7,14 @@ type Axis = "X" | "Y" | "Z";
  */
 abstract class Structure {
     // The center of the structure represented as a Vector3 object.
-    protected readonly center: Vector3;
+    public center: Vector3;
 
     /**
      * Quaternions representing the wall's rotation.
      * @private
      * @type {number[]}
      */
-    protected quaternions: number[];
+    public quaternions: number[];
 
     /**
      * Constructor to initialize the center of the structure.
@@ -37,7 +37,7 @@ abstract class Structure {
         })
     }
 
-    protected rotateQuaternion(axis: Axis, angleDeg: number): number[] {
+    public rotateQuaternion(axis: Axis, angleDeg: number): number[] {
         const angleRad = (angleDeg * Math.PI) / 180; // Convert degrees to radians
         const halfAngle = angleRad / 2;
 
