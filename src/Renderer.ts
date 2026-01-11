@@ -19,6 +19,19 @@ import {
 import lamberPerFragment from './lambertPerFragment.wgsl';
 import {KHRLightExtension} from "./gpu/object/KhronosLight";
 
+// Fog parameters
+const fogColor = [0.05, 0.2, 0.1];
+const fogDensity = 0.08
+const fogGroundY  = 0.0;
+const fogHeight   = 1.5;
+const fogDistance = 20.0;
+
+
+const fogData = new Float32Array([
+    fogColor[0], fogColor[1], fogColor[2], fogDensity,
+    fogGroundY, fogHeight, fogDistance, 0.0
+]);
+
 const vertexBufferLayout: GPUVertexBufferLayout = {
     arrayStride: 32,
     attributes: [
@@ -257,7 +270,7 @@ export class Renderer extends BaseRenderer {
         }
 
         const cameraUniformBuffer = this.device.createBuffer({
-            size: 192,
+            size: 244,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
         });
 
@@ -360,6 +373,11 @@ export class Renderer extends BaseRenderer {
         this.device.queue.writeBuffer(cameraUniformBuffer, 0, viewMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 64, projectionMatrix);
         this.device.queue.writeBuffer(cameraUniformBuffer, 128, modelMatrix);
+        // fog
+        this.device.queue.writeBuffer(cameraUniformBuffer, 192, fogData);
+        // this.device.queue.writeBuffer(cameraUniformBuffer, 192, fogColor);
+        // this.device.queue.writeBuffer(cameraUniformBuffer, 204, new Float32Array([fogNear]));
+        // this.device.queue.writeBuffer(cameraUniformBuffer, 208 - 4, new Float32Array([fogFar]));
         this.renderPass.setBindGroup(0, cameraBindGroup);
 
         // Update lights

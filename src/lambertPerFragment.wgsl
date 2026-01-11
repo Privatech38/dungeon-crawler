@@ -25,11 +25,26 @@ struct FragmentOutput {
     @location(0) color: vec4f,
 }
 
+// struct CameraUniforms {
+//     viewMatrix: mat4x4f,
+//     projectionMatrix: mat4x4f,
+//     modelMatrix: mat4x4f
+// }
+
 struct CameraUniforms {
     viewMatrix: mat4x4f,
     projectionMatrix: mat4x4f,
-    modelMatrix: mat4x4f
+    modelMatrix: mat4x4f,
+
+    fogColor: vec3f,
+    fogDensity: f32,
+
+    fogGroundY: f32,
+    fogHeight: f32,
+    fogDistance: f32,
+    _padding: f32,
 }
+
 
 struct LightUniforms {
     color: vec3f,
@@ -91,28 +106,69 @@ fn fragment(input: FragmentInput) -> FragmentOutput {
 
     let N = vec4f(normalize(input.normal), 0);
 
-    let baseColor = textureSample(baseTexture, baseSampler, input.texcoords) * material.baseFactor;
-    let rougness = textureSample(roughnessTexture, baseSampler, input.texcoords).g;
+    let baseColor = textureSample(baseTexture, baseSampler, input.texcoords)
+                    * material.baseFactor;
+    let roughness = textureSample(roughnessTexture, baseSampler, input.texcoords).g;
 
     var finalColor = vec4f(ambientRed, ambientGreen, ambientBlue, 1.0) * baseColor;
+
     let lightAmount: u32 = arrayLength(&lights);
     let viewDir = normalize(camera.modelMatrix[3] - input.worldPos);
+
     for (var i: u32 = 0; i < lightAmount; i++) {
         let light = lights[i];
-        let lightModelMatrix: mat4x4<f32> = light.globalModelMatrix;
-        let lightPosition: vec4f = lightModelMatrix[3];
-        if (distance(lightPosition, input.worldPos) > 10) {
+        let lightPosition: vec4f = light.globalModelMatrix[3];
+
+        if (distance(lightPosition, input.worldPos) > 10.0) {
             continue;
         }
-        finalColor += calculatePointLight(light.extension, lightPosition, N, input.worldPos, baseColor, rougness, viewDir);
+
+        finalColor += calculatePointLight(
+            light.extension,
+            lightPosition,
+            N,
+            input.worldPos,
+            baseColor,
+            roughness,
+            viewDir
+        );
     }
 
-//    let finalColor = baseColor * vec4f(light.color * lambert + material.ambientColor, 1);
+    // fog
+    let cameraPos = camera.modelMatrix[3].xyz;
+    let dist = distance(cameraPos, input.worldPos.xyz);
 
-    output.color = pow(finalColor, vec4(1 / 2.2));
+    // Height fog (feet)
+    let groundY = camera.fogGroundY;
+    // let heightFogFactor = heightFog(
+    //     input.worldPos.y,
+    //     groundY,
+    //     camera.fogHeight
+    // );
 
+    let heightFogFactor = heightFog(
+        input.worldPos.y,
+        camera.fogGroundY,
+        camera.fogHeight
+    );
+
+    let distanceFog = clamp(dist / camera.fogDistance, 0.0, 1.0);
+    let fogFactor = clamp(heightFogFactor * distanceFog, 0.0, 1.0);
+
+    finalColor = mix(finalColor, vec4f(camera.fogColor, 1.0), fogFactor);
+
+    // Distance fog (softens far fade)
+    // let distanceFog = clamp(dist / camera.fogDistance, 0.0, 1.0);
+
+    // let fogFactor = heightFogFactor * distanceFog;
+
+    // let fogColor = vec4f(camera.fogColor, 1.0);
+    // finalColor = mix(finalColor, fogColor, fogFactor);
+
+    output.color = pow(finalColor, vec4f(1.0 / 2.2));
     return output;
 }
+
 
 fn calculatePointLight(light: Light, lightPosition: vec4f, normal: vec4f, position: vec4f, baseColor: vec4f, roughness: f32, viewDir: vec4f) -> vec4f {
     let lightDir: vec4f = normalize(lightPosition - position);
@@ -139,3 +195,20 @@ fn attenuationFromRange(range: f32, threshold: f32) -> vec3f {
     let quadraticAttenuation: f32 = (1.0 / t - constantAttenuation) / (range * range);
     return vec3f(constantAttenuation, linearAttenuation, quadraticAttenuation);
 }
+
+fn computeFogFactor(distance: f32, density: f32) -> f32 {
+    let fog = 1.0 - exp(-distance * density);
+    return clamp(fog, 0.0, 1.0);
+}
+
+fn heightFog(
+    worldY: f32,
+    groundY: f32,
+    height: f32
+) -> f32 {
+    let h = clamp((worldY - groundY) / height, 0.0, 1.0);
+
+    // Softer curve: thinner at feet, smooth fade upward
+    return exp(-h * 2.0);
+}
+
