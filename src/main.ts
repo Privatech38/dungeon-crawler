@@ -17,16 +17,18 @@ import {PlayerController} from "./game/PlayerController";
 import {GameManager} from "./game/GameManager";
 import {player} from "./game/enteties";
 import {ShadowMapRenderer} from "./engine/renderers/ShadowMapRenderer";
+
+import {EnemyManager} from "./game/EnemyManager.js";
 import {KHRLightExtension, LightType} from "./gpu/object/KhronosLight";
 // @ts-ignore
 import {getGlobalModelMatrix} from "./engine/core/SceneUtils.js";
 // @ts-ignore
 import { vec3, mat4 } from 'glm';
 
-
-let manager = new GameManager(player, 20);
-manager.generateWorld();
-let world = manager.getWorld;
+export const GameState = {
+    paused: false,
+    gameOver: false
+};
 
 const canvas: HTMLCanvasElement = <HTMLCanvasElement>document.querySelector('canvas');
 const renderer = new Renderer(canvas);
@@ -42,10 +44,24 @@ await shadowRenderer.initialize();
 const gltfLoader = new GLTFLoader();
 await gltfLoader.load('./assets/default/DefaultScene.gltf');
 
-const scene: Node = gltfLoader.loadScene(gltfLoader.defaultScene);
-const playerNode: Node = gltfLoader.loadNode("Player");
-const playerArmatureNode: Node = gltfLoader.loadNode("PlayerArmature");
-playerNode.addComponent(new PlayerController(playerNode, playerArmatureNode, canvas, manager));
+const scene = gltfLoader.loadScene(gltfLoader.defaultScene);
+
+let manager = new GameManager(player, 20);
+await manager.generateWorld();
+let world = manager.getWorld;
+
+const enemyManager = new EnemyManager(world.getMaxSurfaceArea/5, player.getPosition, scene);
+await enemyManager.init();
+// generate enemies
+await enemyManager.generateEnemies(world.getRooms, manager);
+
+const playerNode = gltfLoader.loadNode("Player");
+playerNode.setId("playerNode");
+const playerArmatureNode = gltfLoader.loadNode("PlayerArmature");
+playerArmatureNode.setId("playerArmatureNode");
+
+const playerControler = new PlayerController(playerNode, playerArmatureNode, canvas, manager);
+playerNode.addComponent(playerControler);
 
 // @ts-ignore
 const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera));
@@ -53,12 +69,22 @@ const camera: Node = scene.find((node: Node) => node.getComponentOfType(Camera))
 await initialize(scene, playerNode, world);
 
 function update(time: number, dt: number) {
+    if(GameState.gameOver) {
+        showMessage();
+
+        return;
+    }
+
     manager.update(dt);
     scene.traverse((node: Node) => {
         for (const component of node.components) {
             component.update?.(time, dt);
         }
     });
+
+    if (player.isDead()) {
+        GameState.gameOver = true;
+    }
 }
 
 // Set cached light nodes
@@ -80,6 +106,14 @@ function render() {
 
 function resize({ displaySize: { width, height }}: { displaySize: { width: number; height: number } }) {
     camera.getComponentOfType(Camera).aspect = width / height;
+}
+
+function showMessage(message = "YOU DIED") {
+    const el = document.getElementById("death-screen");
+    if (!el) return;
+
+    el.textContent = message;
+    el.style.display = "flex";
 }
 
 new ResizeSystem({ canvas, resize }).start();

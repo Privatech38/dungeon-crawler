@@ -378,6 +378,7 @@ export class Renderer extends BaseRenderer {
 
         const { modelUniformBuffer, modelBindGroup } = this.prepareNode(node);
         this.device.queue.writeBuffer(modelUniformBuffer, 0, modelMatrix);
+
         this.device.queue.writeBuffer(modelUniformBuffer, 64, normalMatrix);
         this.renderPass.setBindGroup(2, modelBindGroup);
 
@@ -429,6 +430,7 @@ export class Renderer extends BaseRenderer {
 
     renderModel(model: Model) {
         for (const primitive of model.primitives) {
+            if (!primitive.material || !primitive.material.baseTexture) continue;
             this.renderPrimitive(primitive);
         }
     }

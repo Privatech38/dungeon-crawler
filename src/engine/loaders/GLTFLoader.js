@@ -452,7 +452,8 @@ export class GLTFLoader {
     loadNode(nameOrIndex) {
         const gltfSpec = this.findByNameOrIndex(this.gltf.nodes, nameOrIndex);
         if (!gltfSpec) {
-            return null;
+            // return null;
+            throw new Error("cnat find" + nameOrIndex);
         }
         if (this.cache.has(gltfSpec)) {
             return this.cache.get(gltfSpec);

@@ -15,7 +15,7 @@ class Movement {
 
     checkMovement(deltaTime: number): Vector3 {
         this.temp.x = this.position.x + this.velocity.x * deltaTime;
-        this.temp.z = this.position.y + this.velocity.y * deltaTime;
+        this.temp.z = this.position.z + this.velocity.z * deltaTime;
         return this.temp.clone();
     }
 

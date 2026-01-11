@@ -1,7 +1,7 @@
 import {Entity} from "./entities/Entity.js";
 import {Player} from "./entities/Player.js";
 import {PlayerMovement} from "./entities/PlayerMovement.js";
-import { World } from "./map/World.js";
+import {World} from "./map/World.js";
 import {Room} from "./map/Room.js";
 import {CollisionManager} from "./entities/hitboxes/Collision.js";
 import {Enemy} from "./entities/Enemy.js";
@@ -10,6 +10,7 @@ import {Wall} from "./map/Structures/Wall.js";
 import {Vector3} from "../math/Vector.js";
 import {OBB} from "./entities/hitboxes/OBB.js";
 import {Weapon} from "./entities/items/Weapon.js";
+import { MeleeWeapon } from "./entities/items/MeleeWeapon.js";
 import {Projectile} from "./attack/types/Projectile.js";
 import {Hitbox} from "./entities/hitboxes/Hitbox";
 import {player} from "./enteties";
@@ -21,12 +22,11 @@ class GameManager {
     private deltaTime: number;
     private readonly world: World;
 
-
     constructor(player: Player, worldSurfaceArea: number) {
         this.player = player;
         this.deltaTime = 0;
         this.entities = new Set<Entity>;
-        this.world = new World(worldSurfaceArea);
+        this.world = new World(worldSurfaceArea, player.getInitialPosition);
     }
 
     public update(dt: number): void {
@@ -52,17 +52,24 @@ class GameManager {
 
     public entityMove() {
         this.entities.forEach((entity: Entity) => {
-            if (this.checkCollision(entity).length !== 0) {return}
+            const colidesWith = this.checkCollision(entity);
+            // if (this.checkCollision(entity).length !== 0) {return}
             if (entity instanceof Enemy) {
                 if (this.collisionWithWall(entity.getHitbox)) {
-                    return;
+                    // return;
                 }
-                entity.update(this.player)
+                entity.update(this.player, this.deltaTime);
+
+                // attck player
+                if (colidesWith.includes(player)) {
+                    const itIsSoOver = player.takeDamage(entity.attack(this.deltaTime));
+                    // if attack landed do something ig
+                }
             }
         })
     }
 
-    public generateWorld() {
+    public async generateWorld() {
         this.world.generateWorld();
     }
 

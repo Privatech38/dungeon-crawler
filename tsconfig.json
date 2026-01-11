@@ -10,6 +10,7 @@
     "strict": true,
     "skipLibCheck": true,
     "downlevelIteration": true,
+    "allowJs": true,
     "types": ["@webgpu/types"],
     "baseUrl": "src",
     "paths": {
