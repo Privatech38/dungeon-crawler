@@ -7,6 +7,7 @@ import {Floor} from "./Structures/Floor.js";
 import {BottomWall} from "./Structures/BottomWall.js";
 import {AddDoors} from "./AddDoors.js";
 import { Vector3 } from "math/Vector.js";
+import { Torch } from "./Structures/Torch";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.
@@ -162,6 +163,10 @@ class World {
             })
         })
         return uniquePillar;
+    }
+
+    public getTorches(): Torch[] {
+        return this.rooms.flatMap((room: Room) => room.getTorches);
     }
 
     get getGrid(): number[][] {
