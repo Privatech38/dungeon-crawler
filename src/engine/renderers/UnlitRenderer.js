@@ -13,6 +13,10 @@ import {
 
 import { BaseRenderer } from './BaseRenderer.ts';
 
+const FOG_COLOR = [0.5, 0.6, 0.7, 1.0];
+const FOG_START = 10.0;
+const FOG_END = 100.0;
+
 const vertexBufferLayout = {
     arrayStride: 20,
     attributes: [

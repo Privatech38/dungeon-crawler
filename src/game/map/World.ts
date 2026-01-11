@@ -8,7 +8,6 @@ import {BottomWall} from "./Structures/BottomWall.js";
 import {AddDoors} from "./AddDoors.js";
 import { Vector3 } from "math/Vector.js";
 import { Torch } from "./Structures/Torch";
-import { Vector3 } from "math/Vector";
 
 /**
  * Represents a World composed of Rooms, with a maximum allowable surface area.

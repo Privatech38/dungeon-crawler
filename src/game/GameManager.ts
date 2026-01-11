@@ -71,6 +71,7 @@ class GameManager {
                     }
                     const itIsSoOver = player.takeDamage(dmg);
                     if (itIsSoOver) {
+                        this.hitAudio.pause();
                         this.deathAudio.play();
                     }
                 }
